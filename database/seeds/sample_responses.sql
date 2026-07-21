@@ -1,0 +1,39 @@
+-- =====================================================================
+-- sample_responses.sql
+-- =====================================================================
+--
+-- Cohorte sintetica de 24 respuestas completadas al benchmark, para poder
+-- probar el calculo de percentiles, la pantalla de resultados y el PDF sin
+-- depender de que existan usuarios reales.
+--
+-- >>> DATOS FALSOS. SOLO EN LOCAL. <<<
+-- Cargar esto en staging contaminaria la cohorte real y falsearia el percentil
+-- de los operadores de verdad.
+--
+-- DEPENDE DE benchmark_instrument_v1.sql: cargar el instrumento PRIMERO, o no
+-- existiran las preguntas ni las opciones a las que apuntan estas respuestas.
+--
+-- Por que 24 y no menos: la regla anti-desanonimizacion
+-- (app.benchmark.min-cohort-size-for-percentile = 5) oculta el percentil con
+-- cohortes pequenas, y con pocas filas el percentil no se distribuye lo
+-- suficiente como para que un error de calculo se note.
+--
+-- Los puntajes se reparten a lo largo de todo el rango, en cuatro grupos de
+-- madurez creciente, con variacion dentro de cada grupo. Hace falta gente en
+-- los extremos para detectar errores de borde: el mejor y el peor de la
+-- cohorte deben dar percentil 1.0000 y 0.0000.
+--
+-- global_score, maturity_level, percentile y cohort_size NO se escriben a mano:
+-- los calcula este mismo archivo a partir de las respuestas, para que los datos
+-- sean coherentes entre si. En produccion ese calculo lo hace el servidor.
+--
+-- Correos con dominio .local e IP de los rangos reservados para documentacion
+-- (RFC 5737): nada de esto puede confundirse con datos reales.
+--
+-- Idempotente: se puede ejecutar varias veces sin duplicar ni fallar.
+--
+-- Carga:
+--   docker exec -i dcplatform-postgres psql -U dcplatform -d dcplatform \
+--     < database/seeds/sample_responses.sql
+-- =====================================================================
+

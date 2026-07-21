@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Tokens de diseno. Valores de arranque para que el proyecto compile.
+  La Disenadora los reemplaza con la paleta real del cliente desde design/tokens/tokens.json.
+  Estos mismos tokens alimentan el template del PDF.
+*/
+:root {
+  --color-forest: #1f4d3a;
+  --color-forest-dark: #12301f;
+  --color-forest-light: #3d7a5f;
+  --color-gold: #c9a227;
+  --color-gold-dark: #9a7a17;
+  --color-ink: #14181a;
+  --color-paper: #ffffff;
+}
+
+body {
+  color: var(--color-ink);
+  background: var(--color-paper);
+}

@@ -1,0 +1,27 @@
+-- =====================================================================
+-- admin_user_dev.sql
+-- =====================================================================
+--
+-- Usuarios internos para entrar al dashboard en DESARROLLO LOCAL.
+--
+-- >>> SOLO EN LOCAL. NUNCA CARGAR ESTE ARCHIVO EN STAGING. <<<
+-- La contrasena de estas cuentas es de juguete y esta escrita mas abajo en
+-- claro. En staging los usuarios internos se crean a mano, uno por persona y
+-- con contrasenas propias.
+--
+-- Contrasena de las dos cuentas:  benchmark-local-dev
+--
+-- El hash es BCrypt de coste 10 ($2a$), compatible con el
+-- BCryptPasswordEncoder de Spring Security. Se generó con pgcrypto:
+--   SELECT crypt('benchmark-local-dev', gen_salt('bf', 10));
+--
+-- Los correos usan el dominio .local, que por definicion no existe en Internet:
+-- ninguno puede confundirse con el de una persona real ni recibir correo.
+--
+-- Idempotente: se puede ejecutar varias veces sin duplicar ni fallar.
+--
+-- Carga:
+--   docker exec -i dcplatform-postgres psql -U dcplatform -d dcplatform \
+--     < database/seeds/admin_user_dev.sql
+-- =====================================================================
+

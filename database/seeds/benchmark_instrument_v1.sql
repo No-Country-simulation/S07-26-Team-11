@@ -1,0 +1,30 @@
+-- =====================================================================
+-- benchmark_instrument_v1.sql
+-- =====================================================================
+--
+-- Instrumento del benchmark de madurez, version 1.
+--
+-- >>> CONTENIDO PROVISIONAL <<<
+-- Las preguntas, las opciones y los PESOS de este archivo son INVENTADOS.
+-- Sirven para desarrollar y probar el flujo completo mientras el cliente no
+-- entregue el cuestionario definitivo. NO presentar a nadie un puntaje ni un
+-- percentil calculado con estos pesos: no significan nada.
+-- Cuando llegue el instrumento real se crea benchmark_instrument_v2.sql; este
+-- archivo no se edita.
+--
+-- Estructura: 5 dimensiones x 3 preguntas x 4 opciones.
+--   - weight de cada dimension: 0.2000. Las cinco suman 1.0000.
+--   - score de cada opcion en escala 0..100 (0.00 / 33.33 / 66.67 / 100.00),
+--     de menor a mayor madurez. El puntaje global queda tambien en 0..100.
+--   - El score NUNCA se expone al cliente.
+--
+-- Los UUID son literales y fijos a proposito: sample_responses.sql apunta a
+-- estas preguntas y opciones, y deben ser las mismas en la maquina de cada
+-- persona.
+--
+-- Idempotente: se puede ejecutar varias veces sin duplicar ni fallar.
+--
+-- Carga:
+--   docker exec -i dcplatform-postgres psql -U dcplatform -d dcplatform \
+--     < database/seeds/benchmark_instrument_v1.sql
+-- =====================================================================
