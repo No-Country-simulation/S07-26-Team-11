@@ -1,6 +1,6 @@
 # testing/ — Plan de pruebas, colecciones y reportes
 
-**Responsable principal:** Vanina Restelli — QA Tester
+**Responsable principal:** Pamela Calafate — QA Tester
 **Objetivo:** verificar que el sistema hace lo que dice, y dejar constancia de qué se probó y con qué resultado.
 
 > Si esta persona cambia, **actualiza esta línea en el mismo PR de la reasignación.**
