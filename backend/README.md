@@ -55,28 +55,89 @@ donde Flyway las busca. No copies archivos `.sql` a `src/main/resources`.
 
 ## Cómo ejecutarlo localmente
 
+La base de datos del proyecto es **Supabase** (PostgreSQL 17 gestionado). Ver [ADR-0004](docs/architecture/adr/0004-supabase-postgres.md).
+
 ```bash
 # 1. Variables de entorno
-cp .env.example .env      # y completar
+cp .env.example .env
+# Pide los valores de DB_URL, DB_USER y DB_PASSWORD por el chat privado del equipo
+# y completá el .env. Nunca los pegues en un issue, un PR ni este README.
 
-# 2. Base de datos
-docker compose up -d postgres
-
-# 3. Aplicación (lee las variables de .env)
+# 2. Cargar las variables y arrancar (ver "Variables de entorno" para otros sistemas)
 set -a && . ./.env && set +a
 ./mvnw spring-boot:run
 
-# 4. Verificar
-curl http://localhost:8080/api/v1/public/ping
+# 3. Verificar
+curl http://localhost:8080/api/v1/public/ping        # el proceso responde
+curl http://localhost:8080/api/v1/public/db-status   # la conexión con la base funciona
 curl http://localhost:8080/actuator/health
 # Documentación: http://localhost:8080/swagger-ui.html
 ```
 
-Sin Docker: instala PostgreSQL 16 (es más recomendable actualmente que la v18), crea la base `dcplatform` y ajusta `DB_URL` en tu `.env`.
+No hace falta levantar ningún contenedor: la base ya está en Supabase y el esquema ya
+está migrado.
+
+### Alternativa: PostgreSQL local
+
+Sirve para trabajar sin conexión o para no tocar la base compartida por todo el equipo.
+
+```bash
+docker compose up -d postgres
+```
+
+Y en tu `.env`:
+
+```bash
+DB_URL=jdbc:postgresql://localhost:5432/dcplatform
+DB_USER=dcplatform
+DB_PASSWORD=<el mismo que tengas en DB_PASSWORD para el contenedor>
+```
+
+Sin Docker: instala PostgreSQL 16 o superior, crea la base `dcplatform` y ajusta `DB_URL`.
 
 **¿Ya tienes algo ocupando el puerto 5432?** Define `DB_PORT` en tu `.env` (por ejemplo
 `DB_PORT=5433`) y ajusta `DB_URL` para que coincida. Dentro de la red de Docker el puerto
 sigue siendo el 5432; `DB_PORT` solo cambia el puerto publicado en tu máquina.
+
+> `docker-compose.yml` es **solo para desarrollo local**: sus servicios `api` y `worker`
+> apuntan siempre al contenedor `postgres`, no a Supabase.
+
+### Comprobar el estado de la conexión
+
+`GET /api/v1/public/db-status` pide una conexión real al pool y ejecuta una consulta. Es lo
+que distingue "la API está caída" de "la API está arriba pero no llega a la base" — algo que
+`/ping` no puede decirte.
+
+```bash
+curl -s http://localhost:8080/api/v1/public/db-status | jq
+```
+
+```json
+{
+  "status": "UP",
+  "latencyMs": 166,
+  "database": "PostgreSQL 17.6",
+  "driver": "PostgreSQL JDBC Driver 42.7.11",
+  "url": "jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require",
+  "username": "postgres.xxxxxxxxxxxx",
+  "schema": "public",
+  "readOnly": false,
+  "pool": { "name": "dcplatform-pool", "active": 1, "idle": 1, "total": 2, "waiting": 0, "max": 5 },
+  "timestamp": "2026-07-23T16:02:58.270436316Z"
+}
+```
+
+- **`200`** → conexión establecida. **`503`** → no se pudo conectar.
+- Si falla, la respuesta trae solo el código `sqlState` (`08001` no se pudo abrir la
+  conexión, `28P01` contraseña inválida, `3D000` la base no existe). **El detalle completo
+  va al log del servidor, nunca al cliente.**
+- Los campos de infraestructura (`url`, `username`, `pool`, …) solo aparecen si
+  `DB_STATUS_DETAILS=true`. La contraseña se enmascara siempre, aunque venga embebida en la
+  cadena JDBC.
+
+> ⚠️ Mientras Spring Security siga desactivada, `/api/v1/public/**` no pide autenticación.
+> **Pon `DB_STATUS_DETAILS=false` en staging**, o estarás publicando el host y el usuario de
+> la base a cualquiera que pase.
 
 **Con todo en contenedores:**
 ```bash
@@ -109,6 +170,95 @@ Todas están declaradas en [`.env.example`](.env.example). **Si agregas una nuev
 
 Ninguna variable con valor real entra al repositorio. En staging se configuran en el panel del proveedor; en GitHub, en `Settings → Secrets and variables → Actions`.
 
+### Regla número uno: el `.env` no se sube
+
+`.env` ya está en el `.gitignore` de la raíz. **Compruébalo antes de tu primer commit:**
+
+```bash
+git check-ignore -v backend/.env
+# debe imprimir:  .gitignore:2:.env    backend/.env
+```
+
+Si ese comando **no imprime nada**, para: tu `.env` no está ignorado y el siguiente
+`git add .` publica las credenciales del equipo. Si ya subiste uno por error, no basta con
+borrarlo — queda en el historial: avisa en el chat y **rota las credenciales**
+(ver la tabla de emergencias en [`CONTRIBUTING.md`](../CONTRIBUTING.md)).
+
+### Cómo cargarlas
+
+Spring lee la configuración desde el entorno del proceso; **no lee el archivo `.env` por sí
+solo**. Hay que cargarlo antes de arrancar, y la forma depende de con qué lo ejecutes:
+
+**Linux / macOS — bash o zsh**
+
+```bash
+set -a && . ./.env && set +a     # exporta todo lo que declara el .env
+./mvnw spring-boot:run
+```
+
+`set -a` hace que cada asignación se exporte sola; `set +a` vuelve a la normalidad. Vale
+solo para la terminal actual: si abres otra, hay que repetirlo.
+
+**Windows — PowerShell**
+
+```powershell
+Get-Content .env | Where-Object { $_ -match '^\s*[^#].*=' } | ForEach-Object {
+    $name, $value = $_ -split '=', 2
+    [Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process')
+}
+.\mvnw.cmd spring-boot:run
+```
+
+**IntelliJ IDEA** — la opción más cómoda si depuras desde el IDE:
+
+- `Run → Edit Configurations… → ApiApplication → Environment variables`, y pegar las
+  variables separadas por `;`, o
+- instalar el plugin **EnvFile** (`Settings → Plugins`), y en la pestaña *EnvFile* de la
+  configuración marcar *Enable EnvFile* y añadir `backend/.env`. Esto es preferible: no
+  duplica los valores dentro de la configuración del IDE, que sí se puede subir por error.
+
+**VS Code** — en `.vscode/launch.json`:
+
+```json
+{ "type": "java", "name": "ApiApplication", "request": "launch",
+  "mainClass": "com.dcplatform.api.ApiApplication",
+  "envFile": "${workspaceFolder}/backend/.env" }
+```
+
+**Docker Compose** — no hay que hacer nada: Compose carga solo el `.env` que esté junto al
+`docker-compose.yml`, o sea `backend/.env`.
+
+**Staging** — en el panel del proveedor, nunca en un archivo dentro de la imagen.
+
+**GitHub Actions** — `Settings → Secrets and variables → Actions`, y en el workflow:
+
+```yaml
+env:
+  DB_URL: ${{ secrets.DB_URL }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+```
+
+### Variables de la base de datos
+
+| Variable | Por defecto | Para qué |
+|---|---|---|
+| `DB_URL` | Postgres local de Compose | Cadena JDBC. Con Supabase, la del **session pooler** |
+| `DB_USER` | `dcplatform` | Con Supabase es `postgres.<project-ref>`, no `postgres` |
+| `DB_PASSWORD` | — | Se pide por el chat privado del equipo |
+| `DB_SCHEMA` | `public` | Esquema donde Flyway lleva su historial |
+| `DB_POOL_SIZE` | `5` | Máximo de conexiones. Los planes gratuitos las limitan |
+| `DB_POOL_MIN_IDLE` | `1` | Conexiones ociosas que se mantienen abiertas |
+| `DB_CONNECTION_TIMEOUT_MS` | `15000` | Espera máxima por una conexión del pool |
+| `DB_KEEPALIVE_MS` / `DB_IDLE_TIMEOUT_MS` / `DB_MAX_LIFETIME_MS` | `120000` / `300000` / `600000` | Reciclado de conexiones. **Mantener el orden `keepalive < idle < max-lifetime`**: el pooler de Supabase corta las conexiones ociosas por su cuenta, y esto hace que Hikari las renueve antes de que eso pase |
+| `FLYWAY_ENABLED` | `true` | `false` arranca sin aplicar migraciones. Útil para probar solo la conectividad contra la base compartida |
+| `DB_STATUS_DETAILS` | `true` | Detalle de `/api/v1/public/db-status`. **`false` en staging** |
+
+**Sobre Supabase:** usa siempre el *session pooler*
+(`aws-1-<región>.pooler.supabase.com:5432`), no la conexión directa
+(`db.<project-ref>.supabase.co`), que resuelve **solo a IPv6** y deja fuera a quien no tenga
+IPv6 en su red. Y **no uses el puerto 6543** (*transaction pooler*): rompe Flyway. El
+razonamiento completo está en [ADR-0004](docs/architecture/adr/0004-supabase-postgres.md).
+
 ---
 
 ## Cosas que no son negociables
@@ -128,6 +278,8 @@ Ninguna variable con valor real entra al repositorio. En staging se configuran e
 - ☑ Configuración YAML con variables de entorno
 - ☑ Manejo global de errores en formato Problem Details
 - ☑ Docker y Compose
+- ☑ Conexión a Supabase (session pooler) y migraciones aplicadas
+- ☑ Endpoint de estado de la conexión: `/api/v1/public/db-status`
 - ☐ Módulo `leads` (Semana 1)
 - ☐ Módulo `calculator` (Semana 1)
 - ☐ Módulo `benchmark` (Semana 2)
