@@ -1,20 +1,20 @@
-# Build multi-etapa. Opcional: el equipo puede desplegar el JAR directamente si prefiere.
-#
-# IMPORTANTE: el contexto de build es la RAIZ del repositorio, no backend/.
-# El pom.xml empaqueta las migraciones desde ../database/migrations, asi que la
-# imagen necesita ver tanto backend/ como database/. Ver docker-compose.yml.
+# Build multi-etapa
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app/backend
 
-# Primero solo lo necesario para resolver dependencias: la capa de descarga se
-# reutiliza mientras no cambien el pom ni el wrapper.
-COPY backend/.mvn/ .mvn/
-COPY backend/mvnw backend/pom.xml ./
+# Copiamos todo el contenido de la carpeta backend
+COPY backend/ .
+
+# Corregimos los saltos de línea (CRLF a LF) por si se editó en Windows
+RUN sed -i 's/\r$//' mvnw
+
+# Descargamos dependencias usando el wrapper corregido
 RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
 
-# Las migraciones viven fuera de backend/ y entran al JAR como db/migration.
+# Copiamos las migraciones que viven fuera de backend/
 COPY database/ /app/database/
-COPY backend/src ./src
+
+# Compilamos el proyecto
 RUN ./mvnw clean package -DskipTests -B
 
 FROM eclipse-temurin:21-jre-alpine
@@ -24,8 +24,6 @@ COPY --from=build /app/backend/target/*.jar app.jar
 USER app
 EXPOSE 8080
 
-# Limite de heap pensado para contenedores de 512 MB (tier gratuito).
-# PDFBox necesita margen: no generar varios PDF en paralelo con esta memoria.
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=70 -XX:+UseSerialGC"
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s \
