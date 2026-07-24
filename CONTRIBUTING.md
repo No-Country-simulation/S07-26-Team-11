@@ -28,7 +28,7 @@ dev     ●──●──●──●──●──●──●──●──
 # Clonar el repositorio
 git clone git@github.com:No-Country-simulation/S07-26-Team-11.git
 # https: git clone https://github.com/No-Country-simulation/S07-26-Team-11.git
-cd [nombre-del-repo]
+cd S07-26-Team-11/
 
 # Configurar tu identidad (usa el mismo email de tu cuenta de GitHub)
 git config user.name "Tu Nombre"
@@ -236,7 +236,7 @@ git checkout dev
 Git permite clonar sin descargar todo el árbol de archivos:
 
 ```bash
-git clone --filter=blob:none --sparse [URL-DEL-REPO]
+git clone --filter=blob:none --sparse git@github.com:No-Country-simulation/S07-26-Team-11.git
 cd [nombre-del-repo]
 git sparse-checkout set backend docs
 ```
@@ -343,8 +343,8 @@ Si no contiene nada sensible (solo texto genérico sin credenciales, rutas ni l�
 pip install git-filter-repo        # o: brew install git-filter-repo
 
 # En una copia limpia del repositorio (no tu copia de trabajo habitual)
-git clone [URL-DEL-REPO] repo-limpieza
-cd repo-limpieza
+git clone git@github.com:No-Country-simulation/S07-26-Team-11.git S07-26-Team-11-clean
+cd S07-26-Team-11-clean
 
 # Eliminar el archivo de TODAS las ramas y de TODO el historial
 git filter-repo --path ruta/al/archivo.md --invert-paths
