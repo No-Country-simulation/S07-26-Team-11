@@ -1,15 +1,25 @@
 package com.dcplatform.api.pdf;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
+/**
+ * Endpoints publicos del modulo pdf. Contrato en docs/API.md seccion 4.
+ */
 @RestController
 @RequestMapping("/api/v1/public/pdf")
+@Tag(name = "PDF", description = "Estado de la generacion y descarga del informe")
 public class PdfController {
 
     private final PdfService pdfService;
@@ -18,60 +28,30 @@ public class PdfController {
         this.pdfService = pdfService;
     }
 
-    // GET /public/pdf/jobs/{jobId}
     @GetMapping("/jobs/{jobId}")
-    public ResponseEntity<PdfJobResponse> getJobStatus(@PathVariable Long jobId) {
-        return pdfService.getJobById(jobId)
-                .map(job -> {
-                    // Buscamos si ya tiene un documento asociado para obtener su UUID
-                    UUID docUuid = null;
-                    String downloadUrl = null;
-                    
-                    if (job.getStatus() == PdfJob.JobStatus.DONE) {
-                        var docOpt = pdfService.getDocumentByUuid(UUID.randomUUID()); // Se ajustará al responseId real luego
-                        // Por ahora simulamos la estructura del contrato
-                        docUuid = UUID.randomUUID();
-                        downloadUrl = "https://storage.example.com/documents/" + docUuid + "/download";
-                    }
-
-                    OffsetDateTime expiresAt = job.getUpdatedAt() != null 
-                            ? job.getUpdatedAt().atOffset(ZoneOffset.UTC).plusDays(7) 
-                            : OffsetDateTime.now(ZoneOffset.UTC).plusDays(7);
-
-                    var response = new PdfJobResponse(
-                            job.getId(),
-                            job.getStatus().name(),
-                            job.getAttempts(),
-                            docUuid,
-                            downloadUrl,
-                            expiresAt,
-                            job.getErrorMessage()
-                    );
-                    return ResponseEntity.ok(response);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Estado del trabajo de generacion",
+            description = "El frontend consulta este endpoint cada 2 segundos mientras el estado sea PENDING o PROCESSING.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Estado actual del trabajo"),
+            @ApiResponse(responseCode = "404", description = "El trabajo no existe")
+    })
+    public ResponseEntity<PdfService.PdfJobStatus> getJobStatus(@PathVariable UUID jobId) {
+        return pdfService.getJobStatus(jobId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-      @GetMapping("/documents/{documentId}/download")
-        public ResponseEntity<Void> downloadDocument(@PathVariable UUID documentId) {
-            return pdfService.getDocumentByUuid(documentId)
-                    .map(doc -> {
-                        // Redirección 302 a la URL firmada del storage real
-                        String signedUrl = "https://storage.example.com/" + doc.getStorageKey() + "?sig=mock";
-                        return ResponseEntity.status(302)
-                                .location(URI.create(signedUrl))
-                                .<Void>build();
-                    })
-                    .orElse(ResponseEntity.notFound().<Void>build());
-        }
-    // Record de respuesta según API.md
-    public record PdfJobResponse(
-            Long jobId,
-            String status,
-            int attempts,
-            UUID documentId,
-            String downloadUrl,
-            OffsetDateTime expiresAt,
-            String failureReason
-    ) {}
+    @GetMapping("/documents/{documentId}/download")
+    @Operation(summary = "Descarga del informe",
+            description = "Registra la descarga y redirige con 302 a una URL firmada y temporal del object storage.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "Redireccion a la URL firmada"),
+            @ApiResponse(responseCode = "404", description = "El documento no existe"),
+            @ApiResponse(responseCode = "422", description = "El enlace vencio"),
+            @ApiResponse(responseCode = "503", description = "El object storage no esta configurado")
+    })
+    public ResponseEntity<Void> downloadDocument(@PathVariable UUID documentId) {
+        URI signedUrl = pdfService.resolveDownload(documentId);
+        return ResponseEntity.status(HttpStatus.FOUND).location(signedUrl).build();
+    }
 }

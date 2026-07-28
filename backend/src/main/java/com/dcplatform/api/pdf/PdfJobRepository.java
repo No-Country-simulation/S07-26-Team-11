@@ -1,19 +1,31 @@
 package com.dcplatform.api.pdf;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface PdfJobRepository extends JpaRepository<PdfJob, Long> {
+public interface PdfJobRepository extends JpaRepository<PdfJob, UUID> {
 
-    // Consulta con bloqueo optimizado para el Worker descrita en la arquitectura
-    @Query(value = "SELECT * FROM pdf_jobs WHERE status = 'PENDING' ORDER BY created_at LIMIT 1 FOR UPDATE SKIP LOCKED", nativeQuery = true)
+    /**
+     * Toma el siguiente trabajo pendiente saltando los que ya bloqueo otro worker.
+     * SKIP LOCKED es lo que permite correr varios workers sin cola externa
+     * (ver PdfGeneratorArchitecture.md).
+     *
+     * El bloqueo solo vive dentro de una transaccion: quien llame a este metodo
+     * tiene que ser @Transactional, o la fila queda liberada de inmediato.
+     */
+    @Query(value = """
+            SELECT * FROM pdf_jobs
+            WHERE status = 'PENDING'
+            ORDER BY created_at
+            LIMIT 1
+            FOR UPDATE SKIP LOCKED
+            """, nativeQuery = true)
     Optional<PdfJob> findNextPendingJobForProcessing();
 
-    Optional<PdfJob> findByResponseId(Long responseId);
+    Optional<PdfJob> findByResponseId(UUID responseId);
 }
