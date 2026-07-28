@@ -19,8 +19,10 @@ Una decisión que solo existe en el chat no existe. Si el equipo acordó algo qu
 
 ## Estado actual
 
+Actualizado en la carpeta compartida del equipo
+
 - ☑ Catálogo de endpoints v1 propuesto
 - ☑ Convenciones de datos publicadas
-- ☐ Diagramas C1 y C2 (Semana 0)
-- ☐ Diagrama de despliegue (Semana 0)
+- ☑ Diagramas C1 y C2 (Semana 0)
+- ☑ Diagrama de despliegue (Semana 0)
 - ☐ Diagrama de secuencia del flujo principal (Semana 1)
