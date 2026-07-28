@@ -30,6 +30,7 @@
         <springdoc.version>3.0.3</springdoc.version>
         <openhtmltopdf.version>1.1.31</openhtmltopdf.version>
         <bucket4j.version>8.19.0</bucket4j.version>
+        <oci.sdk.version>3.77.2</oci.sdk.version>
     </properties>
 
     <dependencies>
@@ -42,7 +43,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-
         <!-- Persistencia -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,6 +102,29 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.18.3</version>
+        </dependency>
+
+        <!-- Object Storage de Oracle Cloud: guarda los PDF generados.
+             Se usa el SDK nativo (firma con par de claves de API), no la capa
+             de compatibilidad S3: es lo que corresponde a las credenciales
+             tenancy/user/fingerprint que administra el equipo.
+             Excluimos el cliente HTTP por defecto para fijar jersey3, que es
+             el compatible con Jakarta EE 10 que usa Spring Boot 4. -->
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-objectstorage</artifactId>
+            <version>${oci.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.oracle.oci.sdk</groupId>
+                    <artifactId>oci-java-sdk-common-httpclient-jersey</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-common-httpclient-jersey3</artifactId>
+            <version>${oci.sdk.version}</version>
         </dependency>
 
         <!-- Documentacion OpenAPI / Swagger UI -->
