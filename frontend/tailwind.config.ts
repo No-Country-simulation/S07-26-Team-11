@@ -3,8 +3,9 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -13,6 +14,7 @@ const config: Config = {
           light: "var(--color-forest-light)",
           DEFAULT: "var(--color-forest)",
           dark: "var(--color-forest-dark)",
+          soft: "var(--color-forest-soft)"
         },
         gold: {
           DEFAULT: "var(--color-gold)",
@@ -33,7 +35,7 @@ const config: Config = {
       },
       fontFamily: {
         display: ["var(--font-redhat)", "sans-serif"], 
-        editorial: ["var(--font-alegreya)", "sans-serif"], // Nueva clase de fuente
+        editorial: ["var(--font-alegreya)", "sans-serif"],
       }
     },
   },

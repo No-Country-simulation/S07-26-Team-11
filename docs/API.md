@@ -371,9 +371,49 @@ Baja de la lista. Sin autenticación, un solo clic. Requisito legal.
 
 | Método | Ruta | Descripción |
 |---|---|---|
+| `GET` | `/api/v1/public/ping` | El proceso responde. No toca la base de datos |
+| `GET` | `/api/v1/public/db-status` | Estado de la conexión con PostgreSQL. `200` conectado, `503` sin conexión |
 | `GET` | `/actuator/health` | Healthcheck. Público. Lo usa el monitor de uptime |
 | `GET` | `/actuator/info` | Versión desplegada |
 | `GET` | `/v3/api-docs` | OpenAPI generado |
+
+### `GET /api/v1/public/db-status`
+
+Pide una conexión real al pool y ejecuta una consulta: distingue "la API está caída" de
+"la API está arriba pero no llega a la base".
+
+**`200 OK`**
+
+```json
+{
+  "status": "UP",
+  "latencyMs": 166,
+  "database": "PostgreSQL 17.6",
+  "driver": "PostgreSQL JDBC Driver 42.7.11",
+  "url": "jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require",
+  "username": "postgres.xxxxxxxxxxxx",
+  "schema": "public",
+  "readOnly": false,
+  "pool": { "name": "dcplatform-pool", "active": 1, "idle": 1, "total": 2, "waiting": 0, "max": 5 },
+  "timestamp": "2026-07-23T16:02:58.270436316Z"
+}
+```
+
+**`503 Service Unavailable`**
+
+```json
+{
+  "status": "DOWN",
+  "sqlState": "08001",
+  "timestamp": "2026-07-23T16:19:49.401855163Z"
+}
+```
+
+`status`, `latencyMs` y `timestamp` son los únicos campos garantizados en el `200`. Todo lo
+demás depende de `DB_STATUS_DETAILS`, que se apaga donde el endpoint quede expuesto: son
+datos de infraestructura. En el error solo viaja el `sqlState` (`08001` no se pudo abrir la
+conexión, `28P01` contraseña inválida, `3D000` la base no existe); el detalle completo queda
+en el log del servidor.
 
 ---
 

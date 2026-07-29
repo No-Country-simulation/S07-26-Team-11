@@ -1,5 +1,6 @@
 import React from "react";
 import ChartCapacidad from "@/components/ChartCapacidad";
+import Footer from "@/components/Footer";
 
 export default function ReportePage() {
   return (
@@ -277,9 +278,7 @@ export default function ReportePage() {
       </main>
 
       {/* Placeholder temporal del Footer */}
-      <footer className="flex h-24 w-full items-center justify-center border-t border-base-border bg-white mt-12">
-        <p className="text-sm text-text-secondary">Footer (A la espera del PR de Oskar)</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -4,15 +4,15 @@
 
 /*
   Tokens de diseno. Valores de arranque para que el proyecto compile.
-  La Disenadora los reemplaza con la paleta real del cliente desde design/tokens/tokens.json.
-  Estos mismos tokens alimentan el template del PDF.
 */
+
 :root {
   /* Paleta Forest */
   --color-forest: #1D6E52;       /* Forest 500 */
   --color-forest-dark: #0A2E22;  /* Forest 900 */
   --color-forest-light: #D8E2DC; /* Forest 100 */
-  
+  --color-forest-soft: #1D6E521A;/* forest 500 */
+
   /* Paleta Gold */
   --color-gold: #C9A227;         /* Gold 500 */
   --color-gold-dark: #C59F26;    /* Warning/Opportunity */
