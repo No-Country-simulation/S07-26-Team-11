@@ -1,52 +1,97 @@
 package com.dcplatform.api.pdf;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
+/**
+ * PDF ya generado y subido al object storage.
+ *
+ * Refleja la tabla pdf_documents de database/migrations/V1__initial_schema.sql.
+ * El id de esta fila es el documentId que expone la API: no existe una columna
+ * document_id aparte.
+ */
 @Entity
 @Table(name = "pdf_documents")
 public class PdfDocument {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
 
-    @Column(name = "document_id", nullable = false, unique = true)
-    private UUID documentId = UUID.randomUUID();
+    /** FK a benchmark_responses.id. */
+    @Column(name = "response_id", nullable = false, updatable = false)
+    private UUID responseId;
 
-    @Column(name = "response_id", nullable = false)
-    private Long responseId;
-
-    @Column(name = "storage_key", nullable = false)
+    /**
+     * Ruta del objeto dentro del bucket. Unica (pdf_documents_storage_key_uk):
+     * se deriva del responseId para que reprocesar un job pise el mismo objeto
+     * en vez de dejar huerfanos.
+     */
+    @Column(name = "storage_key", nullable = false, length = 500)
     private String storageKey;
 
-    @Column(name = "template_version", nullable = false)
-    private String templateVersion = "1.0";
+    @Column(name = "template_version", nullable = false, length = 20)
+    private String templateVersion;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "size_bytes")
+    private Long sizeBytes;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+    @Column(name = "page_count")
+    private Integer pageCount;
+
+    @Column(name = "generated_at", nullable = false, updatable = false)
+    private OffsetDateTime generatedAt;
+
+    @Column(name = "download_count", nullable = false)
+    private int downloadCount = 0;
+
+    protected PdfDocument() {
+        // requerido por JPA
     }
 
-    // Getters y Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public PdfDocument(UUID responseId, String storageKey, String templateVersion,
+                       Long sizeBytes, Integer pageCount) {
+        this.responseId = responseId;
+        this.storageKey = storageKey;
+        this.templateVersion = templateVersion;
+        this.sizeBytes = sizeBytes;
+        this.pageCount = pageCount;
+    }
 
-    public UUID getDocumentId() { return documentId; }
-    public void setDocumentId(UUID documentId) { this.documentId = documentId; }
+    @PrePersist
+    void onInsert() {
+        if (this.generatedAt == null) {
+            this.generatedAt = OffsetDateTime.now(ZoneOffset.UTC);
+        }
+    }
 
-    public Long getResponseId() { return responseId; }
-    public void setResponseId(Long responseId) { this.responseId = responseId; }
+    public void registerDownload() {
+        this.downloadCount += 1;
+    }
+
+    public UUID getId() { return id; }
+
+    public UUID getResponseId() { return responseId; }
 
     public String getStorageKey() { return storageKey; }
-    public void setStorageKey(String storageKey) { this.storageKey = storageKey; }
 
     public String getTemplateVersion() { return templateVersion; }
-    public void setTemplateVersion(String templateVersion) { this.templateVersion = templateVersion; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Long getSizeBytes() { return sizeBytes; }
+
+    public Integer getPageCount() { return pageCount; }
+
+    public OffsetDateTime getGeneratedAt() { return generatedAt; }
+
+    public int getDownloadCount() { return downloadCount; }
 }
