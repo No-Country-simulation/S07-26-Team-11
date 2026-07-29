@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Footer from "@/components/Footer";
 
 const mockPreguntas = [
   {
@@ -156,19 +157,7 @@ export default function BenchmarkPage() {
         </div>
       </main>
 
-      <footer className="w-full bg-white flex items-center justify-between px-40 py-5 border-t border-base-border mt-auto z-20 relative">
-        <img src="/Logotipo.svg" alt="Capacia Logo" className="h-10" />
-        
-        <div className="flex items-center gap-6 text-xs text-text-secondary">
-          <a href="#" className="hover:text-text-primary transition-colors">Privacidad</a>
-          <a href="#" className="hover:text-text-primary transition-colors">Términos y Condiciones</a>
-          <a href="#" className="hover:text-text-primary transition-colors">Contacto</a>
-        </div>
-        
-        <span className="text-xs text-text-secondary">
-          © 2026 Capacia, Inc.
-        </span>
-      </footer>
+      <Footer />
       
     </div>
   );
