@@ -1,15 +1,12 @@
 package com.dcplatform.api.pdf;
 
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +38,11 @@ public class PdfService {
     @Transactional(readOnly = true)
     public Optional<PdfDocument> getDocumentByUuid(UUID documentId) {
         return pdfDocumentRepository.findByDocumentId(documentId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<PdfDocument> getDocumentByResponseId(Long responseId) {
+        return pdfDocumentRepository.findByResponseId(responseId);
     }
 
     @Async

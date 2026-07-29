@@ -1,4 +1,3 @@
-
 package com.dcplatform.api.pdf;
 
 import jakarta.persistence.*;

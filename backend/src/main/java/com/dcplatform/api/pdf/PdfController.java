@@ -18,20 +18,20 @@ public class PdfController {
         this.pdfService = pdfService;
     }
 
-    // GET /public/pdf/jobs/{jobId}
     @GetMapping("/jobs/{jobId}")
     public ResponseEntity<PdfJobResponse> getJobStatus(@PathVariable Long jobId) {
         return pdfService.getJobById(jobId)
                 .map(job -> {
-                    // Buscamos si ya tiene un documento asociado para obtener su UUID
                     UUID docUuid = null;
                     String downloadUrl = null;
                     
                     if (job.getStatus() == PdfJob.JobStatus.DONE) {
-                        var docOpt = pdfService.getDocumentByUuid(UUID.randomUUID()); // Se ajustará al responseId real luego
-                        // Por ahora simulamos la estructura del contrato
-                        docUuid = UUID.randomUUID();
-                        downloadUrl = "https://storage.example.com/documents/" + docUuid + "/download";
+                        var docOpt = pdfService.getDocumentByResponseId(job.getResponseId());
+                        if (docOpt.isPresent()) {
+                            PdfDocument doc = docOpt.get();
+                            docUuid = doc.getDocumentId();
+                            downloadUrl = "/api/v1/public/pdf/documents/" + docUuid + "/download";
+                        }
                     }
 
                     OffsetDateTime expiresAt = job.getUpdatedAt() != null 
@@ -52,19 +52,18 @@ public class PdfController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-      @GetMapping("/documents/{documentId}/download")
-        public ResponseEntity<Void> downloadDocument(@PathVariable UUID documentId) {
-            return pdfService.getDocumentByUuid(documentId)
-                    .map(doc -> {
-                        // Redirección 302 a la URL firmada del storage real
-                        String signedUrl = "https://storage.example.com/" + doc.getStorageKey() + "?sig=mock";
-                        return ResponseEntity.status(302)
-                                .location(URI.create(signedUrl))
-                                .<Void>build();
-                    })
-                    .orElse(ResponseEntity.notFound().<Void>build());
-        }
-    // Record de respuesta según API.md
+    @GetMapping("/documents/{documentId}/download")
+    public ResponseEntity<Void> downloadDocument(@PathVariable UUID documentId) {
+        return pdfService.getDocumentByUuid(documentId)
+                .map(doc -> {
+                    String signedUrl = "https://storage.example.com/" + doc.getStorageKey() + "?sig=mock";
+                    return ResponseEntity.status(302)
+                            .location(URI.create(signedUrl))
+                            .<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().<Void>build());
+    }
+
     public record PdfJobResponse(
             Long jobId,
             String status,
