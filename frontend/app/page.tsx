@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 const chartData = [
   { month: "Ene", height: 76, used: 43 },
@@ -15,25 +16,6 @@ const chartData = [
   { month: "Nov", height: 89, used: 56 },
   { month: "Dic", height: 90, used: 56, recoverable: true },
 ];
-
-function Logo() {
-  return (
-    <Link
-      href="/"
-      aria-label="Ir al inicio"
-      className="inline-flex shrink-0 items-center"
-    >
-      <Image
-        src="/assets/brand/logotipo.svg"
-        alt="Capacia"
-        width={407}
-        height={108}
-        priority
-        className="h-auto w-[102px]"
-      />
-    </Link>
-  );
-}
 
 function Arrow() {
   return (
@@ -102,18 +84,14 @@ function Chart() {
 export default function Home() {
   return (
     <div className="min-h-screen bg-base-natural text-text-primary">
-      <header className="w-full bg-white shadow-sm">
-        <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center justify-between px-6 sm:px-8">
-          <Logo />
-
-          <Link
-            href="/calculadora"
-            className="inline-flex min-h-[45px] items-center justify-center gap-2.5 rounded-sm border border-forest px-6 py-3 text-base font-semibold leading-none tracking-normal text-forest-dark hover:bg-forest hover:text-white focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2"
-          >
-            Calculá tu capacidad
-          </Link>
-        </div>
-      </header>
+      <Header>
+        <Link
+          href="/calculadora"
+          className="inline-flex min-h-[45px] items-center justify-center gap-2.5 rounded-sm border border-forest px-6 py-3 text-base font-semibold leading-none tracking-normal text-forest-dark hover:bg-forest hover:text-white focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2"
+        >
+          Calculá tu capacidad
+        </Link>
+      </Header>
 
       <main>
         <section className="px-6 pb-16 pt-16 text-center sm:px-8 sm:pb-24 sm:pt-24">
@@ -216,25 +194,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <footer className="w-full border-t border-base-border bg-white">
-        <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-6 px-6 py-8 text-xs text-text-secondary sm:flex-row sm:justify-between sm:px-8">
-          <Logo />
-
-          <nav aria-label="Enlaces legales" className="flex items-center gap-7">
-            <Link href="/privacidad" className="text-forest-dark">
-              Privacidad
-            </Link>
-            <Link href="/terminos" className="text-forest-dark">
-              Términos y Condiciones
-            </Link>
-            <Link href="/contacto" className="text-forest-dark">
-              Contacto
-            </Link>
-          </nav>
-          <p className="text-forest-dark">© 2026 Capacia, Inc.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
