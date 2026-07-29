@@ -5,16 +5,12 @@ import Footer from "@/components/Footer";
 export default function ReportePage() {
   return (
     <div className="min-h-screen bg-base-natural text-text-primary">
-      <header className="w-full bg-white flex items-center px-40 py-5 gap-6 shadow-sm z-20 relative">
+      <header className="relative z-20 flex w-full items-center gap-6 bg-white px-40 py-5 shadow-sm">
         <img src="/assets/brand/logotipo.svg" alt="Capacia Logo" className="h-9" />
       </header>
 
-      {/* Contenedor central más angosto para lectura (tipo artículo) */}
       <main className="mx-auto max-w-[800px] px-6 py-16 sm:px-8 sm:py-24">
         
-        {/* =========================================
-            HERO / ENCABEZADO
-        ========================================= */}
         <section className="mb-16">
           <p className="font-display text-sm font-bold uppercase tracking-widest text-gold-dark">
             Reporte Anual · Julio 2026
@@ -34,15 +30,12 @@ export default function ReportePage() {
           </div>
         </section>
 
-        {/* =========================================
-            SECCIÓN 01: ESTADO DEL SECTOR
-        ========================================= */}
         <section className="mb-20">
           <h2 className="font-editorial flex items-center gap-3 text-3xl font-medium text-forest-dark">
             <span className="text-gold-dark">01</span> Estado del sector
           </h2>
           
-          <div className="font-editorial font-light mt-6 space-y-5 leading-relaxed text-[22px] text-text-secondary">
+          <div className="font-editorial mt-6 space-y-5 text-[22px] font-light leading-relaxed text-text-secondary">
             <p>
               La capacidad instalada global creció 22% interanual, impulsada por cargas de IA 
               y consolidación de nube. Pero la utilización real no acompañó: el promedio de la 
@@ -56,14 +49,11 @@ export default function ReportePage() {
           </div>
           
           <div className="mt-10">
-              <ChartCapacidad />
+            <ChartCapacidad />
           </div>
         </section>
 
-        {/* =========================================
-            SECCIÓN 02: CAPACIDAD FANTASMA
-        ========================================= */}
-        <section className="mb-20 font-editorial">
+        <section className="font-editorial mb-20">
           <h2 className="font-editorial flex items-center gap-3 text-3xl font-medium text-forest-dark">
             <span className="text-gold-dark">02</span> El problema de la capacidad fantasma
           </h2>
@@ -75,7 +65,6 @@ export default function ReportePage() {
             "por las dudas".
           </p>
 
-          {/* Caja destacada verde claro */}
           <div className="mt-8 rounded-xl bg-forest-light p-8 sm:p-10">
             <p className="px-4 text-xl font-bold leading-snug text-forest sm:text-2xl">
               En la instalación mediana, 1 de cada 3 kW encendidos no produce 
@@ -91,11 +80,7 @@ export default function ReportePage() {
           </p>
         </section>
 
-        {/* =========================================
-            SECCIÓN 03: BENCHMARKS
-        ========================================= */}
         <section className="mb-20">
-          {/* Encabezado y Texto de la sección con fuente editorial */}
           <div className="font-editorial">
             <h2 className="font-editorial flex items-center gap-3 text-3xl font-medium text-forest-dark">
               <span className="text-gold-dark">03</span> Benchmarks por tipo de operador
@@ -108,10 +93,8 @@ export default function ReportePage() {
             </p>
           </div>
 
-          {/* Grilla de Tarjetas (Fuente normal para lectura de datos) */}
           <div className="mt-10 grid gap-6 font-display sm:grid-cols-3">
             
-            {/* Tarjeta 1: Hyperscale */}
             <div className="rounded-xl border border-transparent bg-white p-6 shadow-sm">
               <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark">
                 Hyperscale
@@ -119,7 +102,6 @@ export default function ReportePage() {
               <p className="mt-1 text-6xl font-bold tracking-tight text-forest">64%</p>
               <p className="mt-1 text-sm text-text-secondary">utilización promedio</p>
               
-              {/* Barra de progreso */}
               <div className="my-5 h-3 w-full rounded-full bg-forest-light">
                 <div className="h-full w-[64%] rounded-full bg-forest"></div>
               </div>
@@ -129,7 +111,6 @@ export default function ReportePage() {
               </p>
             </div>
 
-            {/* Tarjeta 2: Colocation */}
             <div className="rounded-xl border border-transparent bg-white p-6 shadow-sm">
               <h3 className="text-sm font-bold uppercase tracking-wider text-forest-dark">
                 Colocation
@@ -137,7 +118,6 @@ export default function ReportePage() {
               <p className="mt-1 text-6xl font-bold tracking-tight text-forest">51%</p>
               <p className="mt-1 text-sm text-text-secondary">utilización promedio</p>
               
-              {/* Barra de progreso */}
               <div className="my-5 h-3 w-full rounded-full bg-forest-light">
                 <div className="h-full w-[51%] rounded-full bg-forest"></div>
               </div>
@@ -147,7 +127,6 @@ export default function ReportePage() {
               </p>
             </div>
 
-            {/* Tarjeta 3: Enterprise (Destacada) */}
             <div className="rounded-xl border border-gold bg-white p-6 shadow-sm">
               <h3 className="text-sm font-bold uppercase tracking-wider text-gold-dark">
                 Enterprise
@@ -155,7 +134,6 @@ export default function ReportePage() {
               <p className="mt-1 text-6xl font-bold tracking-tight text-forest">38%</p>
               <p className="mt-1 text-sm text-text-secondary">utilización promedio</p>
               
-              {/* Barra de progreso (con opacidad para el fondo dorado) */}
               <div className="my-5 h-3 w-full rounded-full bg-gold/20">
                 <div className="h-full w-[38%] rounded-full bg-gold-dark"></div>
               </div>
@@ -168,11 +146,7 @@ export default function ReportePage() {
           </div>
         </section>
 
-        {/* =========================================
-            SECCIÓN 04: EL COSTO OCULTO
-        ========================================= */}
-        <section className="mb-20 font-editorial">
-          {/* H2 con las clases exactas que me pediste */}
+        <section className="font-editorial mb-20">
           <h2 className="font-editorial flex items-center gap-3 text-3xl font-medium text-forest-dark">
             <span className="text-gold-dark font-bold">04</span> El costo oculto
           </h2>
@@ -189,7 +163,6 @@ export default function ReportePage() {
             </h3>
             
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {/* Dato 1 */}
               <div className="flex flex-col">
                 <p className="text-[28px] font-bold tracking-tight text-gold sm:text-4xl">
                   US$ 105.000
@@ -199,7 +172,6 @@ export default function ReportePage() {
                 </p>
               </div>
 
-              {/* Dato 2 */}
               <div className="flex flex-col">
                 <p className="text-[28px] font-bold tracking-tight text-gold-dark sm:text-4xl">
                   +45%
@@ -209,7 +181,6 @@ export default function ReportePage() {
                 </p>
               </div>
 
-              {/* Dato 3 */}
               <div className="flex flex-col">
                 <p className="text-[28px] font-bold tracking-tight text-white sm:text-4xl">
                   US$ 152.000
@@ -228,29 +199,21 @@ export default function ReportePage() {
           </p>
         </section>
 
-        {/* =========================================
-            SECCIÓN 05: CALL TO ACTION (CTA)
-        ========================================= */}
-        <section className="mb-20">
+        <section className="mb-4">
           <div className="flex flex-col items-center justify-center rounded-2xl border border-base-border bg-white px-6 py-16 text-center shadow-sm sm:px-12 sm:py-20">
             
-            {/* Subtítulo Dorado */}
             <p className="font-display text-sm font-bold uppercase tracking-widest text-gold-dark">
               ¿Y tu instalación?
             </p>
             
-            {/* Título Principal */}
-            <h2 className="mt-4 font-editorial text-3xl font-bold text-forest-dark sm:text-4xl">
+            <h2 className="font-editorial mt-4 text-3xl font-bold text-forest-dark sm:text-4xl">
               Calculá tu propia capacidad subutilizada
             </h2>
             
-            {/* Párrafo descriptivo */}
-            <p className="mt-4 font-editorial text-[22px] max-w-xl leading-relaxed text-text-secondary sm:text-xl">
+            <p className="font-editorial mt-4 max-w-xl text-[22px] leading-relaxed text-text-secondary sm:text-xl">
               Cuatro minutos, sin instalar nada. Obtené tu brecha de utilización y el costo anual estimado.
             </p>
             
-            {/* Botón con Icono SVG */}
-            {/* Nota: Cambiá el href por la ruta real que vayan a usar para la calculadora */}
             <a 
               href="/calculadora" 
               className="mt-6 flex items-center gap-2 rounded-lg bg-forest px-8 py-3.5 font-display font-medium text-white transition-all hover:bg-forest-dark"
@@ -277,8 +240,8 @@ export default function ReportePage() {
 
       </main>
 
-      {/* Placeholder temporal del Footer */}
       <Footer />
+
     </div>
   );
 }
