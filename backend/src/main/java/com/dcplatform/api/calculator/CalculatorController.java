@@ -15,8 +15,16 @@ public class CalculatorController {
 
     @PostMapping("/estimate")
     public ResponseEntity<CalculatorResponse> estimate(@Valid @RequestBody CalculatorRequest request) {
-        BigDecimal carga = request.getCargaTermicaKw();
+        // Convertimos de forma segura el valor del request (Double) a BigDecimal
+        BigDecimal carga = request.getCargaTermicaKw() != null 
+                ? BigDecimal.valueOf(request.getCargaTermicaKw()) 
+                : null;
         
+        // Validación defensiva para evitar errores si es nulo o negativo
+        if (carga == null || carga.compareTo(BigDecimal.ZERO) < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
         // Lógica de estimación básica
         BigDecimal consumoEstimadoKwh = carga.multiply(new BigDecimal("720")); 
         BigDecimal costoEstimado = consumoEstimadoKwh.multiply(new BigDecimal("0.15")); 
