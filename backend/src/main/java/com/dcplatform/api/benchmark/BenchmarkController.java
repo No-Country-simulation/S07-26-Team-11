@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/benchmark")
+@RequestMapping("/api/v1/public/benchmark")
 public class BenchmarkController {
 
     @PostMapping("/submit")
