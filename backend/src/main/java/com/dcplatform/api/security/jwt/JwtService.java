@@ -11,5 +11,7 @@ public interface JwtService {
 
 	boolean isMagicLinkToken(String token);
 
+	boolean isAccessToken(String token);
+
 	boolean isTokenValid(String token);
 }

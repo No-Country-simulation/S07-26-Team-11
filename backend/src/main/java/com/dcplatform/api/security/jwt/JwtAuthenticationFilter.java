@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		try {
-			if (jwtService.isTokenValid(jwt) && !jwtService.isMagicLinkToken(jwt)) {
+			if (jwtService.isTokenValid(jwt) && jwtService.isAccessToken(jwt)) {
 				String email = jwtService.extractEmail(jwt);
 				String role = jwtService.extractRole(jwt);
 
