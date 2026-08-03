@@ -4,15 +4,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record BenchmarkRequest(
-        @NotNull(value = "El consumo energético es obligatorio")
-        @Positive(value = "El consumo debe ser mayor a cero")
+        @NotNull(message = "El consumo energético es obligatorio")
+        @Positive(message = "El consumo debe ser mayor a cero")
         Double energyConsumptionKw,
 
-        @NotNull(value = "La eficiencia PUE es obligatoria")
-        @Positive(value = "El PUE debe ser mayor a cero")
+        @NotNull(message = "La eficiencia PUE es obligatoria")
+        @Positive(message = "El PUE debe ser mayor a cero")
         Double pue,
 
-        @NotNull(value = "La capacidad instalada es obligatoria")
-        @Positive(value = "La capacidad debe ser mayor a cero")
+        @NotNull(message = "La capacidad instalada es obligatoria")
+        @Positive(message = "La capacidad debe ser mayor a cero")
         Double installedCapacityKw
 ) {}

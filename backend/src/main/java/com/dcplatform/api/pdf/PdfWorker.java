@@ -34,10 +34,6 @@ public class PdfWorker {
         this.pdfProperties = pdfProperties;
     }
 
-    /**
-     * Ejecuta el worker periódicamente (por ejemplo, cada 3 segundos) 
-     * siempre y cuando esté habilitado en las propiedades (app.pdf.worker-enabled).
-     */
     @Scheduled(fixedDelayString = "3000")
     @Transactional
     public void processPendingJobs() {
@@ -54,43 +50,33 @@ public class PdfWorker {
         log.info("Procesando trabajo de PDF ID: {} para responseId: {}", job.getId(), job.getResponseId());
 
         try {
-            // 1. Marcar como en proceso
             job.markProcessing();
             pdfJobRepository.save(job);
 
-            // 2. Preparar variables para la plantilla (acá se conectaría con los datos reales del benchmark/calculadora)
             Map<String, Object> templateVariables = new HashMap<>();
             templateVariables.put("responseId", job.getResponseId());
-            // TODO: Inyectar repositorio de benchmark para cargar métricas reales si hace falta
 
-            // 3. Renderizar el reporte HTML a bytes de PDF
-            // Asumimos una plantilla base llamada "report-template" en src/main/resources/templates/
             byte[] pdfBytes = pdfService.renderReport("report-template", templateVariables);
 
-            // 4. Definir la clave de almacenamiento (storage key única basada en el responseId)
             String storageKey = "reports/" + job.getResponseId() + "/informe-benchmark.pdf";
 
-            // 5. Subir al Storage (Bucket)
-            pdfStorage.upload(storageKey, pdfBytes, "application/pdf");
+            pdfStorage.upload(storageKey, pdfBytes);
 
-            // 6. Registrar el documento generado en la base de datos
             PdfDocument document = new PdfDocument(
                     job.getResponseId(),
                     storageKey,
                     pdfProperties.getTemplateVersion(),
                     (long) pdfBytes.length,
-                    1 // Conteo de páginas estimado o calculado
+                    1
             );
             pdfDocumentRepository.save(document);
 
-            // 7. Marcar el trabajo como finalizado con éxito
             job.markDone();
             pdfJobRepository.save(job);
             log.info("Trabajo de PDF ID: {} completado exitosamente.", job.getId());
 
         } catch (Exception e) {
             log.error("Error al procesar el trabajo de PDF ID {}: {}", job.getId(), e.getMessage(), e);
-            // Marcar como fallido aplicando la política de reintentos máxima configurada
             job.markFailed(e.getMessage(), pdfProperties.getMaxAttempts());
             pdfJobRepository.save(job);
         }
