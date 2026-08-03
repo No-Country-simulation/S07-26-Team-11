@@ -1,5 +1,7 @@
 package com.dcplatform.api.security.jwt;
 
+import java.util.Date;
+
 public interface JwtService {
 	String generateMagicLinkToken(String email);
 
@@ -8,6 +10,8 @@ public interface JwtService {
 	String extractEmail(String token);
 
 	String extractRole(String token);
+
+	Date extractExpiration(String token);
 
 	boolean isMagicLinkToken(String token);
 
