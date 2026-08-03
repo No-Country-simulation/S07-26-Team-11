@@ -276,6 +276,79 @@ Redirige (`302`) a la URL firmada del storage y registra la descarga.
 
 ---
 
+## 4.b Documentos institucionales — `/documents` 🔒
+
+Documentos PDF que genera **el usuario autenticado** bajo demanda, distintos del informe del
+benchmark de §4: aquellos los produce un worker a partir de `pdf_jobs`, estos se generan de
+forma síncrona y cuelgan de la cuenta del usuario. Comparten bucket, con prefijos separados.
+
+**Todos los endpoints exigen `Authorization: Bearer <token>`** y operan solo sobre los
+documentos de quien presenta el token. El dueño **nunca** viaja en la ruta ni en el cuerpo.
+
+### `POST /documents` 🔒
+Genera el PDF, lo sube al object storage privado y registra sus metadatos.
+Regenerar con el mismo `metadata.name` **reemplaza** el documento; no crea un duplicado.
+
+**Request**
+```json
+{
+  "metadata": { "name": "informe-julio" },
+  "date": "Thu Jul 30 09:27:13 PM -05 2026",
+  "title": "Informe de posición en el benchmark",
+  "message": ["Primer párrafo.", "Segundo párrafo."]
+}
+```
+`metadata.name`: único por usuario, sin la extensión `.pdf`. Solo `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`
+— termina siendo parte de la clave del objeto en el bucket.
+`date`: acepta la salida de `date(1)` y ISO-8601; si no se reconoce se imprime tal cual. Vacío usa
+la fecha del servidor.
+
+**Response `201`** (cabecera `Location` con la URL de descarga)
+```json
+{
+  "id": "0192...",
+  "owner": "operador@empresa.com",
+  "name": "informe-julio",
+  "fileName": "informe-julio.pdf",
+  "title": "Informe de posición en el benchmark",
+  "sizeBytes": 4988,
+  "createdAt": "2026-08-03T21:59:00Z",
+  "updatedAt": "2026-08-03T21:59:00Z",
+  "downloadUrl": "/api/v1/documents/informe-julio/download"
+}
+```
+
+**Errores:** `400` faltan campos o `name` inválido · `401` sin token · `503` object storage sin
+configurar.
+
+### `POST /documents/preview` 🔒
+Devuelve el **HTML intermedio** (`text/html`) en vez del PDF, sin tocar el bucket. Sirve para
+iterar el diseño de la plantilla en el navegador. Ver `backend/document_design/INSTRUCCIONES.md`.
+
+### `GET /documents` 🔒
+Documentos del usuario autenticado, del más reciente al más antiguo.
+Sin documentos devuelve `count: 0`, **no** `404`.
+
+```json
+{
+  "owner": "operador@empresa.com",
+  "count": 1,
+  "documents": [ { "...": "igual que la respuesta de POST" } ]
+}
+```
+
+### `GET /documents/{name}` 🔒
+Metadatos de un documento propio. **Errores:** `404` si no existe *en la cuenta del usuario*
+(un documento de otro usuario también devuelve `404`, no `403`: no se filtra si existe).
+
+### `GET /documents/{name}/download` 🔒
+Redirige (`302`) a una URL firmada y temporal del object storage. El binario no pasa por la API.
+Con `curl` hay que seguir el redirect: `curl -L`.
+
+**Errores:** `404` no existe en la cuenta · `503` object storage sin configurar.
+
+---
+
 ## 5. Reporte de industria — `/public/industry`
 
 ### `GET /public/industry/stats`
@@ -364,6 +437,7 @@ Baja de la lista. Sin autenticación, un solo clic. Requisito legal.
 | `GET` | `/admin/dashboard/summary` | Métricas del sistema: conversión, tasa de finalización, PDFs generados |
 | `GET` | `/admin/pdf/jobs?status=FAILED` | Trabajos fallidos, para reintento manual |
 | `POST` | `/admin/pdf/jobs/{jobId}/retry` | Reintentar generación |
+| `GET` | `/admin/documents` | Inventario de documentos institucionales de todos los usuarios, agrupado por email. Solo `ADMIN` |
 
 ---
 
@@ -371,9 +445,49 @@ Baja de la lista. Sin autenticación, un solo clic. Requisito legal.
 
 | Método | Ruta | Descripción |
 |---|---|---|
+| `GET` | `/api/v1/public/ping` | El proceso responde. No toca la base de datos |
+| `GET` | `/api/v1/public/db-status` | Estado de la conexión con PostgreSQL. `200` conectado, `503` sin conexión |
 | `GET` | `/actuator/health` | Healthcheck. Público. Lo usa el monitor de uptime |
 | `GET` | `/actuator/info` | Versión desplegada |
 | `GET` | `/v3/api-docs` | OpenAPI generado |
+
+### `GET /api/v1/public/db-status`
+
+Pide una conexión real al pool y ejecuta una consulta: distingue "la API está caída" de
+"la API está arriba pero no llega a la base".
+
+**`200 OK`**
+
+```json
+{
+  "status": "UP",
+  "latencyMs": 166,
+  "database": "PostgreSQL 17.6",
+  "driver": "PostgreSQL JDBC Driver 42.7.11",
+  "url": "jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require",
+  "username": "postgres.xxxxxxxxxxxx",
+  "schema": "public",
+  "readOnly": false,
+  "pool": { "name": "dcplatform-pool", "active": 1, "idle": 1, "total": 2, "waiting": 0, "max": 5 },
+  "timestamp": "2026-07-23T16:02:58.270436316Z"
+}
+```
+
+**`503 Service Unavailable`**
+
+```json
+{
+  "status": "DOWN",
+  "sqlState": "08001",
+  "timestamp": "2026-07-23T16:19:49.401855163Z"
+}
+```
+
+`status`, `latencyMs` y `timestamp` son los únicos campos garantizados en el `200`. Todo lo
+demás depende de `DB_STATUS_DETAILS`, que se apaga donde el endpoint quede expuesto: son
+datos de infraestructura. En el error solo viaja el `sqlState` (`08001` no se pudo abrir la
+conexión, `28P01` contraseña inválida, `3D000` la base no existe); el detalle completo queda
+en el log del servidor.
 
 ---
 
@@ -390,8 +504,12 @@ Baja de la lista. Sin autenticación, un solo clic. Requisito legal.
 | `PATCH /public/benchmark/responses/{id}` | 2 | ☐ |
 | `POST /public/benchmark/responses/{id}/complete` | 2 | ☐ |
 | `GET /public/industry/stats` | 2 | ☐ |
-| `GET /public/pdf/jobs/{id}` | 3 | ☐ |
-| `GET /public/pdf/documents/{id}/download` | 3 | ☐ |
+| `GET /public/pdf/jobs/{id}` | 3 | ☑ |
+| `GET /public/pdf/documents/{id}/download` | 3 | ☑ |
+| `POST /auth/register` · `POST /auth/login` · `POST /auth/logout` · `GET /auth/me` | 3 | ☑ |
+| `POST /documents` · `POST /documents/preview` | 3 | ☑ |
+| `GET /documents` · `GET /documents/{name}` · `GET /documents/{name}/download` | 3 | ☑ |
+| `GET /admin/documents` | 3 | ☑ |
 | `POST /admin/outreach/*` | 4 | ☐ |
 | `POST /public/webhooks/email/{provider}` | 4 | ☐ |
 | `/admin/*` (dashboard) | 2–4 | ☐ |

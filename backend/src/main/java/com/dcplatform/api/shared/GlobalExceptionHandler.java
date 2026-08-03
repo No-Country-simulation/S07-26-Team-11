@@ -3,9 +3,14 @@ package com.dcplatform.api.shared;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.util.List;
@@ -34,6 +39,25 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    public ProblemDetail handleMalformedRequest(Exception ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create("/errors/validation"));
+        problem.setTitle("Datos de entrada invalidos");
+        problem.setDetail("El formato o tipo de un parametro o campo del cuerpo de la solicitud es invalido");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problem.setType(URI.create("/errors/not-found"));
+        problem.setTitle("Recurso no encontrado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
     @ExceptionHandler(ApiException.class)
     public ProblemDetail handleApi(ApiException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(ex.getStatus());
@@ -50,6 +74,26 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problem.setType(URI.create("/errors/internal"));
         problem.setTitle("Error interno del servidor");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED.value());
+        problem.setType(URI.create("/errors/auth"));
+        problem.setTitle("Autenticación");
+        problem.setDetail("El token de acceso es inválido, ha expirado o no fue proporcionado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN.value());
+        problem.setType(URI.create("/errors/auth"));
+        problem.setTitle("Acceso no permitido");
+        problem.setDetail("No se tienen los privilegios necesarios para acceder a esta ruta");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }

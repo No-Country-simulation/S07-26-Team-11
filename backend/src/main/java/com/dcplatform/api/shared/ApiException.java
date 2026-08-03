@@ -25,6 +25,14 @@ public class ApiException extends RuntimeException {
         return new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "business-rule", message);
     }
 
+    public static ApiException conflict(String message) {
+        return new ApiException(HttpStatus.CONFLICT, "conflict", message);
+    }
+
+    public static ApiException unauthorized(String message) {
+        return new ApiException(HttpStatus.UNAUTHORIZED, "auth", message);
+    }
+
     public HttpStatus getStatus() {
         return status;
     }
