@@ -54,6 +54,11 @@ public class JwtServiceImpl implements JwtService {
 	}
 
 	@Override
+	public Date extractExpiration(String token) {
+		return extractAllClaims(token).getExpiration();
+	}
+
+	@Override
 	public boolean isMagicLinkToken(String token) {
 		return TokenType.MAGIC_LINK.name().equals(extractAllClaims(token).get("type"));
 	}
