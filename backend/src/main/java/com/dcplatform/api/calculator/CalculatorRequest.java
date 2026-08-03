@@ -1,19 +1,28 @@
 package com.dcplatform.api.calculator;
 
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import jakarta.validation.constraints.Positive;
 
 public class CalculatorRequest {
 
-    @NotNull
-    private BigDecimal cargaTermicaKw;
+    @NotNull(message = "La carga térmica en kW es obligatoria")
+    @Positive(message = "La carga térmica debe ser un valor numérico positivo")
+    private Double cargaTermicaKw;
 
-    // Getters y Setters
-    public BigDecimal getCargaTermicaKw() {
+  
+    public CalculatorRequest() {}
+
+   
+    public CalculatorRequest(Double cargaTermicaKw) {
+        this.cargaTermicaKw = cargaTermicaKw;
+    }
+
+   
+    public Double getCargaTermicaKw() {
         return cargaTermicaKw;
     }
 
-    public void setCargaTermicaKw(BigDecimal cargaTermicaKw) {
+    public void setCargaTermicaKw(Double cargaTermicaKw) {
         this.cargaTermicaKw = cargaTermicaKw;
     }
 }
