@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserAuthService {
 
-    private static final String ROLE = "USER";
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -45,6 +43,8 @@ public class UserAuthService {
             throw ApiException.unauthorized("Email o contraseña invalidos");
         }
 
-        return AccessTokenResponse.of(jwtService.generateAccessToken(user.getEmail(), ROLE));
+        // El rol sale de la fila, no de una constante: un ADMIN se promueve en la base
+        // (ver database/seeds/) y su token queda con ROLE_ADMIN sin tocar codigo.
+        return AccessTokenResponse.of(jwtService.generateAccessToken(user.getEmail(), user.getRole()));
     }
 }

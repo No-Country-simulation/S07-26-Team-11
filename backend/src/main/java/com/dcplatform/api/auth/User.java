@@ -32,6 +32,13 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 200)
     private String passwordHash;
 
+    /**
+     * USER o ADMIN (CHECK en la tabla). Viaja como claim "role" en el token de acceso y es lo
+     * que SecurityConfig traduce a ROLE_USER / ROLE_ADMIN para proteger /api/v1/admin/**.
+     */
+    @Column(name = "role", nullable = false, length = 20)
+    private String role = "USER";
+
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
@@ -67,6 +74,8 @@ public class User {
     public String getEmail() { return email; }
 
     public String getPasswordHash() { return passwordHash; }
+
+    public String getRole() { return role; }
 
     public boolean isActive() { return active; }
 
