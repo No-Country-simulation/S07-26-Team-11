@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.dcplatform.api.shared.ApiException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class PdfController {
             @PathVariable @NotNull(message = "El jobId es obligatorio") UUID jobId) {
         return pdfService.getJobStatus(jobId)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> ApiException.notFound("El trabajo solicitado no existe"));
     }
 
     @GetMapping("/documents/{documentId}/download")

@@ -3,11 +3,14 @@ package com.dcplatform.api.shared;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.util.List;
@@ -33,6 +36,25 @@ public class GlobalExceptionHandler {
                         "message", String.valueOf(fieldError.getDefaultMessage())))
                 .toList();
         problem.setProperty("errors", errors);
+        return problem;
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    public ProblemDetail handleMalformedRequest(Exception ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create("/errors/validation"));
+        problem.setTitle("Datos de entrada invalidos");
+        problem.setDetail("El formato o tipo de un parametro o campo del cuerpo de la solicitud es invalido");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problem.setType(URI.create("/errors/not-found"));
+        problem.setTitle("Recurso no encontrado");
+        problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
 

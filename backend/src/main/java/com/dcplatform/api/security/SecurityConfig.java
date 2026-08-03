@@ -38,6 +38,8 @@ public class SecurityConfig {
 						.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
 						// endpoints públicos explícitos
+						// unico punto de entrada al sistema de auth: sin esto, nadie puede solicitar acceso
+						.requestMatchers(HttpMethod.POST, "/api/v1/auth/request-access").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/calculator/estimate").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/calculator/defaults").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/leads").permitAll()
