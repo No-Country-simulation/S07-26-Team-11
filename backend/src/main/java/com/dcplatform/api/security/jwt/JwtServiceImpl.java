@@ -1,6 +1,7 @@
 package com.dcplatform.api.security.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -64,7 +65,11 @@ public class JwtServiceImpl implements JwtService {
 
 	@Override
 	public boolean isTokenValid(String token) {
-		return extractAllClaims(token).getExpiration().after(new Date());
+		try {
+			return extractAllClaims(token).getExpiration().after(new Date());
+		} catch (JwtException | IllegalArgumentException e) {
+			return false;
+		}
 	}
 
 	private Claims extractAllClaims(String token) {
