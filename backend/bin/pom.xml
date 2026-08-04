@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ARQUETIPO INICIAL - verificar las versiones antes del primer build.
+  Spring Boot 4.x cambio varios starters respecto de la linea 3.x; springdoc y otras
+  librerias de terceros pueden requerir una version especifica compatible.
+  Si algo no resuelve, revisar https://central.sonatype.com y dejar constancia en un ADR.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.dcplatform</groupId>
+    <artifactId>api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>dcplatform-api</name>
+    <description>API de la plataforma integrada de benchmark de data centers</description>
+    <packaging>jar</packaging>
+
+    <properties>
+        <java.version>21</java.version>
+        <!-- springdoc 3.x es la linea compatible con Spring Boot 4.x; la 2.x es para Boot 3.x -->
+        <springdoc.version>3.0.3</springdoc.version>
+        <openhtmltopdf.version>1.1.31</openhtmltopdf.version>
+        <bucket4j.version>8.19.0</bucket4j.version>
+        <oci.sdk.version>3.77.2</oci.sdk.version>
+        <jwt.version>0.13.0</jwt.version>
+    </properties>
+
+    <dependencies>
+        <!-- Web y validacion -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <!-- Persistencia -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Spring Boot 4 saco las autoconfiguraciones de spring-boot-autoconfigure
+             a modulos propios. Con solo flyway-core NO hay autoconfiguracion: las
+             migraciones no se aplican y no se registra ni una linea de log.
+             Este modulo arrastra flyway-core de forma transitiva. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
+        <!-- Seguridad -->
+        <!-- DESACTIVADA TEMPORALMENTE para la prueba inicial de arranque del arquetipo.
+             Sin un SecurityFilterChain configurado, Spring Security bloquea TODAS las
+             rutas con HTTP Basic: ni /api/v1/public/ping ni Swagger UI responden, y no
+             se puede verificar que el arquetipo levanta.
+             REACTIVAR junto con una SecurityConfig que deje abiertas /api/v1/public/**,
+             /actuator/health y Swagger, y exija autenticacion en /api/v1/admin/**,
+             cuando se implementen el dashboard interno y los magic links.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Implementación JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Plantillas para el PDF y los correos -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- Generacion de PDF: HTML/CSS -> PDF. Licencia LGPL/Apache, sin JavaScript ni flexbox -->
+        <dependency>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>${openhtmltopdf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-svg-support</artifactId>
+            <version>${openhtmltopdf.version}</version>
+        </dependency>
+        <!--
+          Manda los avisos del motor a slf4j en vez de java.util.logging. Es lo que hace
+          visible en el log del backend el CSS que el motor ignoro y los recursos que no
+          pudo cargar: el unico canal de feedback de quien maqueta el PDF.
+        -->
+        <dependency>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-slf4j</artifactId>
+            <version>${openhtmltopdf.version}</version>
+        </dependency>
+        <!-- Limpia HTML no bien formado antes de pasarlo al renderizador -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.18.3</version>
+        </dependency>
+
+        <!-- Object Storage de Oracle Cloud: guarda los PDF generados.
+             Se usa el SDK nativo (firma con par de claves de API), no la capa
+             de compatibilidad S3: es lo que corresponde a las credenciales
+             tenancy/user/fingerprint que administra el equipo.
+             Excluimos el cliente HTTP por defecto para fijar jersey3, que es
+             el compatible con Jakarta EE 10 que usa Spring Boot 4. -->
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-objectstorage</artifactId>
+            <version>${oci.sdk.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.oracle.oci.sdk</groupId>
+                    <artifactId>oci-java-sdk-common-httpclient-jersey</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.oci.sdk</groupId>
+            <artifactId>oci-java-sdk-common-httpclient-jersey3</artifactId>
+            <version>${oci.sdk.version}</version>
+        </dependency>
+
+        <!-- Documentacion OpenAPI / Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- Rate limiting -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>${bucket4j.version}</version>
+        </dependency>
+
+        <!-- Lectura de CSV y XLSX para el outreach -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.3.0</version>
+        </dependency>
+
+        <!-- Observabilidad -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Pruebas -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Desactivada junto con spring-boot-starter-security (ver comentario arriba). -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Testcontainers 2.x renombro los modulos: "postgresql" -> "testcontainers-postgresql".
+             La version la gestiona el BOM del parent de Spring Boot. -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--
+          Las migraciones son propiedad del area database/ y viven en database/migrations/.
+          Aqui solo se empaquetan dentro del JAR en la ruta que espera Flyway
+          (spring.flyway.locations = classpath:db/migration). Unica fuente de verdad:
+          no copiar los .sql a src/main/resources.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/../database/migrations</directory>
+                <targetPath>db/migration</targetPath>
+                <includes>
+                    <include>V*.sql</include>
+                </includes>
+            </resource>
+            <!--
+              Assets del PDF institucional (logo y fuentes). Se empaquetan en el JAR
+              para que el modulo funcione igual en local y en el contenedor, donde no
+              existe backend/assets: el runtime los lee de classpath:assets/.
+              Los binarios no se filtran, filtrarlos los corromperia.
+            -->
+            <resource>
+                <directory>${project.basedir}/assets</directory>
+                <targetPath>assets</targetPath>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>README.md</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

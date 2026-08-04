@@ -31,6 +31,7 @@
         <openhtmltopdf.version>1.1.31</openhtmltopdf.version>
         <bucket4j.version>8.19.0</bucket4j.version>
         <oci.sdk.version>3.77.2</oci.sdk.version>
+        <jwt.version>0.13.0</jwt.version>
     </properties>
 
     <dependencies>
@@ -74,11 +75,31 @@
              REACTIVAR junto con una SecurityConfig que deje abiertas /api/v1/public/**,
              /actuator/health y Swagger, y exija autenticacion en /api/v1/admin/**,
              cuando se implementen el dashboard interno y los magic links.
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        -->
+
+        <!-- Implementación JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Plantillas para el PDF y los correos -->
         <dependency>
@@ -95,6 +116,16 @@
         <dependency>
             <groupId>io.github.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-svg-support</artifactId>
+            <version>${openhtmltopdf.version}</version>
+        </dependency>
+        <!--
+          Manda los avisos del motor a slf4j en vez de java.util.logging. Es lo que hace
+          visible en el log del backend el CSS que el motor ignoro y los recursos que no
+          pudo cargar: el unico canal de feedback de quien maqueta el PDF.
+        -->
+        <dependency>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-slf4j</artifactId>
             <version>${openhtmltopdf.version}</version>
         </dependency>
         <!-- Limpia HTML no bien formado antes de pasarlo al renderizador -->
@@ -177,13 +208,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Desactivada junto con spring-boot-starter-security (ver comentario arriba).
+        <!-- Desactivada junto con spring-boot-starter-security (ver comentario arriba). -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        -->
+
         <!-- Testcontainers 2.x renombro los modulos: "postgresql" -> "testcontainers-postgresql".
              La version la gestiona el BOM del parent de Spring Boot. -->
         <dependency>
@@ -210,6 +241,20 @@
                 <includes>
                     <include>V*.sql</include>
                 </includes>
+            </resource>
+            <!--
+              Assets del PDF institucional (logo y fuentes). Se empaquetan en el JAR
+              para que el modulo funcione igual en local y en el contenedor, donde no
+              existe backend/assets: el runtime los lee de classpath:assets/.
+              Los binarios no se filtran, filtrarlos los corromperia.
+            -->
+            <resource>
+                <directory>${project.basedir}/assets</directory>
+                <targetPath>assets</targetPath>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>README.md</exclude>
+                </excludes>
             </resource>
         </resources>
 

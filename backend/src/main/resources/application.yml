@@ -44,6 +44,12 @@ spring:
     baseline-on-migrate: true
     schemas: ${DB_SCHEMA:public}
 
+  thymeleaf:
+    # El template del PDF se itera contra POST /api/v1/documents/preview. Sin cache
+    # cada peticion relee el HTML: se edita y se refresca sin reiniciar. En staging
+    # y produccion tiene que ir en true (THYMELEAF_CACHE=true).
+    cache: ${THYMELEAF_CACHE:false}
+
   jackson:
     default-property-inclusion: always
     datatype:
@@ -91,6 +97,26 @@ app:
     signed-url-ttl-days: 7
     max-attempts: 3
     worker-enabled: ${PDF_WORKER_ENABLED:true}
+  documents:
+    # Documentos institucionales que genera el usuario autenticado desde
+    # /api/v1/documents. Se guardan en el mismo bucket privado que los informes
+    # del benchmark, bajo su propio prefijo.
+    #
+    # Los assets viven en backend/assets/ y el pom los empaqueta en el JAR, por eso
+    # el default es el classpath: funciona igual en local y en el contenedor.
+    # Para iterar el diseno sin recompilar: DOCUMENTS_ASSETS_LOCATION=file:./assets/
+    assets-location: ${DOCUMENTS_ASSETS_LOCATION:classpath:assets/}
+    logo-file: ${DOCUMENTS_LOGO_FILE:logo.svg}
+    template: pdf/institutional-document
+    # Se guarda con cada documento para poder regenerar historicos con su diseno.
+    template-version: "1.0.0"
+    storage-prefix: ${DOCUMENTS_STORAGE_PREFIX:documents/}
+    organization:
+      # Marca impresa en el encabezado y el pie. La Disenadora fija los textos
+      # definitivos; ver backend/document_design/INSTRUCCIONES.md
+      name: ${DOCUMENTS_ORG_NAME:Capacia}
+      tagline: ${DOCUMENTS_ORG_TAGLINE:Plataforma de Benchmark de Data Centers}
+      footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
     api-key: ${EMAIL_API_KEY}
@@ -134,6 +160,9 @@ logging:
   level:
     root: INFO
     com.dcplatform: DEBUG
+    # El motor de PDF avisa aqui del CSS que no soporta y de los recursos que no pudo
+    # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
+    com.openhtmltopdf: WARN
 
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica
