@@ -319,6 +319,68 @@ class JwtServiceImplTest {
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
+	@Test
+	void extractExpiration_shouldReturnFutureDateForValidAccessToken() {
+		String token = jwtService.generateAccessToken("admin@example.com", "ADMIN");
+
+		Date expirationDate = jwtService.extractExpiration(token);
+
+		assertThat(expirationDate).isNotNull();
+		assertThat(expirationDate).isAfter(new Date());
+	}
+
+	@Test
+	void extractExpiration_shouldReturnFutureDateForValidMagicLinkToken() {
+		String token = jwtService.generateMagicLinkToken("lead@example.com");
+
+		Date expirationDate = jwtService.extractExpiration(token);
+
+		assertThat(expirationDate).isNotNull();
+		assertThat(expirationDate).isAfter(new Date());
+	}
+
+	@Test
+	void extractExpiration_shouldThrowIllegalArgumentExceptionOnNullToken() {
+		assertThatThrownBy(() -> jwtService.extractExpiration(null))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void extractExpiration_shouldThrowJwtExceptionOnMalformedToken() {
+		String malformedToken = "not.a.valid.jwt";
+
+		assertThatThrownBy(() -> jwtService.extractExpiration(malformedToken))
+				.isInstanceOf(io.jsonwebtoken.JwtException.class);
+	}
+
+	@Test
+	void extractExpiration_shouldThrowExpiredJwtExceptionOnExpiredToken() {
+		// 1. Configuramos el tiempo de vida en 0 para forzar la expiración inmediata
+		ReflectionTestUtils.setField(jwtService, "magicLinkTtlMinutes", 0);
+		String expiredToken = jwtService.generateMagicLinkToken("expired@example.com");
+
+		// 2. Al intentar extraer los claims (y por ende la expiración), la librería debe fallar
+		assertThatThrownBy(() -> jwtService.extractExpiration(expiredToken))
+				.isInstanceOf(io.jsonwebtoken.ExpiredJwtException.class);
+	}
+
+	@Test
+	void extractExpiration_shouldThrowJwtExceptionWhenSignatureIsInvalid() {
+		// 1. Simulamos un token generado por un atacante con un secreto diferente
+		String attackerSecret = "9999999999abcdef0123456789abcdef";
+		SecretKey attackerKey = Keys.hmacShaKeyFor(attackerSecret.getBytes(StandardCharsets.UTF_8));
+
+		String tamperedToken = Jwts.builder()
+				.subject("hacked@example.com")
+				.expiration(new Date(System.currentTimeMillis() + 100000))
+				.signWith(attackerKey)
+				.compact();
+
+		// 2. Intentamos extraer la fecha, lo que desencadenará una falla de firma criptográfica
+		assertThatThrownBy(() -> jwtService.extractExpiration(tamperedToken))
+				.isInstanceOf(io.jsonwebtoken.JwtException.class);
+	}
+
 	private Claims extractClaims(String token) {
 		SecretKey signingKey = Keys.hmacShaKeyFor(
 				((String) Objects.requireNonNull(ReflectionTestUtils.getField(jwtService, "secret")))
