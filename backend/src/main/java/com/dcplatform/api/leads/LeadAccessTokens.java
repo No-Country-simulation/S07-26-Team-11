@@ -1,4 +1,13 @@
-public class lead_access_tokens {
+package com.dcplatform.api.leads;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
+public class LeadAccessTokens {
     private UUID id ;
     private UUID lead_id;
     private String token_hash;

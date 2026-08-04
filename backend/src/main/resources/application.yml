@@ -93,7 +93,7 @@ app:
     worker-enabled: ${PDF_WORKER_ENABLED:true}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
-    api-key: ${EMAIL_API_KEY:}
+    api-key: ${EMAIL_API_KEY}
     from-address: ${EMAIL_FROM:}
     daily-quota: ${EMAIL_DAILY_QUOTA:300}
   storage:

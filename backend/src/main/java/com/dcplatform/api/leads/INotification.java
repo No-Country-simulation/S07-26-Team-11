@@ -1,3 +1,5 @@
+package com.dcplatform.api.leads;
+
 public interface INotification {
-    void sendNotification();
+    void sendNotification(Lead lead , LeadAccessTokens leadAccessTokens);
 }
