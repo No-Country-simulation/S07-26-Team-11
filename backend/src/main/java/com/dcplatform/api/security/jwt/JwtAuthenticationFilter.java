@@ -1,5 +1,6 @@
 package com.dcplatform.api.security.jwt;
 
+import com.dcplatform.api.auth.TokenRevocationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +21,11 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
+	private final TokenRevocationService tokenRevocationService;
 
-	public JwtAuthenticationFilter(JwtService jwtService) {
+	public JwtAuthenticationFilter(JwtService jwtService, TokenRevocationService tokenRevocationService) {
 		this.jwtService = jwtService;
+		this.tokenRevocationService = tokenRevocationService;
 	}
 
 	@Override
@@ -41,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		try {
-			if (jwtService.isTokenValid(jwt) && jwtService.isAccessToken(jwt)) {
+			if (jwtService.isTokenValid(jwt) && jwtService.isAccessToken(jwt) && !tokenRevocationService.isRevoked(jwt)) {
 				String email = jwtService.extractEmail(jwt);
 				String role = jwtService.extractRole(jwt);
 

@@ -118,6 +118,16 @@
             <artifactId>openhtmltopdf-svg-support</artifactId>
             <version>${openhtmltopdf.version}</version>
         </dependency>
+        <!--
+          Manda los avisos del motor a slf4j en vez de java.util.logging. Es lo que hace
+          visible en el log del backend el CSS que el motor ignoro y los recursos que no
+          pudo cargar: el unico canal de feedback de quien maqueta el PDF.
+        -->
+        <dependency>
+            <groupId>io.github.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-slf4j</artifactId>
+            <version>${openhtmltopdf.version}</version>
+        </dependency>
         <!-- Limpia HTML no bien formado antes de pasarlo al renderizador -->
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -219,6 +229,20 @@
                 <includes>
                     <include>V*.sql</include>
                 </includes>
+            </resource>
+            <!--
+              Assets del PDF institucional (logo y fuentes). Se empaquetan en el JAR
+              para que el modulo funcione igual en local y en el contenedor, donde no
+              existe backend/assets: el runtime los lee de classpath:assets/.
+              Los binarios no se filtran, filtrarlos los corromperia.
+            -->
+            <resource>
+                <directory>${project.basedir}/assets</directory>
+                <targetPath>assets</targetPath>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>README.md</exclude>
+                </excludes>
             </resource>
         </resources>
 
