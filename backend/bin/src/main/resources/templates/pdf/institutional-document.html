@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<!--/*
+  ============================================================================
+  PLANTILLA DEL PDF INSTITUCIONAL
+  ============================================================================
+
+  Este archivo es lo unico que hay que tocar para cambiar el aspecto del PDF.
+  Guia completa para disenar: backend/document_design/INSTRUCCIONES.md
+
+  VARIABLES DISPONIBLES
+    ${title}          texto  - titulo del documento
+    ${dateText}       texto  - fecha ya formateada en espanol
+    ${owner}          texto  - email del usuario dueno
+    ${documentName}   texto  - nombre del documento, sin .pdf
+    ${paragraphs}     lista  - parrafos del cuerpo
+    ${assets.logo}    texto  - logo como data URI; puede NO existir (ver th:if)
+    ${org.name}       texto  - de application.yml, bloque app.documents.organization
+    ${org.tagline}    texto
+    ${org.footerNote} texto
+
+  LIMITES DEL MOTOR (Open HTML to PDF) -- CSS 2.1 + paged media:
+    NO hay flexbox, NO hay grid, NO hay JavaScript, NO hay position: sticky.
+    Para poner cosas lado a lado se usa <table>. Ya hay ejemplos abajo.
+    El motor TAMPOCO puede pintar en el margen de la pagina: todo lo visible
+    vive dentro del area de contenido. Por eso el encabezado va en un <thead>
+    con -fs-table-paginate, que el motor repite en cada pagina.
+
+  ITERAR EL DISENO SIN GENERAR PDF:
+    POST /api/v1/documents/preview devuelve este HTML ya renderizado, para
+    abrirlo en el navegador. Ojo: el navegador es mas permisivo que el motor.
+
+  COLORES: salen de design/tokens/tokens.json. Si la Disenadora cambia la
+  paleta alli, hay que reflejarla aqui: el motor no lee el JSON.
+  ============================================================================
+*/-->
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <!-- <title> y <meta name="author"> se convierten en los metadatos del PDF. -->
+    <title th:text="${title}">Documento</title>
+    <meta name="author" th:content="${owner}" content=""/>
+    <meta name="subject" th:content="${org.name}" content=""/>
+
+    <style type="text/css">
+        /* ==================================================================
+           1. PAGINA
+           Medidas de design/tokens/tokens.json -> bloque "pdf".
+           Los margenes de @page son el blanco del papel: el encabezado y el
+           pie NO caben ahi (el motor recorta lo que sale del area de
+           contenido), se resuelven mas abajo con la tabla de pagina.
+           ================================================================== */
+        @page {
+            size: A4;
+            margin: 20mm 18mm 22mm 18mm;
+        }
+
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.45;
+            color: #14181A;            /* neutral.ink */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ==================================================================
+           2. ESQUELETO DE PAGINA
+           -fs-table-paginate es una extension de Open HTML to PDF: repite
+           <thead> y <tfoot> en cada pagina y evita que el cuerpo se les monte
+           encima. Es el equivalente a los margin boxes de CSS3, que este
+           motor no implementa.
+           ================================================================== */
+        table.page-layout {
+            -fs-table-paginate: paginate;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.page-layout > thead > tr > td,
+        table.page-layout > tfoot > tr > td,
+        table.page-layout > tbody > tr > td {
+            padding: 0;
+            vertical-align: top;
+        }
+
+        /* Reserva la franja inferior en todas las paginas. El pie visible se
+           pinta encima con position: fixed, para que tambien quede abajo del
+           todo en la ultima pagina, donde el contenido no llena la hoja. */
+        .footer-reserve {
+            height: 14mm;
+        }
+
+        /* ==================================================================
+           3. ENCABEZADO (se repite en cada pagina)
+           ================================================================== */
+        .masthead {
+            padding-bottom: 7mm;
+        }
+
+        .masthead table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .masthead .logo-cell {
+            width: 20mm;
+            vertical-align: middle;
+            padding: 0;
+        }
+
+        .masthead .logo-cell img {
+            width: 18mm;
+        }
+
+        .masthead .brand-cell {
+            vertical-align: middle;
+        }
+
+        /* Sin logo el bloque de marca ocupa todo el ancho, sin hueco a la izquierda. */
+        .masthead .brand-cell.with-logo {
+            padding: 0 0 0 5mm;
+        }
+
+        .brand-name {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #1F4D3A;            /* forest.default */
+        }
+
+        .brand-tagline {
+            font-size: 8pt;
+            color: #6B7280;            /* neutral.muted */
+            letter-spacing: 0.6pt;
+            text-transform: uppercase;
+        }
+
+        /* Regla doble: gruesa en verde, fina en dorado. Recurso de papeleria. */
+        .rule-thick {
+            border-top: 2pt solid #1F4D3A;
+            margin-top: 4mm;
+        }
+
+        .rule-thin {
+            border-top: 0.75pt solid #C9A227;   /* gold.default */
+            margin-top: 1mm;
+        }
+
+        /* ==================================================================
+           4. PIE (se repite en cada pagina)
+           ================================================================== */
+        #page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 12mm;
+            border-top: 0.5pt solid #E5E7EB;   /* neutral.line */
+            padding-top: 2mm;
+            font-size: 7.5pt;
+            color: #6B7280;
+        }
+
+        #page-footer table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #page-footer td {
+            padding: 0;
+        }
+
+        #page-footer .footer-right {
+            text-align: right;
+        }
+
+        /* El motor resuelve los contadores de pagina en una segunda pasada. */
+        .page-number:after {
+            content: counter(page);
+        }
+
+        .page-total:after {
+            content: counter(pages);
+        }
+
+        /* ==================================================================
+           5. BLOQUE DE TITULO
+           ================================================================== */
+        .eyebrow {
+            font-size: 7.5pt;
+            font-weight: bold;
+            letter-spacing: 1.2pt;
+            text-transform: uppercase;
+            color: #9A7A17;            /* gold.dark: legible sobre blanco */
+            margin: 0 0 2mm 0;
+        }
+
+        h1.doc-title {
+            font-size: 20pt;
+            line-height: 1.25;
+            font-weight: bold;
+            color: #12301F;            /* forest.dark */
+            margin: 0;
+            padding: 0;
+        }
+
+        .doc-date {
+            font-size: 9pt;
+            color: #6B7280;
+            margin-top: 2mm;
+        }
+
+        /* ==================================================================
+           6. FICHA DE METADATOS
+           Dos columnas con <table>, porque no hay grid.
+           ================================================================== */
+        .meta-card {
+            background-color: #F3F6F4;
+            border-left: 2.5pt solid #1F4D3A;
+            padding: 4mm 5mm;
+            margin: 7mm 0 8mm 0;
+        }
+
+        .meta-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .meta-card td {
+            width: 50%;
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .meta-label {
+            font-size: 7pt;
+            font-weight: bold;
+            letter-spacing: 0.7pt;
+            text-transform: uppercase;
+            color: #6B7280;
+        }
+
+        .meta-value {
+            font-size: 10.5pt;
+            color: #14181A;
+            padding-top: 0.8mm;
+        }
+
+        /* ==================================================================
+           7. CUERPO
+           orphans/widows evitan que quede una linea suelta al cortar la pagina.
+           ================================================================== */
+        .body-copy p {
+            margin: 0 0 4.5mm 0;
+            text-align: justify;
+            orphans: 2;
+            widows: 2;
+        }
+
+        .doc-end {
+            margin-top: 10mm;
+            border-top: 0.5pt solid #E5E7EB;
+            padding-top: 2.5mm;
+            font-size: 7.5pt;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pie visible. Fuera de la tabla, fijado al borde inferior de cada pagina. -->
+<div id="page-footer">
+    <table>
+        <tr>
+            <td th:text="${org.footerNote}">Documento generado automaticamente.</td>
+            <td class="footer-right">
+                P&#225;gina <span class="page-number"></span> de <span class="page-total"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table class="page-layout">
+    <!-- thead: el motor lo repite al principio de cada pagina. -->
+    <thead>
+    <tr>
+        <td>
+            <div class="masthead">
+                <table>
+                    <tr>
+                        <!-- El logo es opcional: si backend/assets/ no lo tiene, la celda no se pinta. -->
+                        <td class="logo-cell" th:if="${assets.logo}">
+                            <img th:src="${assets.logo}" src="" alt="Logotipo"/>
+                        </td>
+                        <td class="brand-cell" th:classappend="${assets.logo} ? 'with-logo' : ''">
+                            <div class="brand-name" th:text="${org.name}">Capacia</div>
+                            <div class="brand-tagline" th:text="${org.tagline}">Benchmark de Data Centers</div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="rule-thick"></div>
+                <div class="rule-thin"></div>
+            </div>
+        </td>
+    </tr>
+    </thead>
+
+    <!-- tfoot: reserva el alto del pie en cada pagina. Va vacio a proposito. -->
+    <tfoot>
+    <tr>
+        <td>
+            <div class="footer-reserve"></div>
+        </td>
+    </tr>
+    </tfoot>
+
+    <tbody>
+    <tr>
+        <td>
+
+            <div class="eyebrow">Documento institucional</div>
+            <h1 class="doc-title" th:text="${title}">Titulo del documento</h1>
+            <div class="doc-date" th:text="${dateText}">Fecha</div>
+
+            <div class="meta-card">
+                <table>
+                    <tr>
+                        <td>
+                            <div class="meta-label">Emitido para</div>
+                            <div class="meta-value" th:text="${owner}">usuario@ejemplo.com</div>
+                        </td>
+                        <td>
+                            <div class="meta-label">Referencia</div>
+                            <div class="meta-value" th:text="${documentName}">nombre-documento</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="body-copy">
+                <p th:each="paragraph : ${paragraphs}" th:text="${paragraph}">
+                    Parrafo de ejemplo, visible solo al abrir este archivo directamente en el navegador.
+                </p>
+            </div>
+
+            <div class="doc-end">Fin del documento</div>
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
