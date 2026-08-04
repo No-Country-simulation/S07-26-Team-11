@@ -1,0 +1,175 @@
+# Configuracion base. Los valores sensibles llegan por variables de entorno.
+# NUNCA escribir credenciales reales en este archivo.
+
+spring:
+  application:
+    name: dcplatform-api
+
+  datasource:
+    # El proveedor es Supabase (PostgreSQL gestionado). Ver ADR-0004.
+    # Los valores reales viven en backend/.env, que no entra al repositorio.
+    # El default apunta al Postgres de docker-compose para que el proyecto
+    # siga arrancando en local sin .env.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dcplatform}
+    username: ${DB_USER:dcplatform}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: dcplatform-pool
+      maximum-pool-size: ${DB_POOL_SIZE:5}       # los planes gratuitos limitan conexiones
+      minimum-idle: ${DB_POOL_MIN_IDLE:1}        # no sostener conexiones ociosas contra el pooler
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:15000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT_MS:5000}
+      # El pooler de Supabase corta las conexiones ociosas por su cuenta. Si Hikari
+      # las recicla primero, el usuario nunca ve el "connection closed" del primer
+      # request despues de un rato sin trafico. keepalive < idle-timeout < max-lifetime.
+      keepalive-time: ${DB_KEEPALIVE_MS:120000}      # 2 min
+      idle-timeout: ${DB_IDLE_TIMEOUT_MS:300000}     # 5 min
+      max-lifetime: ${DB_MAX_LIFETIME_MS:600000}     # 10 min
+
+  jpa:
+    hibernate:
+      ddl-auto: validate        # el esquema lo maneja Flyway, nunca Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    # Se puede apagar con FLYWAY_ENABLED=false para probar solo la conectividad
+    # contra una base compartida, sin aplicar migraciones desde tu maquina.
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    schemas: ${DB_SCHEMA:public}
+
+  thymeleaf:
+    # El template del PDF se itera contra POST /api/v1/documents/preview. Sin cache
+    # cada peticion relee el HTML: se edita y se refresca sin reiniciar. En staging
+    # y produccion tiene que ir en true (THYMELEAF_CACHE=true).
+    cache: ${THYMELEAF_CACHE:false}
+
+  jackson:
+    default-property-inclusion: always
+    datatype:
+      datetime:
+        # Jackson 3 (el que trae Spring Boot 4) movio esta opcion de
+        # SerializationFeature a DateTimeFeature. No devolverla a
+        # "serialization:": el arranque falla.
+        # Fechas en ISO-8601 con zona, nunca epoch (ver CLAUDE.md).
+        write-dates-as-timestamps: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never      # no filtrar detalles internos al cliente
+
+app:
+  openapi:
+    # URL publica del backend de staging (Render) para el selector de
+    # servidores de Swagger UI. Si esta vacia solo se publica el local.
+    staging-url: ${OPENAPI_STAGING_URL:https://s07-26-team-11.onrender.com}
+  cors:
+    # Lista separada por comas. Nunca "*": la API envia credenciales.
+    # El frontend de staging esta en Vercel.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,https://capacia.vercel.app}
+  db-status:
+    # GET /api/v1/public/db-status. En true agrega host, usuario y estado del pool:
+    # util en local, informacion de infraestructura de mas en un endpoint publico.
+    # Ponerlo en false en staging mientras Spring Security siga desactivada.
+    show-details: ${DB_STATUS_DETAILS:true}
+  security:
+    magic-link-ttl-minutes: 30
+    jwt-secret: ${JWT_SECRET:}          # obligatorio en staging
+  rate-limit:
+    leads-per-email-per-hour: 3
+    leads-per-ip-per-hour: 10
+  benchmark:
+    min-cohort-size-for-percentile: 5   # regla anti-desanonimizacion
+  pdf:
+    template-version: "1.0.0"
+    signed-url-ttl-days: 7
+    max-attempts: 3
+    worker-enabled: ${PDF_WORKER_ENABLED:true}
+  documents:
+    # Documentos institucionales que genera el usuario autenticado desde
+    # /api/v1/documents. Se guardan en el mismo bucket privado que los informes
+    # del benchmark, bajo su propio prefijo.
+    #
+    # Los assets viven en backend/assets/ y el pom los empaqueta en el JAR, por eso
+    # el default es el classpath: funciona igual en local y en el contenedor.
+    # Para iterar el diseno sin recompilar: DOCUMENTS_ASSETS_LOCATION=file:./assets/
+    assets-location: ${DOCUMENTS_ASSETS_LOCATION:classpath:assets/}
+    logo-file: ${DOCUMENTS_LOGO_FILE:logo.svg}
+    template: pdf/institutional-document
+    # Se guarda con cada documento para poder regenerar historicos con su diseno.
+    template-version: "1.0.0"
+    storage-prefix: ${DOCUMENTS_STORAGE_PREFIX:documents/}
+    organization:
+      # Marca impresa en el encabezado y el pie. La Disenadora fija los textos
+      # definitivos; ver backend/document_design/INSTRUCCIONES.md
+      name: ${DOCUMENTS_ORG_NAME:Capacia}
+      tagline: ${DOCUMENTS_ORG_TAGLINE:Plataforma de Benchmark de Data Centers}
+      footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
+  email:
+    provider: ${EMAIL_PROVIDER:brevo}
+    api-key: ${EMAIL_API_KEY:}
+    from-address: ${EMAIL_FROM:}
+    daily-quota: ${EMAIL_DAILY_QUOTA:300}
+  storage:
+    # Oracle Cloud Object Storage, bucket privado, SDK nativo (firma con par de
+    # claves de API). Si falta cualquiera de estos valores la aplicacion arranca
+    # igual: solo se deshabilitan la subida y la descarga de PDF, con un WARN
+    # en el log y 503 en los endpoints que dependen del bucket.
+    oci:
+      bucket-name: ${OCI_BUCKET_NAME:}
+      # Opcional: si queda vacio se descubre al arrancar con GetNamespace.
+      namespace: ${OCI_NAMESPACE:}
+      region: ${OCI_REGION:}
+      tenancy-ocid: ${OCI_TENANCY_OCID:}
+      user-ocid: ${OCI_USER_OCID:}
+      fingerprint: ${OCI_FINGERPRINT:}
+      # En local conviene la ruta al PEM; en Render, el PEM en base64.
+      private-key-path: ${OCI_PRIVATE_KEY_PATH:}
+      private-key-base64: ${OCI_PRIVATE_KEY_BASE64:}
+      private-key-passphrase: ${OCI_PRIVATE_KEY_PASSPHRASE:}
+      signed-url-ttl: ${OCI_SIGNED_URL_TTL:15m}
+      key-prefix: ${OCI_KEY_PREFIX:benchmark-reports/}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.dcplatform: DEBUG
+    # El motor de PDF avisa aqui del CSS que no soporta y de los recursos que no pudo
+    # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
+    com.openhtmltopdf: WARN
+
+---
+# Perfil del worker: mismo artefacto, sin exponer la API publica
+spring:
+  config:
+    activate:
+      on-profile: worker
+app:
+  pdf:
+    worker-enabled: true
