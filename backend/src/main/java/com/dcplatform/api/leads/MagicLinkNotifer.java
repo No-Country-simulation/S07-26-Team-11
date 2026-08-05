@@ -24,11 +24,11 @@ public class MagicLinkNotifer {
         this.observers.add(observer);
     }
 
-    public void SendNotificacion(Lead lead, LeadAccessTokens leadAccessTokens) {
+    public void SendNotificacion(String email, LeadAccessTokens leadAccessTokens) {
 
         for (INotification observer : observers) {
             try {
-                observer.sendNotification(lead, leadAccessTokens);
+                observer.sendNotification(email, leadAccessTokens);
             } catch (Exception e) {
                 System.err.println("Falló un canal de notificación: " + e.getMessage());
             }

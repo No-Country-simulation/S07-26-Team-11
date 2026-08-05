@@ -28,20 +28,20 @@ public class AdapterEmail implements INotification {
   private String senderName;
 
   @Override
-  public void sendNotification(Lead lead, LeadAccessTokens leadAccessTokens) {
+  public void sendNotification(String email, LeadAccessTokens leadAccessTokens) {
     try {
       SendSmtpEmailSender sender = new SendSmtpEmailSender()
           .email(senderEmail)
           .name(senderName);
 
       SendSmtpEmailTo recipient = new SendSmtpEmailTo()
-          .email(lead.getEmail())
-          .name(lead.getCompanyName());
+          .email(email);
+          
 
       SendSmtpEmail sendSmtpEmail = new SendSmtpEmail()
           .sender(sender)
           .to(List.of(recipient))
-          .htmlContent("<p>Hola " + lead.getCompanyName() + ", usá este token: " 
+          .htmlContent("<p>Hola " + ", usá este token: " 
                                 + leadAccessTokens.getToken_hash() + "</p>");
 
       
