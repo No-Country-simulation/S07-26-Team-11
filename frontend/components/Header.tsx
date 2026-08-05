@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 type HeaderProps = {
-  children: ReactNode;
+  subtitle?: ReactNode;
+  children?: ReactNode;
 };
 
 function Logo() {
@@ -25,11 +26,18 @@ function Logo() {
   );
 }
 
-export default function Header({ children }: HeaderProps) {
+export default function Header({ subtitle, children }: HeaderProps) {
   return (
     <header className="w-full bg-white shadow-sm">
       <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center justify-between px-6 sm:px-8">
-        <Logo />
+        <div className="flex items-center gap-3">
+          <Logo />
+          {subtitle && (
+            <div className="flex items-center pl-3 text-text-secondary text-sm font-medium">
+              {subtitle}
+            </div>
+          )}
+        </div>
         {children}
       </div>
     </header>
