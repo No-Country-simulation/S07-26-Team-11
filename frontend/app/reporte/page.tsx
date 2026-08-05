@@ -1,13 +1,12 @@
 import React from "react";
 import ChartCapacidad from "@/components/ChartCapacidad";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function ReportePage() {
   return (
     <div className="min-h-screen bg-base-natural text-text-primary">
-      <header className="relative z-20 flex w-full items-center gap-6 bg-white px-40 py-5 shadow-sm">
-        <img src="/assets/brand/logotipo.svg" alt="Capacia Logo" className="h-9" />
-      </header>
+      <Header />
 
       <main className="mx-auto max-w-[800px] px-6 py-16 sm:px-8 sm:py-24">
         

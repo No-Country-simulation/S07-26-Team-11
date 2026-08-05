@@ -76,12 +76,7 @@ export default function CompleteResultPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header>
-        <p className="text-xs font-medium text-text-primary sm:text-sm">
-          <span aria-hidden="true" className="mx-2 text-base-border">/</span>
-          Resultado completo
-        </p>
-      </Header>
+      <Header subtitle="/ Resultado Completo" />
 
       <main className="relative flex flex-1 overflow-hidden px-4 py-12 sm:px-8 lg:py-16">
         <img

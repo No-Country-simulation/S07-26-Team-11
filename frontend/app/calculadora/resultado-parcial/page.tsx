@@ -62,12 +62,7 @@ export default function PartialResultPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header>
-        <p className="text-xs font-medium text-text-secondary sm:text-sm">
-          <span aria-hidden="true" className="mx-2 text-base-border">/</span>
-          Capacity Calculator
-        </p>
-      </Header>
+      <Header subtitle="/ Resultado Parcial" />
 
       <main className="flex flex-1 items-center px-4 py-12 sm:px-8 lg:py-16">
         <div className="mx-auto w-full max-w-[710px]">

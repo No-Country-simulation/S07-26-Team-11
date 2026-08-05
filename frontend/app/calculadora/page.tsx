@@ -75,12 +75,7 @@ export default function CalculatorPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header>
-        <p className="text-xs font-medium text-text-secondary sm:text-sm">
-          <span aria-hidden="true" className="mx-2 text-base-border">/</span>
-          Capacity Calculator
-        </p>
-      </Header>
+      <Header subtitle="/ Capacity Calculator" />
 
       <main className="relative flex flex-1 overflow-hidden px-4 py-12 sm:px-8 lg:py-[72px]">
         <img
