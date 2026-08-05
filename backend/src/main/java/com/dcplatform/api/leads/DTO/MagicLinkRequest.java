@@ -10,6 +10,5 @@ public record MagicLinkRequest(
         Source source,
         UUID estimateId,
         String consent,
-        String privacyPolicyVersion
-    ) {
+        String privacyPolicyVersion) {
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +30,7 @@ public class AdapterEmail implements INotification {
   private String senderName;
 
   @Override
-  public void sendNotification(String email, LeadAccessTokens leadAccessTokens) {
+  public void sendNotification(String email, String mensaje) {
     try {
       SendSmtpEmailSender sender = new SendSmtpEmailSender()
           .email(senderEmail)
@@ -42,7 +44,7 @@ public class AdapterEmail implements INotification {
           .sender(sender)
           .to(List.of(recipient))
           .htmlContent("<p>Hola " + ", usá este token: " 
-                                + leadAccessTokens.getToken_hash() + "</p>");
+                                + mensaje + "</p>");
 
       
       CreateSmtpEmail response = apiInstance.sendTransacEmail(sendSmtpEmail);

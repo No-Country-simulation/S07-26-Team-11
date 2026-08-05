@@ -1,30 +1,66 @@
 package com.dcplatform.api.leads;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.dcplatform.api.auth.RevokedTokenRepository;
-import com.dcplatform.api.leads.DTO.MagicLinkDto;
+import com.dcplatform.api.leads.DTO.LeadResponse;
 import com.dcplatform.api.leads.DTO.MagicLinkRequest;
+import com.dcplatform.api.leads.DTO.MagicLinkResponse;
+import com.dcplatform.api.leads.DTO.TokenRequest;
+import com.dcplatform.api.leads.DTO.TokenResponse;
+import com.dcplatform.api.security.jwt.JwtService;
 
 import lombok.AllArgsConstructor;
-
 
 @AllArgsConstructor
 @Service
 public class MagicLinkService {
 
-    private  MagicLinkNotifer magicLinkNotifier;
-  
+    private MagicLinkNotifer magicLinkNotifier;
+    private JwtService jwtService;
+    private TokenHasher tokenHasher;
+    private LeandAccessTokenRepository leandAccessTokenRepository;
 
-    public MagicLinkDto generateMagicLink(MagicLinkRequest magicLinkRequest) {
+    public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest) {
 
-        
+        var magick_link = jwtService.generateMagicLinkToken(magicLinkRequest.email());
 
-       // magicLinkNotifier.sendNotification(magicLinkRequest.email(),);
+        magicLinkNotifier.sendNotificacion(magicLinkRequest.email(), magick_link);
 
-        return new MagicLinkDto("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
+        return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
+    }
+
+    public TokenResponse verifyAndExchange(String rawToken) {
+
+        if (!jwtService.isTokenValid(rawToken) || !jwtService.isMagicLinkToken(rawToken)) {
+            // throw new badRequest("El token de acceso es inválido o ha expirado");
+        }
+
+        String email = jwtService.extractEmail(rawToken);
+
+        String hash = tokenHasher.hash(rawToken);
+
+        LeadAccessTokens accessToken = leandAccessTokenRepository.findByTokenHash(hash);
+
+        if (accessToken.getUsedAt() != null) {
+            // throw ApiException.badRequest("El enlace mágico ya fue utilizado");
+        }
+
+        accessToken.setUsedAt(LocalDateTime.now());
+        leandAccessTokenRepository.save(accessToken);
+
+        String newAccessToken = jwtService.generateAccessToken(email, "LEAD");
+
+        Date expiration = jwtService.extractExpiration(newAccessToken);
+
+        var lead = new LeadResponse(null, email, newAccessToken);
+
+        return new TokenResponse(newAccessToken, expiration, lead);
+
     }
 
 }

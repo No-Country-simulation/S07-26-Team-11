@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +26,11 @@ public class MagicLinkNotifer {
         this.observers.add(observer);
     }
 
-    public void SendNotificacion(String email, LeadAccessTokens leadAccessTokens) {
+    public void sendNotificacion(String email, String magicLink) {
 
         for (INotification observer : observers) {
             try {
-                observer.sendNotification(email, leadAccessTokens);
+                observer.sendNotification(email, magicLink);
             } catch (Exception e) {
                 System.err.println("Falló un canal de notificación: " + e.getMessage());
             }

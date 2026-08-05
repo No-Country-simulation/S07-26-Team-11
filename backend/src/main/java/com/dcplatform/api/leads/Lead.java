@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLRestriction;
 import io.micrometer.core.annotation.Counted;
 import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ indexes = {
     }
 )
 @SQLRestriction("deleted_at IS NULL")
+@Entity
 public class Lead {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,13 +42,13 @@ public class Lead {
     private Source source;
     @Column(name = "consent_at")
     private LocalDateTime consentAt;
-    @Column(name = "consent_ip")
+    @Column(name = "consent_ip" ,columnDefinition = "inet")
     private String consentIp;
     @Column(name = "privacy_policy_version")
     private String privacyPolicyVersion;
-    @Column(name = "created_at ")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
-    @Column(name = "  updated_at ")
+    @Column(name = "  updated_at")
     private LocalDateTime updatedAt;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
