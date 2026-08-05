@@ -61,6 +61,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/dcplatform
       DB_USER: dcplatform
       DB_PASSWORD: ${DB_PASSWORD:-dcplatform_local}
+      JWT_SECRET: ${JWT_SECRET:-cambiar-en-local-minimo-32-caracteres}
       EMAIL_PROVIDER: ${EMAIL_PROVIDER:-brevo}
       EMAIL_API_KEY: ${EMAIL_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}

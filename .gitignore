@@ -5,6 +5,7 @@
 *.pem
 *.key
 secrets/
+db.txt
 
 # ---- Java / Maven ----
 target/
@@ -14,6 +15,7 @@ target/
 !**/src/**/*.jar
 *.log
 hs_err_pid*
+backend/bin
 
 # ---- Node / Next.js ----
 node_modules/
