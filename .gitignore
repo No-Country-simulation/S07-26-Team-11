@@ -5,6 +5,7 @@
 *.pem
 *.key
 secrets/
+db.txt
 
 # ---- Java / Maven ----
 target/
