@@ -2,6 +2,12 @@ import React from "react";
 import ChartCapacidad from "@/components/ChartCapacidad";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Reporte | Capacia",
+  description: "Reporte de madurez operacional y costos",
+};
 
 export default function ReportePage() {
   return (

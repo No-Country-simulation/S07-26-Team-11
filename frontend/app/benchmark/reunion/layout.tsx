@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Agendar una Reunión",
+  title: "Agendar una Reunión | Capacia",
 };
 
 export default function AgendarReunionLayout({
