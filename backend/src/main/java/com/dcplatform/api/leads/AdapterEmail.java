@@ -3,12 +3,7 @@ package com.dcplatform.api.leads;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
-
-
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.stereotype.Component;
 import sendinblue.ApiException;
 import sibApi.TransactionalEmailsApi;
 import sibModel.CreateSmtpEmail;
@@ -16,12 +11,10 @@ import sibModel.SendSmtpEmail;
 import sibModel.SendSmtpEmailSender;
 import sibModel.SendSmtpEmailTo;
 
-@AllArgsConstructor
-@Getter
-@Setter
+@Component
 public class AdapterEmail implements INotification {
 
-  private final TransactionalEmailsApi apiInstance;
+  private final TransactionalEmailsApi apiInstance = new TransactionalEmailsApi();
 
   @Value("${app.email.provider}")
   private String senderEmail;
@@ -38,15 +31,15 @@ public class AdapterEmail implements INotification {
 
       SendSmtpEmailTo recipient = new SendSmtpEmailTo()
           .email(email);
-          
+
 
       SendSmtpEmail sendSmtpEmail = new SendSmtpEmail()
           .sender(sender)
           .to(List.of(recipient))
-          .htmlContent("<p>Hola " + ", usá este token: " 
+          .htmlContent("<p>Hola " + ", usá este token: "
                                 + mensaje + "</p>");
 
-      
+
       CreateSmtpEmail response = apiInstance.sendTransacEmail(sendSmtpEmail);
       System.out.println("Email enviado con éxito. MessageId: " + response.getMessageId());
 

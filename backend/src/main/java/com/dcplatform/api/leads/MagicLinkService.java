@@ -3,29 +3,31 @@ package com.dcplatform.api.leads;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.dcplatform.api.auth.RevokedTokenRepository;
 import com.dcplatform.api.leads.DTO.LeadResponse;
 import com.dcplatform.api.leads.DTO.MagicLinkRequest;
 import com.dcplatform.api.leads.DTO.MagicLinkResponse;
-import com.dcplatform.api.leads.DTO.TokenRequest;
 import com.dcplatform.api.leads.DTO.TokenResponse;
 import com.dcplatform.api.security.jwt.JwtService;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 @Service
 public class MagicLinkService {
 
-    private MagicLinkNotifer magicLinkNotifier;
-    private JwtService jwtService;
-    private TokenHasher tokenHasher;
-    private LeandAccessTokenRepository leandAccessTokenRepository;
+    private final MagicLinkNotifer magicLinkNotifier;
+    private final JwtService jwtService;
+    private final TokenHasher tokenHasher;
+    private final LeandAccessTokenRepository leandAccessTokenRepository;
 
-    public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest) {
+	public MagicLinkService(MagicLinkNotifer magicLinkNotifier, JwtService jwtService, TokenHasher tokenHasher,
+	                        LeandAccessTokenRepository leandAccessTokenRepository) {
+		this.magicLinkNotifier = magicLinkNotifier;
+		this.jwtService = jwtService;
+		this.tokenHasher = tokenHasher;
+		this.leandAccessTokenRepository = leandAccessTokenRepository;
+	}
+
+	public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest) {
 
         var magick_link = jwtService.generateMagicLinkToken(magicLinkRequest.email());
 
