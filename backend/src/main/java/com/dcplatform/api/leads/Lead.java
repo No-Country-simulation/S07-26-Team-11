@@ -45,7 +45,9 @@ public class Lead {
     private LocalDateTime updatedAt;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+     
 
+    
     public UUID getId() {
         return id;
     }

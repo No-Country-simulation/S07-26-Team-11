@@ -6,6 +6,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,7 +40,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class })
     public ProblemDetail handleMalformedRequest(Exception ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setType(URI.create("/errors/validation"));
@@ -48,6 +49,8 @@ public class GlobalExceptionHandler {
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
+
+   
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
@@ -70,7 +73,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
         // TODO: registrar la excepcion completa en el log con el traceId,
-        //       pero nunca devolverla al cliente.
+        // pero nunca devolverla al cliente.
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problem.setType(URI.create("/errors/internal"));
         problem.setTitle("Error interno del servidor");

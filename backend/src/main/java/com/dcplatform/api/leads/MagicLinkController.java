@@ -11,6 +11,8 @@ import com.dcplatform.api.leads.DTO.MagicLinkResponse;
 import com.dcplatform.api.leads.DTO.TokenRequest;
 import com.dcplatform.api.leads.DTO.TokenResponse;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/public")
 public class MagicLinkController {
@@ -22,7 +24,7 @@ public class MagicLinkController {
 	}
 
 	@PostMapping("/leads")
-    public ResponseEntity<MagicLinkResponse> generateMagicLink(@RequestBody MagicLinkRequest magicLinkRequest) {
+    public ResponseEntity<MagicLinkResponse> generateMagicLink(@Valid @RequestBody MagicLinkRequest magicLinkRequest) {
 
         var response = magicLinkService.generateMagicLink(magicLinkRequest);
 
