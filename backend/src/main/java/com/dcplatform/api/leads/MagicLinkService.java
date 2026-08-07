@@ -31,6 +31,8 @@ public class MagicLinkService {
 
         var magick_link = jwtService.generateMagicLinkToken(magicLinkRequest.email());
 
+        
+
         magicLinkNotifier.sendNotificacion(magicLinkRequest.email(), magick_link);
 
         return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");

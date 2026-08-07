@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.dcplatform.api.config.BrevoConfig;
+
 import sendinblue.ApiException;
 import sibApi.TransactionalEmailsApi;
 import sibModel.CreateSmtpEmail;
@@ -14,13 +17,21 @@ import sibModel.SendSmtpEmailTo;
 @Component
 public class AdapterEmail implements INotification {
 
-  private final TransactionalEmailsApi apiInstance = new TransactionalEmailsApi();
+  private final TransactionalEmailsApi apiInstance;
+  
+
+public AdapterEmail(TransactionalEmailsApi apiInstance) {
+        this.apiInstance = apiInstance;
+    }
+
 
   @Value("${app.email.provider}")
   private String senderEmail;
 
   @Value("${app.email.from-address}")
   private String senderName;
+
+
 
   @Override
   public void sendNotification(String email, String mensaje) {

@@ -8,7 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class MagicLinkNotifer {
 
-    List<INotification> observers = new ArrayList<>();
+    private final List<INotification> observers;
+
+    public MagicLinkNotifer(List<INotification> observers) {
+        this.observers = observers != null ? observers : new ArrayList<>();
+    }
 
     public void subscribe(INotification observer) {
         this.observers.add(observer);
