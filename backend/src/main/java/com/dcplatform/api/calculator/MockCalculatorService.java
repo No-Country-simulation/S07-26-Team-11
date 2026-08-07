@@ -1,6 +1,7 @@
 package com.dcplatform.api.calculator;
 
 import com.dcplatform.api.shared.annotations.MockIntegration;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,15 +14,19 @@ import java.util.UUID;
 @Service
 public class MockCalculatorService implements CalculatorService {
 
+	private final Logger logger = org.slf4j.LoggerFactory.getLogger(MockCalculatorService.class);
+
 	@Override
 	public CalculatorEstimateResponse calculate(CalculatorEstimateRequest request) {
+		logger.info("Using mock calculator service");
+
 		double contracted = request.contractedCapacityMw();
 		double utilized = request.utilizedCapacityMw();
 		double energyCost = request.energyCostPerKwh();
 		String country = request.country();
 		double pue = request.pue();
 
-		// calcular cpacidad ociosa
+		// calcular capacidad ociosa
 		double idleRatio = 0.0;
 		double idleMw = 0.0;
 
@@ -58,7 +63,7 @@ public class MockCalculatorService implements CalculatorService {
 		String createdAt = Instant.now().atOffset(ZoneOffset.UTC)
 				.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
-		// construir los KPIs
+		// construir los KPI
 		CalculatorEstimateResponse.KpiResult ratioKpi = new CalculatorEstimateResponse.KpiResult(
 				"IDLE_CAPACITY_RATIO",
 				"Capacidad ociosa pagada",
@@ -82,7 +87,7 @@ public class MockCalculatorService implements CalculatorService {
 				createdAt,
 				false,
 				List.of(ratioKpi, costKpi),
-				4 // cantidad de KPIs ocultos
+				4 // cantidad de KPI ocultos
 		);
 	}
 }

@@ -164,6 +164,14 @@ logging:
     # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
     com.openhtmltopdf: WARN
 
+# ---------------------------------------------------------
+# VARIABLES GLOBALES (Aplica a todos los perfiles)
+# ---------------------------------------------------------
+client:
+  api:
+    mock:
+      enabled: false # cambiar a false cuando el cliente libere los servicios
+
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica
 spring:
@@ -173,11 +181,3 @@ spring:
 app:
   pdf:
     worker-enabled: true
-
-# ---------------------------------------------------------
-# VARIABLES GLOBALES (Aplica a todos los perfiles)
-# ---------------------------------------------------------
-client:
-  api:
-    mock:
-      enabled: true # cambiar a false cuando el cliente libere los servicios
