@@ -173,3 +173,11 @@ spring:
 app:
   pdf:
     worker-enabled: true
+
+# ---------------------------------------------------------
+# VARIABLES GLOBALES (Aplica a todos los perfiles)
+# ---------------------------------------------------------
+client:
+  api:
+    mock:
+      enabled: true # cambiar a false cuando el cliente libere los servicios
