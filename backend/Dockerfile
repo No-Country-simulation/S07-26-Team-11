@@ -6,10 +6,10 @@ WORKDIR /app/backend
 COPY backend/ .
 
 # Corregimos los saltos de línea (CRLF a LF) por si se editó en Windows
-RUN sed -i 's/\r$//' mvnw
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
 
 # Descargamos dependencias usando el wrapper corregido
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+RUN ./mvnw dependency:go-offline
 
 # Copiamos las migraciones que viven fuera de backend/
 COPY database/ /app/database/

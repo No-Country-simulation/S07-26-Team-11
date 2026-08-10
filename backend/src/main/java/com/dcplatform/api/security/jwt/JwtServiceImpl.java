@@ -2,9 +2,11 @@ package com.dcplatform.api.security.jwt;
 
 import com.dcplatform.api.shared.ApiException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -76,13 +78,28 @@ public class JwtServiceImpl implements JwtService {
 	}
 
 	@Override
-	public boolean isTokenValid(String token) {
-		try {
-			return extractAllClaims(token).getExpiration().after(new Date());
-		} catch (JwtException | IllegalArgumentException e) {
-			return false;
-		}
-	}
+public boolean isTokenValid(String token) {
+    try {
+        Claims claims = extractAllClaims(token);
+        boolean isValid = claims.getExpiration().after(new Date());
+        System.out.println("🔍 [DEBUG JWT] ¿Fecha de expiración válida?: " + isValid);
+        return isValid;
+
+    } catch (ExpiredJwtException e) {
+        System.err.println("❌ [DEBUG JWT] Token EXPIRADO: " + e.getMessage());
+        return false;
+    } catch (SignatureException e) {
+        System.err.println("❌ [DEBUG JWT] FIRMA INVÁLIDA (Revisá JWT_SECRET): " + e.getMessage());
+        return false;
+    } catch (JwtException | IllegalArgumentException e) {
+        System.err.println("❌ [DEBUG JWT] Error de firma o estructura JWT: " + e.getMessage());
+        return false;
+    } catch (Exception e) {
+        System.err.println("❌ [DEBUG JWT] Error inesperado al parsear JWT: " + e.getMessage());
+        return false;
+    }
+}
+	
 
 	private Claims extractAllClaims(String token) {
 		return Jwts.parser()
@@ -101,8 +118,7 @@ public class JwtServiceImpl implements JwtService {
 			throw new ApiException(
 					HttpStatus.BAD_REQUEST,
 					"validation-error",
-					"El formato del email es inválido"
-			);
+					"El formato del email es inválido");
 		}
 	}
 
