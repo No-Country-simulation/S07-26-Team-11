@@ -53,7 +53,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/calculator/estimate").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/calculator/defaults").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/leads").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/v1/public/leads/verify").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/v1/public/verify").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/benchmark/instrument").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/industry/stats").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/webhooks/email/*").permitAll()

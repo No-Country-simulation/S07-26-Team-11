@@ -2,26 +2,21 @@ package com.dcplatform.api.calculator;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/public/calculator")
 public class CalculatorController {
 
-    @PostMapping("/estimate")
-    public ResponseEntity<CalculatorResponse> estimate(@Valid @RequestBody CalculatorRequest request) {
-        BigDecimal carga = BigDecimal.valueOf(request.getCargaTermicaKw());
+	private final CalculatorService calculatorService;
 
-        BigDecimal consumoEstimadoKwh = carga.multiply(new BigDecimal("720")); 
-        BigDecimal costoEstimado = consumoEstimadoKwh.multiply(new BigDecimal("0.15")); 
+	public CalculatorController(CalculatorService calculatorService) {
+		this.calculatorService = calculatorService;
+	}
 
-        CalculatorResponse response = new CalculatorResponse(consumoEstimadoKwh, costoEstimado);
-
-        return ResponseEntity.ok(response);
-    }
+	@PostMapping("/estimate")
+	public ResponseEntity<CalculatorEstimateResponse> estimate(@Valid @RequestBody CalculatorEstimateRequest request) {
+		CalculatorEstimateResponse response = calculatorService.calculate(request);
+		return ResponseEntity.ok(response);
+	}
 }
