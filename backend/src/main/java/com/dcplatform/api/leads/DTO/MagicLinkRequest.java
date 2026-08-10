@@ -20,7 +20,7 @@ public record MagicLinkRequest(
 
                 UUID estimateId,
 
-                @NotNull(message = "El consentimiento es obligatorio") @AssertTrue(message = "Debes aceptar los términos y condiciones para continuar") String consent,
+                @NotNull(message = "El consentimiento es obligatorio") String consent,
 
                 @NotBlank(message = "La versión de la política de privacidad es obligatoria") String privacyPolicyVersion) {
 }

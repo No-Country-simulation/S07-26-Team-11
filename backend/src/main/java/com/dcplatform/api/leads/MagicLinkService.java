@@ -36,14 +36,20 @@ public class MagicLinkService {
 
     public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest) {
 
-        Lead lead = new Lead();
-        lead.setEmail(magicLinkRequest.email());
-        lead.setCompanyName(magicLinkRequest.companyName());
-        lead.setRole(magicLinkRequest.role());
-        lead.setSource(magicLinkRequest.source());
-        lead.setConsentIp(magicLinkRequest.consent());
-        lead.setPrivacyPolicyVersion(magicLinkRequest.privacyPolicyVersion());
-        var leadbd = leadRepository.save(lead);
+        var leadDb = leadRepository.findByEmail(magicLinkRequest.email());
+        Lead lead = leadDb;
+        if (lead == null) {
+            lead = new Lead(
+                magicLinkRequest.email(),
+                magicLinkRequest.companyName(),
+                magicLinkRequest.role(),
+                magicLinkRequest.source(),
+                LocalDateTime.now(),
+                magicLinkRequest.consent(),
+                magicLinkRequest.privacyPolicyVersion());
+
+            leadRepository.save(lead);
+        }
 
         String rawToken = jwtService.generateMagicLinkToken(magicLinkRequest.email());
         String tokenHash = tokenHasher.hash(rawToken);
@@ -52,7 +58,7 @@ public class MagicLinkService {
         accessToken.setTokenHash(tokenHash);
         accessToken.setLead(lead);
         accessToken.setCreatedAt(LocalDateTime.now());
-        accessToken.setExpiresAt(LocalDateTime.now().plusMinutes(15)); // O el tiempo configurado
+        accessToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
         leandAccessTokenRepository.save(accessToken);
 
         magicLinkNotifier.sendNotificacion(magicLinkRequest.email(), rawToken);

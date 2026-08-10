@@ -3,7 +3,11 @@ package com.dcplatform.api.leads;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +29,7 @@ indexes = {
 @Entity
 public class Lead {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String email;
     @Column(name = "company_name")
@@ -36,18 +40,35 @@ public class Lead {
     @Column(name = "consent_at")
     private LocalDateTime consentAt;
     @Column(name = "consent_ip" ,columnDefinition = "inet")
+    @JdbcTypeCode(SqlTypes.INET)
     private String consentIp;
     @Column(name = "privacy_policy_version")
     private String privacyPolicyVersion;
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
-    @Column(name = "  updated_at")
+    @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
      
 
     
+   public Lead() {
+    }
+
+   public Lead(String email, String companyName, String role, Source source, 
+                LocalDateTime consentAt, String consentIp, String privacyPolicyVersion) {
+        this.email = email;
+        this.companyName = companyName;
+        this.role = role;
+        this.source = source;
+        this.consentAt = consentAt;
+        this.consentIp = consentIp;
+        this.privacyPolicyVersion = privacyPolicyVersion;
+    }
+
     public UUID getId() {
         return id;
     }

@@ -25,10 +25,10 @@ public AdapterEmail(TransactionalEmailsApi apiInstance) {
     }
 
 
-  @Value("${app.email.provider}")
+  @Value("${app.email.from-address}")
   private String senderEmail;
 
-  @Value("${app.email.from-address}")
+  @Value("${app.email.from-name:Capacia}")
   private String senderName;
 
 
@@ -44,11 +44,11 @@ public AdapterEmail(TransactionalEmailsApi apiInstance) {
           .email(email);
 
 
-      SendSmtpEmail sendSmtpEmail = new SendSmtpEmail()
-          .sender(sender)
-          .to(List.of(recipient))
-          .htmlContent("<p>Hola " + ", usá este token: "
-                                + mensaje + "</p>");
+    SendSmtpEmail sendSmtpEmail = new SendSmtpEmail()
+                    .sender(sender)
+                    .to(List.of(recipient))
+                    .subject("Tu enlace de acceso - Capacia") // 👈 🟢 ESTO FALTABA: Asunto obligatorio
+                    .htmlContent("<p>Hola, usá este token: <strong>" + mensaje + "</strong></p>");
 
 
       CreateSmtpEmail response = apiInstance.sendTransacEmail(sendSmtpEmail);
