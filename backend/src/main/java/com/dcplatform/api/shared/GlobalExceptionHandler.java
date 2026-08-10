@@ -71,7 +71,8 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleApi(ApiException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(ex.getStatus());
         problem.setType(URI.create("/errors/" + ex.getType()));
-        problem.setTitle(ex.getMessage());
+        problem.setTitle(ex.getType());
+        problem.setDetail(ex.getMessage());
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
