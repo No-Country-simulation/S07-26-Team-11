@@ -47,8 +47,8 @@ public AdapterEmail(TransactionalEmailsApi apiInstance) {
     SendSmtpEmail sendSmtpEmail = new SendSmtpEmail()
                     .sender(sender)
                     .to(List.of(recipient))
-                    .subject("Tu enlace de acceso - Capacia") // 👈 🟢 ESTO FALTABA: Asunto obligatorio
-                    .htmlContent("<p>Hola, usá este token: <strong>" + mensaje + "</strong></p>");
+                    .subject("Tu enlace de acceso - Capacia") 
+                    .htmlContent("<p>Hola, tu magick link: <strong>" + mensaje + "</strong></p>");
 
 
       CreateSmtpEmail response = apiInstance.sendTransacEmail(sendSmtpEmail);

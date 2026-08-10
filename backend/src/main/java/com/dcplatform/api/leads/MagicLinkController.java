@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dcplatform.api.leads.DTO.MagicLinkRequest;
@@ -32,9 +33,10 @@ public class MagicLinkController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<TokenResponse> generateToken(@RequestBody TokenRequest tokenRequest) {
+    public ResponseEntity<TokenResponse> generateToken(
+        @Valid @RequestBody TokenRequest tokenRequest) {
 
-        TokenResponse response = magicLinkService.verifyAndExchange(tokenRequest.token());
+        TokenResponse response = magicLinkService.verifyAndExchange(tokenRequest);
         return ResponseEntity.ok(response);
     }
 }

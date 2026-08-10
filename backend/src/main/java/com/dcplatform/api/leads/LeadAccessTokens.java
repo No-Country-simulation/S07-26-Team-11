@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="lead_access_tokens")
+@Table(name = "lead_access_tokens")
 public class LeadAccessTokens {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
