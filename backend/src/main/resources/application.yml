@@ -119,7 +119,7 @@ app:
       footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
-    api-key: ${EMAIL_API_KEY}
+    api-key: ${EMAIL_API_KEY:x-dummy-api-key}
     from-address: ${EMAIL_FROM:}
     from-name: ${EMAIL_FROM_NAME:Capacia}
     daily-quota: ${EMAIL_DAILY_QUOTA:300}
