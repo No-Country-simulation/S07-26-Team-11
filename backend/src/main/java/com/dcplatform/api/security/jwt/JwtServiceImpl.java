@@ -78,28 +78,13 @@ public class JwtServiceImpl implements JwtService {
 	}
 
 	@Override
-public boolean isTokenValid(String token) {
-    try {
-        Claims claims = extractAllClaims(token);
-        boolean isValid = claims.getExpiration().after(new Date());
-        System.out.println("🔍 [DEBUG JWT] ¿Fecha de expiración válida?: " + isValid);
-        return isValid;
-
-    } catch (ExpiredJwtException e) {
-        System.err.println("❌ [DEBUG JWT] Token EXPIRADO: " + e.getMessage());
-        return false;
-    } catch (SignatureException e) {
-        System.err.println("❌ [DEBUG JWT] FIRMA INVÁLIDA (Revisá JWT_SECRET): " + e.getMessage());
-        return false;
-    } catch (JwtException | IllegalArgumentException e) {
-        System.err.println("❌ [DEBUG JWT] Error de firma o estructura JWT: " + e.getMessage());
-        return false;
-    } catch (Exception e) {
-        System.err.println("❌ [DEBUG JWT] Error inesperado al parsear JWT: " + e.getMessage());
-        return false;
-    }
-}
-	
+	public boolean isTokenValid(String token) {
+		try {
+			return extractAllClaims(token).getExpiration().after(new Date());
+		} catch (JwtException | IllegalArgumentException e) {
+			return false;
+		}
+	}
 
 	private Claims extractAllClaims(String token) {
 		return Jwts.parser()

@@ -79,6 +79,7 @@ app:
     # Lista separada por comas. Nunca "*": la API envia credenciales.
     # El frontend de staging esta en Vercel.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,https://capacia.vercel.app}
+    frontend-url: ${FRONTEND_URL:https://capacia.vercel.app}
   db-status:
     # GET /api/v1/public/db-status. En true agrega host, usuario y estado del pool:
     # util en local, informacion de infraestructura de mas en un endpoint publico.

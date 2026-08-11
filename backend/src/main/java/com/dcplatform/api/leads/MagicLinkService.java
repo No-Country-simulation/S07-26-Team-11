@@ -29,8 +29,8 @@ public class MagicLinkService {
     private final LeadRepository leadRepository;
     private final RateLimiterService rateLimiterService;
 
-    @Value("${app.openapi.staging-url}")
-    private String backendUrl;
+    @Value("${app.cors.frontend-url}")
+    private String frontendUrl;
 
     public MagicLinkService(MagicLinkNotifer magicLinkNotifier, JwtService jwtService, TokenHasher tokenHasher,
             LeandAccessTokenRepository leandAccessTokenRepository, LeadRepository leadRepository,
@@ -49,38 +49,36 @@ public class MagicLinkService {
         if (!rateLimiterService.tryConsumeIp(clientIp)) {
             throw ApiException.ratLimited("Has superado el límite de solicitudes por IP. Intenta más tarde.");
         }
-          
+
+        
         if (!rateLimiterService.tryConsumeEmail(magicLinkRequest.email())) {
-            throw ApiException.ratLimited("Has superado el límite de solicitudes por IP. Intenta más tarde.");
+            throw ApiException.ratLimited("Has superado el límite de solicitudes por este correo. Intenta más tarde.");
         }
-        Lead lead = leadRepository.findByEmail(magicLinkRequest.email())
-                .orElseGet(() -> leadRepository.save(new Lead(
-                        magicLinkRequest.email(),
-                        magicLinkRequest.companyName(),
-                        magicLinkRequest.role(),
-                        magicLinkRequest.source(),
-                        LocalDateTime.now(),
-                        magicLinkRequest.consent(),
-                        magicLinkRequest.privacyPolicyVersion())));
+    
 
-        String rawToken = jwtService.generateMagicLinkToken(magicLinkRequest.email());
-        String tokenHash = tokenHasher.hash(rawToken);
+    Lead lead = leadRepository.findByEmail(magicLinkRequest.email())
+            .orElseGet(() -> leadRepository.save(new Lead(
+                    magicLinkRequest.email(),
+                    magicLinkRequest.companyName(),
+                    magicLinkRequest.role(),
+                    magicLinkRequest.source(),
+                    LocalDateTime.now(),
+                    clientIp,
+                    magicLinkRequest.privacyPolicyVersion())));
 
-        LeadAccessTokens accessToken = new LeadAccessTokens();
-        accessToken.setTokenHash(tokenHash);
-        accessToken.setLead(lead);
-        accessToken.setCreatedAt(LocalDateTime.now());
-        accessToken.setExpiresAt(LocalDateTime.now());
-        leandAccessTokenRepository.save(accessToken);
+    String rawToken = jwtService.generateMagicLinkToken(magicLinkRequest.email());
+    String tokenHash = tokenHasher.hash(rawToken);
 
-        String magicLinkUrl = UriComponentsBuilder.fromUriString(backendUrl)
-                .path("/api/v1/public/verify")
-                .queryParam("token", rawToken)
-                .toUriString();
+    LeadAccessTokens accessToken = new LeadAccessTokens();accessToken.setTokenHash(tokenHash);accessToken.setLead(lead);accessToken.setCreatedAt(LocalDateTime.now());accessToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));leandAccessTokenRepository.save(accessToken);
 
-        magicLinkNotifier.sendNotificacion(magicLinkRequest.email(), magicLinkUrl);
+    String magicLinkUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+            .path("/api/v1/public/verify")
+            .queryParam("token", rawToken)
+            .toUriString();
 
-        return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
+    magicLinkNotifier.sendNotificacion(magicLinkRequest.email(),magicLinkUrl);
+
+    return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
     }
 
     public TokenResponse verifyAndExchange(TokenRequest tokenRequest) {

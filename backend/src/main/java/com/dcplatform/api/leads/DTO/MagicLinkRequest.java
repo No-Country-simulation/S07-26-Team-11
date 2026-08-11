@@ -10,17 +10,21 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record MagicLinkRequest(
-                @NotBlank(message = "El email es obligatorio") @Email(message = "El formato del email no es válido") String email,
+        @NotBlank(message = "El email es obligatorio") 
+        @Email(message = "El formato del email no es válido") String email,
+        
+        String companyName,
 
-                String companyName,
+        String role,
 
-                String role,
+        @NotNull(message = "El origen (source) es obligatorio") Source source,
 
-                @NotNull(message = "El origen (source) es obligatorio") Source source,
+        UUID estimateId,
+           
+        @NotNull(message = "El consentimiento es obligatorio") 
+        @AssertTrue(message = "Debes aceptar los términos para continuar")
+        Boolean consent,
 
-                UUID estimateId,
+        @NotBlank(message = "La versión de la política de privacidad es obligatoria") String privacyPolicyVersion) {
 
-                @NotNull(message = "El consentimiento es obligatorio") String consent,
-
-                @NotBlank(message = "La versión de la política de privacidad es obligatoria") String privacyPolicyVersion) {
 }
