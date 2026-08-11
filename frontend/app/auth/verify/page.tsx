@@ -16,7 +16,6 @@ function VerifyContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorType, setErrorType] = useState<ErrorType>(null);
 
-  // 1. Asignación inmediata del título apenas carga el cliente
   useEffect(() => {
     if (isLoading) {
       document.title = "Verificando acceso... | Capacia";
@@ -29,6 +28,7 @@ function VerifyContent() {
 
   const validarToken = async () => {
     if (!token) {
+      console.log("No hay token en la URL");
       setErrorType("invalid_link");
       setIsLoading(false);
       return;
@@ -37,14 +37,25 @@ function VerifyContent() {
     setIsLoading(true);
     setErrorType(null);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
-      const response = await fetch("http://localhost:8080/api/v1/public/leads/verify", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      console.log("Llamando a la API en:", `${API_URL}/api/v1/public/leads/verify`);
+
+      const response = await fetch(`${API_URL}/api/v1/public/leads/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
+        signal: controller.signal,
       });
 
-      if (response.status === 400) {
+      clearTimeout(timeoutId);
+
+      console.log("Status de respuesta:", response.status);
+
+      if (response.status === 400 || response.status === 404) {
         setErrorType("invalid_link");
         return;
       }
@@ -63,6 +74,7 @@ function VerifyContent() {
 
       router.push("/benchmark/cuestionario");
     } catch (err) {
+      console.error("Error capturado en la petición:", err);
       setErrorType("server_error");
     } finally {
       setIsLoading(false);

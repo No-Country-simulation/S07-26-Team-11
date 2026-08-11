@@ -61,20 +61,11 @@ export default function ReunionConfirmacionPage() {
 
           <div className="mt-4 flex flex-col items-center gap-4">
             <Link
-              href="/benchmark/resultado"
+              href="/benchmark/resultados"
               className="inline-flex h-10 w-full max-w-[200px] items-center justify-center rounded border border-forest px-4 text-base font-semibold text-forest-dark"
             >
               Volver a mi resultado
             </Link>
-
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-base font-bold text-forest transition-underline hover:underline"
-            >
-              Agregar al calendario <span aria-hidden="true">↗</span>
-            </a>
           </div>
         </div>
       </main>
