@@ -72,7 +72,7 @@ public class MagickLinkTest {
         String email = "test@empresa.com";
         String clientIp = "192.168.1.1";
         MagicLinkRequest request = new MagicLinkRequest(
-                email, "Empresa", "Dev", Source.CALCULATOR, null, "true", "v1.0");
+                email, "Empresa", "Dev", Source.CALCULATOR, null, true, "v1.0");
 
         lenient().when(rateLimiterService.tryConsumeIp(any())).thenReturn(true);
         lenient().when(rateLimiterService.tryConsumeEmail(any())).thenReturn(true);
