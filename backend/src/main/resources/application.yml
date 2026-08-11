@@ -120,7 +120,7 @@ app:
       footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
-    api-key: ${EMAIL_API_KEY}
+    api-key: ${EMAIL_API_KEY:x-dummy-api-key}
     from-address: ${EMAIL_FROM:}
     from-name: ${EMAIL_FROM_NAME:Capacia}
     daily-quota: ${EMAIL_DAILY_QUOTA:300}
@@ -165,6 +165,14 @@ logging:
     # El motor de PDF avisa aqui del CSS que no soporta y de los recursos que no pudo
     # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
     com.openhtmltopdf: WARN
+
+# ---------------------------------------------------------
+# VARIABLES GLOBALES (Aplica a todos los perfiles)
+# ---------------------------------------------------------
+client:
+  api:
+    mock:
+      enabled: false # cambiar a false cuando el cliente libere los servicios
 
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica

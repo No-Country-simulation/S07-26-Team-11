@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
@@ -38,11 +39,30 @@ const pasosProgreso = [
 ];
 
 export default function BenchmarkPage() {
+  const router = useRouter();
   const [indiceActual, setIndiceActual] = useState(0);
+  
+  const [respuestas, setRespuestas] = useState<Record<number, string>>({});
+
   const preguntaActiva = mockPreguntas[indiceActual];
+  const esUltimaPregunta = indiceActual === mockPreguntas.length - 1;
+
+  const opcionSeleccionada = respuestas[preguntaActiva.id];
+  const tieneRespuesta = Boolean(opcionSeleccionada);
+
+  const seleccionarOpcion = (opcion: string) => {
+    setRespuestas((prev) => ({
+      ...prev,
+      [preguntaActiva.id]: opcion,
+    }));
+  };
 
   const irSiguiente = () => {
-    if (indiceActual < mockPreguntas.length - 1) {
+    if (!tieneRespuesta) return; 
+
+    if (esUltimaPregunta) {
+      router.push("/benchmark/resultados");
+    } else {
       setIndiceActual(indiceActual + 1);
     }
   };
@@ -127,12 +147,29 @@ export default function BenchmarkPage() {
           </p>
 
           <div className="flex flex-col gap-3">
-            {preguntaActiva.opciones.map((opcion, index) => (
-              <label key={index} className="flex items-center p-4 border border-base-border rounded-lg cursor-pointer hover:bg-base-internal transition-colors">
-                <input type="radio" name={`pregunta-${preguntaActiva.id}`} className="w-5 h-5 mr-4" />
-                <span className="text-text-primary">{opcion}</span>
-              </label>
-            ))}
+            {preguntaActiva.opciones.map((opcion, index) => {
+              const estaSeleccionada = opcionSeleccionada === opcion;
+
+              return (
+                <label 
+                  key={index} 
+                  className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                    estaSeleccionada 
+                      ? "border-forest bg-forest/5 font-medium" 
+                      : "border-base-border hover:bg-base-internal"
+                  }`}
+                >
+                  <input 
+                    type="radio" 
+                    name={`pregunta-${preguntaActiva.id}`} 
+                    checked={estaSeleccionada}
+                    onChange={() => seleccionarOpcion(opcion)}
+                    className="w-5 h-5 mr-4 accent-forest" 
+                  />
+                  <span className="text-text-primary">{opcion}</span>
+                </label>
+              );
+            })}
           </div>
 
           <div className="flex justify-between items-center mt-8">
@@ -146,10 +183,14 @@ export default function BenchmarkPage() {
             
             <button 
               onClick={irSiguiente}
-              disabled={indiceActual === mockPreguntas.length - 1}
-              className={`font-bold text-xs flex items-center ${indiceActual === mockPreguntas.length - 1 ? 'text-base-border cursor-not-allowed' : 'text-forest hover:text-forest-dark'}`}
+              disabled={!tieneRespuesta}
+              className={`font-bold text-xs flex items-center transition-colors ${
+                !tieneRespuesta 
+                  ? "text-base-border cursor-not-allowed" 
+                  : "text-forest hover:text-forest-dark"
+              }`}
             >
-              Siguiente →
+              {esUltimaPregunta ? "Ver resultados →" : "Siguiente →"}
             </button>
           </div>
         </div>

@@ -37,7 +37,10 @@ export default function BenchmarkResultadosPage() {
         <Recomendaciones />
 
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4 mt-8">
-          <button className="flex-1 bg-white border border-forest text-forest-dark font-semibold text-base py-3 rounded-md hover:bg-base-natural transition-colors">
+          <button 
+            className="flex-1 bg-white border border-forest text-forest-dark font-semibold text-base py-3 rounded-md hover:bg-base-natural transition-colors"
+            onClick={() => router.push("/benchmark/resultados/descarga")}
+          >
             Descargar informe PDF
           </button>
           <button 

@@ -158,10 +158,10 @@ export default function Home() {
                 Dónde está parado tu Data Center frente al mercado.
               </p>
               <Link
-                href="/reporte-industria"
+                href="/reporte"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest hover:underline"
               >
-                Descargar el report <span aria-hidden="true">→</span>
+                Visualiza el report <span aria-hidden="true">→</span>
               </Link>
             </article>
 
