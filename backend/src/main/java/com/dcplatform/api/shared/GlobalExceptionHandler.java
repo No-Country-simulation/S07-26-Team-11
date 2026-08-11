@@ -10,7 +10,6 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +29,8 @@ import java.util.UUID;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
@@ -46,7 +47,11 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
-    @ExceptionHandler({ MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class })
+    @ExceptionHandler({ 
+        MethodArgumentTypeMismatchException.class, 
+        HttpMessageNotReadableException.class, 
+        IllegalArgumentException.class 
+    })
     public ProblemDetail handleMalformedRequest(Exception ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setType(URI.create("/errors/validation"));
@@ -55,8 +60,6 @@ public class GlobalExceptionHandler {
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
-
-   
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
@@ -72,20 +75,6 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(ex.getStatus());
         problem.setType(URI.create("/errors/" + ex.getType()));
         problem.setTitle(ex.getMessage());
-        problem.setInstance(URI.create(request.getRequestURI()));
-        return problem;
-    }
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
-        String traceId = Optional.ofNullable(MDC.get("traceId"))
-                .orElseGet(() -> Optional.ofNullable(request.getHeader("X-Trace-Id"))
-                        .orElseGet(() -> UUID.randomUUID().toString().substring(0, 8)));
-                        log.error("[TraceID: {}] Error no controlado en la ruta {}: ", traceId, request.getRequestURI(), ex);
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problem.setType(URI.create("/errors/internal"));
-        problem.setTitle("Error interno del servidor");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
@@ -106,6 +95,19 @@ public class GlobalExceptionHandler {
         problem.setType(URI.create("/errors/auth"));
         problem.setTitle("Acceso no permitido");
         problem.setDetail("No se tienen los privilegios necesarios para acceder a esta ruta");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
+        String traceId = Optional.ofNullable(MDC.get("traceId"))
+                .orElseGet(() -> Optional.ofNullable(request.getHeader("X-Trace-Id"))
+                        .orElseGet(() -> UUID.randomUUID().toString().substring(0, 8)));
+        log.error("[TraceID: {}] Error no controlado en la ruta {}: ", traceId, request.getRequestURI(), ex);
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problem.setType(URI.create("/errors/internal"));
+        problem.setTitle("Error interno del servidor");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
