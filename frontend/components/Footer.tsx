@@ -27,13 +27,13 @@ export default function Footer() {
         <Logo />
 
         <nav aria-label="Enlaces legales" className="flex items-center gap-7">
-          <Link href="/privacidad" className="text-forest-dark">
+          <Link href="" className="text-forest-dark">
             Privacidad
           </Link>
-          <Link href="/terminos" className="text-forest-dark">
+          <Link href="" className="text-forest-dark">
             Términos y Condiciones
           </Link>
-          <Link href="/contacto" className="text-forest-dark">
+          <Link href="" className="text-forest-dark">
             Contacto
           </Link>
         </nav>

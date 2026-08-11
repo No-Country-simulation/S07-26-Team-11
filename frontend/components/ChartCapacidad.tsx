@@ -1,57 +1,59 @@
 import React from "react";
 
 export default function ChartCapacidad() {
-  // Arreglo de datos con las alturas simuladas en clases de Tailwind
   const data = [
-    { year: "2022", encendida: "h-[55%]", utilizada: "h-[30%]" },
-    { year: "2023", encendida: "h-[65%]", utilizada: "h-[35%]" },
-    { year: "2024", encendida: "h-[70%]", utilizada: "h-[35%]" },
-    { year: "2025", encendida: "h-[75%]", utilizada: "h-[40%]" },
-    { year: "2026", encendida: "h-[90%]", utilizada: "h-[45%]" },
+    { year: "2022", encendida: "55%", utilizada: "30%" },
+    { year: "2023", encendida: "65%", utilizada: "35%" },
+    { year: "2024", encendida: "70%", utilizada: "35%" },
+    { year: "2025", encendida: "75%", utilizada: "40%" },
+    { year: "2026", encendida: "90%", utilizada: "45%" },
   ];
 
   return (
-    <div className="w-full rounded-xl border border-base-border bg-white p-6 shadow-sm sm:p-8">
-      
+    <div className="w-full overflow-hidden rounded-xl border border-base-border bg-white p-4 shadow-sm sm:p-8">
       {/* Header del gráfico y Leyenda */}
-      <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h3 className="font-display text-base font-semibold text-text-primary">
+      <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:mb-10 sm:flex-row sm:items-center sm:gap-4">
+        <h3 className="font-display text-sm font-semibold text-text-primary sm:text-base">
           Capacidad instalada vs. utilizada (MW promedio por instalación)
         </h3>
 
-        <div className="flex items-center gap-5 text-sm text-text-secondary">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-sm bg-forest-light"></span>
+        <div className="flex items-center gap-4 text-xs text-text-secondary sm:gap-5 sm:text-sm">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="h-2.5 w-2.5 rounded-sm bg-forest-light sm:h-3 sm:w-3"></span>
             <span>Encendida</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-sm bg-forest-dark"></span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="h-2.5 w-2.5 rounded-sm bg-forest-dark sm:h-3 sm:w-3"></span>
             <span>Utilizada</span>
           </div>
         </div>
       </div>
 
-      {/* Área de las barras */}
-      {/* Usamos items-end para que las barras "crezcan" desde abajo hacia arriba */}
-      <div className="flex h-[240px] w-full items-end justify-between border-b border-base-border pb-3 sm:justify-around">
+      {/* Área de las barras + Eje x */}
+      <div className="flex h-[200px] w-full items-end justify-between border-b border-base-border pb-2 sm:h-[240px] sm:pb-3">
         {data.map((item) => (
-          <div key={item.year} className="flex h-full flex-col justify-end gap-3">
-            
+          <div
+            key={item.year}
+            className="flex h-full flex-1 flex-col items-center justify-end gap-2"
+          >
             {/* Contenedor del par de barras */}
-            <div className="flex h-full items-end justify-center gap-1 sm:gap-2">
-              <div 
-                className={`w-8 rounded-t-sm bg-forest-light transition-all hover:opacity-80 sm:w-12 ${item.encendida}`}
+            <div className="flex h-full items-end justify-center gap-0.5 min-[380px]:gap-1 sm:gap-2">
+              <div
+                style={{ height: item.encendida }}
+                className="w-2.5 rounded-t-sm bg-forest-light transition-all hover:opacity-80 min-[380px]:w-3.5 sm:w-10"
+                title={`Encendida: ${item.encendida}`}
               ></div>
-              <div 
-                className={`w-8 rounded-t-sm bg-forest-dark transition-all hover:opacity-80 sm:w-12 ${item.utilizada}`}
+              <div
+                style={{ height: item.utilizada }}
+                className="w-2.5 rounded-t-sm bg-forest-dark transition-all hover:opacity-80 min-[380px]:w-3.5 sm:w-10"
+                title={`Utilizada: ${item.utilizada}`}
               ></div>
             </div>
-            
+
             {/* Etiqueta del año */}
-            <span className="text-center font-display text-sm text-text-secondary">
+            <span className="text-center font-display text-[11px] text-text-secondary min-[380px]:text-xs sm:text-sm">
               {item.year}
             </span>
-            
           </div>
         ))}
       </div>

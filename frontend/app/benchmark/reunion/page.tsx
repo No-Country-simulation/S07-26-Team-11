@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Calendario from "@/components/Calendario";
 import Header from "@/components/Header";
@@ -22,6 +23,19 @@ export default function AgendarReunionPage() {
   };
 
   const isFormValid = selectedTime !== null && nombre.trim() !== "" && email.trim() !== "";
+
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault(); 
+
+    if (!isFormValid) return;
+
+    const datosReunion = { nombre, email, mensaje };
+    localStorage.setItem("datosReunion", JSON.stringify(datosReunion));
+
+    router.push("/benchmark/reunion/confirmacion"); 
+  };
 
   return (
     <div className="min-h-screen bg-base-natural flex flex-col font-display relative overflow-hidden">
@@ -79,7 +93,7 @@ export default function AgendarReunionPage() {
 
             <div className="bg-white rounded-md shadow-sm border border-base-border p-6 sm:p-8">
               <h3 className="text-sm font-bold text-text-primary mb-6">Confirmá tus datos</h3>
-              <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-xs text-text-secondary mb-1.5">Nombre</label>
                   <input 
