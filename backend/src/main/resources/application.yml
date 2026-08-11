@@ -74,7 +74,7 @@ app:
   openapi:
     # URL publica del backend de staging (Render) para el selector de
     # servidores de Swagger UI. Si esta vacia solo se publica el local.
-    staging-url: ${OPENAPI_STAGING_URL:https://s07-26-team-11.onrender.com}
+    staging-url: ${OPENAPI_STAGING_URL:https://s07-26-team-11-api.onrender.com}
   cors:
     # Lista separada por comas. Nunca "*": la API envia credenciales.
     # El frontend de staging esta en Vercel.
@@ -172,7 +172,7 @@ logging:
 client:
   api:
     mock:
-      enabled: false # cambiar a false cuando el cliente libere los servicios
+      enabled: true # cambiar a false cuando el cliente libere los servicios
 
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica
