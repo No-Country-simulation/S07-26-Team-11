@@ -1,0 +1,249 @@
+package com.dcplatform.api.documents;
+
+import com.dcplatform.api.pdf.PdfRendererComponent;
+import org.junit.jupiter.api.Test;
+import org.thymeleaf.ITemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.templateresolver.StringTemplateResolver;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class PdfTemplateRenderTest {
+
+    // Plantilla HTML completa incrustada, con la expresión de números corregida
+    private static final String TEMPLATE = """
+            <!DOCTYPE html>
+            <html xmlns:th="http://www.thymeleaf.org" lang="es">
+            <head>
+                <meta charset="utf-8"/>
+                <title th:text="${title}">Documento</title>
+                <meta name="author" th:content="${owner}" content=""/>
+                <meta name="subject" th:content="${org.name}" content=""/>
+                <style type="text/css">
+                    @page { size: A4; margin: 20mm 18mm 22mm 18mm; }
+                    body { font-family: "Helvetica", sans-serif; font-size: 10.5pt; line-height: 1.45; color: #14181A; margin: 0; padding: 0; }
+                    table.page-layout { -fs-table-paginate: paginate; width: 100%; border-collapse: collapse; }
+                    table.page-layout > thead > tr > td, table.page-layout > tfoot > tr > td, table.page-layout > tbody > tr > td { padding: 0; vertical-align: top; }
+                    .footer-reserve { height: 14mm; }
+                    .masthead { padding-bottom: 7mm; }
+                    .masthead table { width: 100%; border-collapse: collapse; }
+                    .masthead .logo-cell { width: 20mm; vertical-align: middle; padding: 0; }
+                    .masthead .logo-cell img { width: 18mm; }
+                    .masthead .brand-cell { vertical-align: middle; }
+                    .masthead .brand-cell.with-logo { padding: 0 0 0 5mm; }
+                    .brand-name { font-size: 13pt; font-weight: bold; color: #1F4D3A; }
+                    .brand-tagline { font-size: 8pt; color: #6B7280; letter-spacing: 0.6pt; text-transform: uppercase; }
+                    .rule-thick { border-top: 2pt solid #1F4D3A; margin-top: 4mm; }
+                    .rule-thin { border-top: 0.75pt solid #C9A227; margin-top: 1mm; }
+                    #page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 12mm; border-top: 0.5pt solid #E5E7EB; padding-top: 2mm; font-size: 7.5pt; color: #6B7280; }
+                    #page-footer table { width: 100%; border-collapse: collapse; }
+                    #page-footer td { padding: 0; }
+                    #page-footer .footer-right { text-align: right; }
+                    .page-number:after { content: counter(page); }
+                    .page-total:after { content: counter(pages); }
+                    .eyebrow { font-size: 7.5pt; font-weight: bold; letter-spacing: 1.2pt; text-transform: uppercase; color: #9A7A17; margin: 0 0 2mm 0; }
+                    h1.doc-title { font-size: 20pt; line-height: 1.25; font-weight: bold; color: #12301F; margin: 0; padding: 0; }
+                    .subtitle-label { font-size: 7.5pt; font-weight: bold; letter-spacing: 1.2pt; text-transform: uppercase; color: #6B7280; margin: 6mm 0 2mm 0; }
+                    .description { font-size: 10.5pt; line-height: 1.5; color: #14181A; margin-bottom: 7mm; text-align: justify; }
+                    .highlight-card { background-color: #FCF8ED; border: 1px solid #E2DAC4; padding: 5mm; margin-bottom: 8mm; }
+                    .highlight-label { font-size: 7pt; font-weight: bold; text-transform: uppercase; color: #8B7D5E; letter-spacing: 0.7pt; }
+                    .highlight-value { font-size: 24pt; font-weight: bold; color: #C9A227; margin-top: 1mm; }
+                    .two-cards-table { width: 100%; border-collapse: separate; border-spacing: 15px 0; margin: 10mm 0 8mm 0; }
+                    .stat-card { width: 50%; border: 1px solid #E5E7EB; padding: 4mm; vertical-align: top; }
+                    .stat-label { display: block; font-size: 7pt; font-weight: bold; text-transform: uppercase; color: #6B7280; letter-spacing: 0.7pt; margin-bottom: 2mm; }
+                    .stat-value { display: block; font-size: 16pt; font-weight: bold; color: #1F4D3A; }
+                    .three-cards-table { width: 100%; border-collapse: separate; border-spacing: 15px 0; margin-bottom: 10mm; }
+                    .three-cards-table td { border: 1px solid #E5E7EB; padding: 4mm; text-align: center; }
+                    .indicator-label { display: block; font-size: 7pt; font-weight: bold; text-transform: uppercase; color: #6B7280; letter-spacing: 0.7pt; margin-bottom: 2mm; }
+                    .indicator-value { display: block; font-size: 16pt; font-weight: bold; color: #1F4D3A; }
+                    .chart-note { font-size: 9pt; color: #C9A227; margin-bottom: 6mm; }
+                    .chart-table { width: 100%; border-collapse: collapse; margin-bottom: 10mm; }
+                    .chart-table tr { height: 12mm; }
+                    .chart-label { width: 30%; padding-right: 5mm; font-weight: 600; color: #1F4D3A; font-size: 11pt; }
+                    .chart-bar { width: 60%; }
+                    .bar-bg { background-color: #F3F3F3; height: 14px; border-radius: 8px; overflow: hidden; }
+                    .bar-fill { height: 100%; border-radius: 8px; }
+                    .bar-gold { background-color: #C9A227; }
+                    .bar-dark-green { background-color: #1F4D3A; }
+                    .bar-pattern-diagonal { background: repeating-linear-gradient(45deg, #1F4D3A 0px, #1F4D3A 2px, transparent 2px, transparent 4px); }
+                    .bar-pattern-dots { background: repeating-linear-gradient(90deg, #1F4D3A 0px, #1F4D3A 2px, transparent 2px, transparent 4px); }
+                    .chart-value { width: 10%; text-align: right; font-weight: 700; color: #1F4D3A; }
+                    .rec-table { width: 100%; border: 1px solid #E5E7EB; margin-bottom: 3mm; border-collapse: separate; }
+                    .rec-num-cell { width: 40px; vertical-align: middle; padding: 3mm; }
+                    .rec-text-cell { vertical-align: middle; padding: 3mm 3mm 3mm 0; font-weight: 600; color: #1F4D3A; font-size: 12pt; }
+                    .rec-number { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; background-color: #F3F3F3; border-radius: 6px; color: #6B7280; font-weight: bold; font-size: 10pt; }
+                    .cta-card { background-color: #0B2D26; color: #FFFFFF; padding: 6mm; margin-top: 10mm; }
+                    .cta-title { color: #A0B4AE; font-weight: 700; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2mm; }
+                    .cta-card p { font-size: 11pt; line-height: 1.5; margin-bottom: 4mm; }
+                    .link-primary { color: #FFFFFF; font-weight: 700; font-size: 12pt; text-decoration: none; display: block; }
+                    .link-secondary { color: #A0B4AE; font-size: 10pt; text-decoration: none; display: block; margin-top: 2mm; }
+                    .page-subtitle { font-size: 7.5pt; font-weight: bold; letter-spacing: 1.2pt; text-transform: uppercase; color: #9A7A17; margin-bottom: 5mm; }
+                </style>
+            </head>
+            <body>
+            <div id="page-footer">
+                <table>
+                    <tr>
+                        <td th:text="${footerText}">Capacia – Informe de capacidad | 29 de julio de 2026 · Confidencial</td>
+                        <td class="footer-right">Página <span class="page-number"></span> de <span class="page-total"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <table class="page-layout">
+                <thead>
+                <tr>
+                    <td>
+                        <div class="masthead">
+                            <table>
+                                <tr>
+                                    <td class="logo-cell" th:if="${assets.logo}">
+                                        <img th:src="${assets.logo}" src="" alt="Logotipo"/>
+                                    </td>
+                                    <td class="brand-cell" th:classappend="${assets.logo} ? 'with-logo' : ''">
+                                        <div class="brand-name" th:text="${org.name}">Capacia</div>
+                                        <div class="brand-tagline" th:text="${org.tagline}">Benchmark de Data Centers</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="rule-thick"></div>
+                            <div class="rule-thin"></div>
+                        </div>
+                    </td>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr><td><div class="footer-reserve"></div></td></tr>
+                </tfoot>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="eyebrow">INFORME EJECUTIVO</div>
+                        <h1 class="doc-title" th:text="${title}">Informe de capacidad – Northbridge Data Systems</h1>
+                        <div class="subtitle-label">RESUMEN EJECUTIVO</div>
+                        <p class="description" th:text="${executiveSummary}">Su infraestructura opera hoy con una utilización promedio del 70%...</p>
+                        <div class="highlight-card">
+                            <div class="highlight-label">COSTO ANUAL DESPERDICIADO</div>
+                            <div class="highlight-value" th:text="${annualCost}">US$ 48.200</div>
+                        </div>
+                        <table class="two-cards-table">
+                            <tr>
+                                <td class="stat-card"><span class="stat-label">NIVEL DE MADUREZ</span><span class="stat-value" th:text="${maturityLevel}">Gestionado</span></td>
+                                <td class="stat-card"><span class="stat-label">SCORE</span><span class="stat-value" th:text="${score}">54 / 100</span></td>
+                            </tr>
+                        </table>
+                        <div style="page-break-before: always;"></div>
+                        <div class="page-subtitle">PÁGINA 2</div>
+                        <h2>Indicadores clave</h2>
+                        <table class="three-cards-table">
+                            <tr>
+                                <td><span class="indicator-label">kW subutilizados</span><span class="indicator-value" th:text="${kwUnderutilized}">142 kW</span></td>
+                                <td><span class="indicator-label">% de utilización</span><span class="indicator-value" th:text="${utilizationPercent}">38%</span></td>
+                                <td><span class="indicator-label">Costo por rack / año</span><span class="indicator-value" th:text="${costPerRack}">US$ 1.004</span></td>
+                            </tr>
+                        </table>
+                        <h2>Posición frente a la industria</h2>
+                        <p class="chart-note">Score de madurez (0-100) por segmento. Patrones de trama distinguen las barras si se imprime en blanco y negro.</p>
+                        <table class="chart-table">
+                            <tr th:each="item : ${industryScores}">
+                                <td class="chart-label" th:text="${item.label}">Tu resultado</td>
+                                <td class="chart-bar"><div class="bar-bg"><div class="bar-fill" th:class="${item.barClass}" th:style="'width:' + ${item.value} + '%;'"></div></div></td>
+                                <td class="chart-value" th:text="${item.value}">54</td>
+                            </tr>
+                        </table>
+                        <div style="page-break-before: always;"></div>
+                        <div class="page-subtitle">PÁGINA 3</div>
+                        <h2>Recomendaciones</h2>
+                        <table class="rec-table" th:each="rec, iter : ${recommendations}">
+                            <tr>
+                                <td class="rec-num-cell"><span class="rec-number" th:text="${(iter.index < 9 ? '0' + (iter.index + 1) : '' + (iter.index + 1))}">01</span></td>
+                                <td class="rec-text-cell" th:text="${rec}">Implementá monitoreo por carga de trabajo...</td>
+                            </tr>
+                        </table>
+                        <div class="cta-card">
+                            <div class="cta-title">HABLEMOS DE ESTOS RESULTADOS</div>
+                            <p>Un especialista de Capacia puede revisar este informe con su equipo y estimar el plan de recuperación.</p>
+                            <a th:href="${meetingLink}" class="link-primary">Agendá una reunión: capacia.com/agenda</a>
+                            <a th:href="'mailto:' + ${contactEmail}" class="link-secondary">o escribí a enterprise@capacia.com</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            </body>
+            </html>
+            """;
+
+    private final ITemplateEngine templateEngine = buildTemplateEngine();
+
+    private ITemplateEngine buildTemplateEngine() {
+        SpringTemplateEngine engine = new SpringTemplateEngine();
+        engine.setTemplateResolver(new StringTemplateResolver());
+        return engine;
+    }
+
+    @Test
+    void shouldRenderHtmlWithoutErrors() throws IOException {
+        Map<String, Object> model = buildSampleModel();
+        String html = templateEngine.process(TEMPLATE, new Context(Locale.of("es"), model));
+        assertThat(html).isNotEmpty();
+        Files.writeString(Path.of("target/test-preview.html"), html);
+        System.out.println("HTML guardado en target/test-preview.html");
+    }
+
+    @Test
+    void shouldRenderPdfWithoutErrors() throws IOException {
+        Map<String, Object> model = buildSampleModel();
+        String html = templateEngine.process(TEMPLATE, new Context(Locale.of("es"), model));
+        PdfRendererComponent pdfRenderer = new PdfRendererComponent();
+        byte[] pdfBytes = pdfRenderer.renderHtmlToPdf(html);
+        assertThat(pdfBytes).isNotEmpty();
+        Files.write(Path.of("target/test-output.pdf"), pdfBytes);
+        System.out.println("PDF guardado en target/test-output.pdf");
+    }
+
+    private Map<String, Object> buildSampleModel() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("title", "Informe de capacidad – Northbridge Data Systems");
+        model.put("dateText", "29 de julio de 2026");
+        model.put("owner", "operador@empresa.com");
+        model.put("documentName", "informe-capacidad");
+        model.put("paragraphs", List.of("Párrafo de ejemplo."));
+        model.put("assets", new AssetsStub(""));
+        model.put("org", new OrgStub("Capacia", "Benchmark de Data Centers", "Documento generado automáticamente."));
+        model.put("executiveSummary", "Su infraestructura opera hoy con una utilización promedio del 70%...");
+        model.put("annualCost", "US$ 48.200");
+        model.put("maturityLevel", "Gestionado");
+        model.put("score", "54 / 100");
+        model.put("kwUnderutilized", "142 kW");
+        model.put("utilizationPercent", "38%");
+        model.put("costPerRack", "US$ 1.004");
+        model.put("industryScores", List.of(
+                Map.of("label", "Tu resultado", "value", 54, "barClass", "bar-gold"),
+                Map.of("label", "Hyperscale", "value", 71, "barClass", "bar-pattern-diagonal"),
+                Map.of("label", "Colocation", "value", 58, "barClass", "bar-pattern-dots"),
+                Map.of("label", "Enterprise (promedio)", "value", 46, "barClass", "bar-dark-green")
+        ));
+        model.put("recommendations", List.of(
+                "Implementá monitoreo por carga de trabajo para reducir el punto ciego de visibilidad.",
+                "Establece un proceso de bajas de recursos ociosos con revisión trimestral.",
+                "Automatizá el apagado programado en ambientes no productivos.",
+                "Asigna ownership formal a cada carga para sostener la gobernanza en el tiempo."
+        ));
+        model.put("meetingLink", "https://capacia.com/agenda");
+        model.put("contactEmail", "enterprise@capacia.com");
+        model.put("footerText", "Capacia – Informe de capacidad | 29 de julio de 2026 · Confidencial");
+        return model;
+    }
+
+    public record AssetsStub(String logo) {}
+    public record OrgStub(String name, String tagline, String footerNote) {}
+}
