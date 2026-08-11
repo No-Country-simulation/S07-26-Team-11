@@ -22,15 +22,15 @@ import com.dcplatform.api.shared.ApiException;
 @Service
 public class MagicLinkService {
 
-    private final ApiApplication apiApplication;
     private final MagicLinkNotifer magicLinkNotifier;
     private final JwtService jwtService;
     private final TokenHasher tokenHasher;
     private final LeandAccessTokenRepository leandAccessTokenRepository;
     private final LeadRepository leadRepository;
+    private final RateLimiterService rateLimiterService;
 
-    @Value("${app.openapi.staging-url}")
-    private String backendUrl;
+    @Value("${app.cors.frontend-url}")
+    private String frontendUrl;
 
     public MagicLinkService(MagicLinkNotifer magicLinkNotifier, JwtService jwtService, TokenHasher tokenHasher,
             LeandAccessTokenRepository leandAccessTokenRepository, LeadRepository leadRepository,
@@ -40,48 +40,54 @@ public class MagicLinkService {
         this.tokenHasher = tokenHasher;
         this.leandAccessTokenRepository = leandAccessTokenRepository;
         this.leadRepository = leadRepository;
-        this.apiApplication = apiApplication;
+        this.rateLimiterService = new RateLimiterService();
+
     }
 
-    public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest) {
+    public MagicLinkResponse generateMagicLink(MagicLinkRequest magicLinkRequest, String clientIp) {
 
-        Lead lead = leadRepository.findByEmail(magicLinkRequest.email())
-                .orElseGet(() -> leadRepository.save(new Lead(
-                        magicLinkRequest.email(),
-                        magicLinkRequest.companyName(),
-                        magicLinkRequest.role(),
-                        magicLinkRequest.source(),
-                        LocalDateTime.now(),
-                        magicLinkRequest.consent(),
-                        magicLinkRequest.privacyPolicyVersion())));
+        if (!rateLimiterService.tryConsumeIp(clientIp)) {
+            throw ApiException.ratLimited("Has superado el límite de solicitudes por IP. Intenta más tarde.");
+        }
 
-        String rawToken = jwtService.generateMagicLinkToken(magicLinkRequest.email());
-        String tokenHash = tokenHasher.hash(rawToken);
+        
+        if (!rateLimiterService.tryConsumeEmail(magicLinkRequest.email())) {
+            throw ApiException.ratLimited("Has superado el límite de solicitudes por este correo. Intenta más tarde.");
+        }
+    
 
-        LeadAccessTokens accessToken = new LeadAccessTokens();
-        accessToken.setTokenHash(tokenHash);
-        accessToken.setLead(lead);
-        accessToken.setCreatedAt(LocalDateTime.now());
-        accessToken.setExpiresAt(LocalDateTime.now());
-        leandAccessTokenRepository.save(accessToken);
+    Lead lead = leadRepository.findByEmail(magicLinkRequest.email())
+            .orElseGet(() -> leadRepository.save(new Lead(
+                    magicLinkRequest.email(),
+                    magicLinkRequest.companyName(),
+                    magicLinkRequest.role(),
+                    magicLinkRequest.source(),
+                    LocalDateTime.now(),
+                    clientIp,
+                    magicLinkRequest.privacyPolicyVersion())));
 
-        String magicLinkUrl = UriComponentsBuilder.fromUriString(backendUrl)
-                .path("/api/v1/public/verify")
-                .queryParam("token", rawToken)
-                .toUriString();
+    String rawToken = jwtService.generateMagicLinkToken(magicLinkRequest.email());
+    String tokenHash = tokenHasher.hash(rawToken);
 
-        magicLinkNotifier.sendNotificacion(magicLinkRequest.email(), magicLinkUrl);
+    LeadAccessTokens accessToken = new LeadAccessTokens();accessToken.setTokenHash(tokenHash);accessToken.setLead(lead);accessToken.setCreatedAt(LocalDateTime.now());accessToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));leandAccessTokenRepository.save(accessToken);
 
-        return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
+    String magicLinkUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+            .path("/api/v1/public/verify")
+            .queryParam("token", rawToken)
+            .toUriString();
+
+    magicLinkNotifier.sendNotificacion(magicLinkRequest.email(),magicLinkUrl);
+
+    return new MagicLinkResponse("Si el correo es válido, recibirás un enlace de acceso en unos segundos.");
     }
 
     public TokenResponse verifyAndExchange(TokenRequest tokenRequest) {
 
         String token = tokenRequest.token();
 
-      if (!jwtService.isTokenValid(token)) {
-        throw ApiException.badRequest("El token de acceso es inválido o ha expirado");
-    }
+        if (!jwtService.isTokenValid(token)) {
+            throw ApiException.badRequest("El token de acceso es inválido o ha expirado");
+        }
 
         if (!jwtService.isMagicLinkToken(token)) {
             throw ApiException.badRequest("El token proporcionado no es un token de acceso de tipo Magic Link");
@@ -92,8 +98,6 @@ public class MagicLinkService {
 
         Lead leadBd = leadRepository.findByEmail(emailJwt)
                 .orElseThrow(() -> ApiException.notFound("El lead especificado no existe"));
-
-        
 
         LeadAccessTokens accessToken = leandAccessTokenRepository.findByTokenHash(hash)
                 .orElseThrow(() -> ApiException.badRequest("El token de acceso no se encuentra registrado"));

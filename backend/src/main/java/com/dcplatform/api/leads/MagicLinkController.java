@@ -11,7 +11,9 @@ import com.dcplatform.api.leads.DTO.MagicLinkRequest;
 import com.dcplatform.api.leads.DTO.MagicLinkResponse;
 import com.dcplatform.api.leads.DTO.TokenRequest;
 import com.dcplatform.api.leads.DTO.TokenResponse;
+import com.dcplatform.api.leads.utils.GetClientIp;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -19,22 +21,27 @@ import jakarta.validation.Valid;
 public class MagicLinkController {
 
     private final MagicLinkService magicLinkService;
+    private final GetClientIp getClientIp = new GetClientIp();
 
-	public MagicLinkController(MagicLinkService magicLinkService) {
-		this.magicLinkService = magicLinkService;
-	}
+    public MagicLinkController(MagicLinkService magicLinkService) {
+        this.magicLinkService = magicLinkService;
 
-	@PostMapping("/leads")
-    public ResponseEntity<MagicLinkResponse> generateMagicLink(@Valid @RequestBody MagicLinkRequest magicLinkRequest) {
+    }
 
-        var response = magicLinkService.generateMagicLink(magicLinkRequest);
+    @PostMapping("/leads")
+    public ResponseEntity<MagicLinkResponse> generateMagicLink(@Valid @RequestBody MagicLinkRequest magicLinkRequest,
+            HttpServletRequest request) {
+
+        String clientIp = getClientIp.getClienwtIp(request);
+
+        var response = magicLinkService.generateMagicLink(magicLinkRequest, clientIp);
 
         return ResponseEntity.status(202).body(response);
     }
 
     @PostMapping("/verify")
     public ResponseEntity<TokenResponse> generateToken(
-        @Valid @RequestBody TokenRequest tokenRequest) {
+            @Valid @RequestBody TokenRequest tokenRequest) {
 
         TokenResponse response = magicLinkService.verifyAndExchange(tokenRequest);
         return ResponseEntity.ok(response);
