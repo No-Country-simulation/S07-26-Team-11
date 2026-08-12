@@ -20,13 +20,11 @@ public class MockCalculatorService implements CalculatorService {
 	public CalculatorEstimateResponse calculate(CalculatorEstimateRequest request) {
 		logger.info("Using mock calculator service");
 
-		// 1. Extraer los nuevos campos de la request
 		double installedKw = request.installedCapacityKw();
 		double usedKw = request.usedCapacityKw();
 		double energyCost = request.electricityRatePerKwh();
 		int rackCount = request.rackCount();
 
-		// 2. Calcular capacidad ociosa (ahora en kW)
 		double idleRatio = 0.0;
 		double idleKw = 0.0;
 
@@ -35,53 +33,76 @@ public class MockCalculatorService implements CalculatorService {
 			idleKw = installedKw - usedKw;
 		}
 
-		// 3. Calcular costo anual
 		double annualHours = 8760.0;
 		double idleAnnualCost = idleKw * annualHours * energyCost;
 
-		// 4. Lógica de diversidad: benchmarks dinámicos basados en infraestructura
-		double ratioBenchmark = 0.20; // default para un DC mediano
+		double idleCostMonthly = idleAnnualCost / 12.0;
+		double idleCost3yProjection = idleAnnualCost * 3.0;
 
-		if (rackCount < 50) {
-			ratioBenchmark = 0.28; // Centros pequeños suelen tener más ociosidad relativa
-		} else if (rackCount > 200) {
-			ratioBenchmark = 0.15; // Hiperescala u operaciones grandes optimizan mejor
-		}
+		double idleCostPerRackAnnual = rackCount > 0 ? (idleAnnualCost / rackCount) : 0.0;
 
-		// 5. Redondeo de valores
-		double finalIdleRatio = Math.round(idleRatio * 1000.0) / 1000.0;       // 3 decimales
-		double finalIdleCost = Math.round(idleAnnualCost * 10.0) / 10.0;       // 1 decimal
-		double finalBenchmark = Math.round(ratioBenchmark * 100.0) / 100.0;    // 2 decimales
+		double finalIdleKw = Math.round(idleKw * 10.0) / 10.0;
+		double finalIdleRatio = Math.round(idleRatio * 1000.0) / 1000.0;
+		double finalAnnualCost = Math.round(idleAnnualCost * 10.0) / 10.0;
+		double finalCostMonthly = Math.round(idleCostMonthly * 10.0) / 10.0;
+		double finalCost3y = Math.round(idleCost3yProjection * 10.0) / 10.0;
+		double finalCostPerRack = Math.round(idleCostPerRackAnnual * 10.0) / 10.0;
 
-		// 6. Generar fecha en formato ISO 8601
 		String createdAt = Instant.now().atOffset(ZoneOffset.UTC)
 				.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
-		// 7. Construir los KPI alineados al CalculatorEstimateResponse
-		CalculatorEstimateResponse.KpiResult ratioKpi = new CalculatorEstimateResponse.KpiResult(
-				"IDLE_CAPACITY_RATIO",
-				"Capacidad ociosa pagada",
-				finalIdleRatio,
-				"RATIO",
-				finalBenchmark
+		List<CalculatorEstimateResponse.KpiResult> listOfKpi = List.of(
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_CAPACITY_KW",
+						"Capacidad subutilizada estimada",
+						finalIdleKw,
+						"KW",
+						null
+				),
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_CAPACITY_RATIO",
+						"Porcentaje de subutilización",
+						finalIdleRatio,
+						"RATIO",
+						null
+				),
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_CAPACITY_ANNUAL_COST",
+						"Costo anual desperdiciado",
+						finalAnnualCost,
+						"CURRENCY",
+						null
+				),
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_COST_MONTHLY",
+						"Costo mensual estimado",
+						finalCostMonthly,
+						"CURRENCY",
+						null
+				),
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_COST_3Y_PROJECTION",
+						"Proyección a 3 años",
+						finalCost3y,
+						"CURRENCY",
+						null
+				),
+				new CalculatorEstimateResponse.KpiResult(
+						"IDLE_COST_PER_RACK_ANNUAL",
+						"Costo por rack / año",
+						finalCostPerRack,
+						"CURRENCY",
+						null
+				)
 		);
 
-		CalculatorEstimateResponse.KpiResult costKpi = new CalculatorEstimateResponse.KpiResult(
-				"IDLE_CAPACITY_ANNUAL_COST",
-				"Costo anual de capacidad ociosa",
-				finalIdleCost,
-				"CURRENCY",
-				null // null porque este no lleva benchmark en tu modelo
-		);
-
-		// 8. Retornar la respuesta final
 		return new CalculatorEstimateResponse(
 				UUID.randomUUID().toString(),
 				"1.0.0",
 				createdAt,
-				false,
-				List.of(ratioKpi, costKpi),
-				4 // cantidad de KPI ocultos
+				true,
+				listOfKpi,
+				0
 		);
 	}
 }
