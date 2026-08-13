@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
-	                                @NonNull FilterChain filterChain) throws ServletException, IOException {
+			@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String jwt = null;
 		final String authHeader = request.getHeader("Authorization");
 
@@ -44,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		try {
-			if (jwtService.isTokenValid(jwt) && jwtService.isAccessToken(jwt) && !tokenRevocationService.isRevoked(jwt)) {
+			if (jwtService.isTokenValid(jwt) && jwtService.isAccessToken(jwt)
+					&& !tokenRevocationService.isRevoked(jwt)) {
 				String email = jwtService.extractEmail(jwt);
 				String role = jwtService.extractRole(jwt);
 
@@ -54,8 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 							: Collections.emptyList();
 
 					var authToken = new UsernamePasswordAuthenticationToken(
-							email, null, authorities
-					);
+							email, null, authorities);
 					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}
@@ -65,5 +65,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String path = request.getRequestURI();
+		// 🟢 Si es una ruta pública o una petición Preflight OPTIONS, saltear la
+		// validación JWT
+		return path.startsWith("/api/v1/public/")
+				|| "OPTIONS".equalsIgnoreCase(request.getMethod());
 	}
 }

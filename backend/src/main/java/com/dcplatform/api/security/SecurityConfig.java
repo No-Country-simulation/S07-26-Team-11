@@ -51,6 +51,7 @@ public class SecurityConfig {
 						.accessDeniedHandler(exceptionDelegator) // 403 FORBIDDEN
 				)
 				.authorizeHttpRequests(auth -> auth
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						// rutas de operación y documentación (públicas)
 						.requestMatchers("/actuator/health", "/actuator/info").permitAll()
 						.requestMatchers("/api/v1/public/ping", "/api/v1/public/db-status").permitAll()
@@ -107,4 +108,5 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 		return source;
 	}
+	
 }

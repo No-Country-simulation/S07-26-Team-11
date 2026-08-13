@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1/public/leads")
 public class MagicLinkController {
 
     private final MagicLinkService magicLinkService;
@@ -28,7 +28,7 @@ public class MagicLinkController {
 
     }
 
-    @PostMapping("/leads")
+    @PostMapping("")
     public ResponseEntity<MagicLinkResponse> generateMagicLink(@Valid @RequestBody MagicLinkRequest magicLinkRequest,
             HttpServletRequest request) {
 
@@ -39,7 +39,7 @@ public class MagicLinkController {
         return ResponseEntity.status(202).body(response);
     }
 
-    @PostMapping("leads/verify")
+    @PostMapping("/verify")
     public ResponseEntity<TokenResponse> generateToken(
             @Valid @RequestBody TokenRequest tokenRequest) {
 
