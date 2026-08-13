@@ -39,7 +39,7 @@ public class MagicLinkController {
         return ResponseEntity.status(202).body(response);
     }
 
-    @PostMapping("/verify")
+    @PostMapping("leads/verify")
     public ResponseEntity<TokenResponse> generateToken(
             @Valid @RequestBody TokenRequest tokenRequest) {
 

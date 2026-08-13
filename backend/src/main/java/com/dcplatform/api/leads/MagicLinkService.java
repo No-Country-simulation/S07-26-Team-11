@@ -72,7 +72,7 @@ public class MagicLinkService {
     LeadAccessTokens accessToken = new LeadAccessTokens();accessToken.setTokenHash(tokenHash);accessToken.setLead(lead);accessToken.setCreatedAt(LocalDateTime.now());accessToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));leandAccessTokenRepository.save(accessToken);
 
     String magicLinkUrl = UriComponentsBuilder.fromUriString(frontendUrl)
-            .path("/api/v1/public/verify")
+            .path("/auth/verify")
             .queryParam("token", rawToken)
             .toUriString();
 
