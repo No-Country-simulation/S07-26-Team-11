@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import ChartCapacidad from "@/components/ChartCapacidad";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -149,7 +150,17 @@ export default function ReportePage() {
             </div>
 
           </div>
+          <div className="flex flex-col items-center ">
+            <Link
+              href="/benchmark/cuestionario"
+              className="mt-8 flex gap-2 h-12 w-full max-w-[338px] justify-center rounded border border-forest-dark px-6 py-3 text-sm font-semibold text-forest-dark shadow-sm focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2 focus:ring-offset-base-natural"
+            >
+              Evaluá tu propia madurez operativa <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+          
         </section>
+        
 
         <section className="font-editorial mb-20">
           <h2 className="font-editorial flex items-center gap-3 text-3xl font-medium text-forest-dark">
