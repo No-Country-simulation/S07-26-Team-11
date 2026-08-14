@@ -1,4 +1,6 @@
-package com.dcplatform.api.calculator;
+package com.dcplatform.api.calculator.model.dto;
+
+import com.dcplatform.api.calculator.model.KpiCode;
 
 import java.util.List;
 
@@ -11,11 +13,10 @@ public record CalculatorEstimateResponse(
 		int lockedKpiCount
 ) {
 	public record KpiResult(
-			String code,
+			KpiCode code,
 			String label,
 			Double value,
-			String unit,
-			Double benchmarkMedian
+			KpiCode.UnitType unit
 	) {
 	}
 }

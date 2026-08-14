@@ -1,7 +1,10 @@
 package com.dcplatform.api.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,6 +24,13 @@ public class OpenApiConfig {
 				.info(new Info()
 						.title("Plataforma de Benchmark de Data Centers")
 						.version("v1")
-						.description("Calculadora, benchmark de madurez, generación de PDF y outreach. CAPACIA"));
+						.description("Calculadora, benchmark de madurez, generación de PDF y outreach. CAPACIA"))
+				.addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+				.components(new Components()
+						.addSecuritySchemes("BearerAuth", new SecurityScheme()
+								.name("BearerAuth")
+								.type(SecurityScheme.Type.HTTP)
+								.scheme("bearer")
+								.bearerFormat("JWT")));
 	}
 }
