@@ -131,7 +131,7 @@ export default function Home() {
             de capacidad analizada en más de 300 instalaciones
           </p>
 
-          <div className="mx-auto mt-16 grid w-full max-w-[880px] gap-6 text-left md:grid-cols-2">
+          <div className="mx-auto mt-16 w-full max-w-[880px] gap-6 text-left md:grid-cols-2">
             <article className="rounded-2xl border border-base-border bg-white p-6 transition-all hover:-translate-y-0.5 hover:shadow-md sm:p-8">
               <span className="grid size-10 place-items-center rounded-lg bg-forest-light text-forest-dark">
                 <svg
@@ -161,34 +161,7 @@ export default function Home() {
                 href="/reporte"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest hover:underline"
               >
-                Visualiza el report <span aria-hidden="true">→</span>
-              </Link>
-            </article>
-
-            <article className="rounded-2xl border border-base-border bg-white p-6 transition-all hover:-translate-y-0.5 hover:shadow-md sm:p-8">
-              <span className="grid size-10 place-items-center rounded-lg bg-base-internal text-gold-dark">
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  className="size-4"
-                  fill="currentColor"
-                >
-                  <path d="m12 3 2.1 4.9L19 10l-4.9 2.1L12 17l-2.1-4.9L5 10l4.9-2.1L12 3Z" />
-                </svg>
-              </span>
-
-              <h2 className="mt-6 text-xl font-semibold text-text-primary">
-                Hacé el Maturity Benchmark
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
-                Evaluá la madurez operativa de tu infraestructura en cuatro
-                dimensiones y compará contra pares de tu segmento.
-              </p>
-              <Link
-                href="/benchmark"
-                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-forest hover:underline"
-              >
-                Empezar el benchmark <span aria-hidden="true">→</span>
+                Visualiza el Report <span aria-hidden="true">↗</span>
               </Link>
             </article>
           </div>
