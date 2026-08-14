@@ -71,57 +71,129 @@ Header opcional: `Idempotency-Key`.
 **Request**
 ```json
 {
-  "contractedCapacityMw": 12.5,
-  "utilizedCapacityMw": 8.2,
-  "pue": 1.58,
-  "energyCostPerKwh": 0.087,
-  "rackCount": 420,
-  "designPowerPerRackKw": 8.0,
-  "averagePowerPerRackKw": 4.6,
-  "currency": "USD",
-  "country": "CO"
+  "installedCapacityKw": 2000.0,
+  "usedCapacityKw": 760.0,
+  "electricityRatePerKwh": 0.12,
+  "rackCount": 48
 }
 ```
 
 **Response `200`**
 ```json
 {
-  "estimateId": "0192f3a1-...",
+  "estimateId": "c07c4f5b-498b-48d1-805f-74b4496412f2",
   "calculationVersion": "1.0.0",
-  "createdAt": "2026-07-20T14:30:00Z",
+  "createdAt": "2026-08-14T00:52:49Z",
   "unlocked": false,
   "kpis": [
     {
+      "code": "IDLE_CAPACITY_KW",
+      "label": "Capacidad subutilizada estimada",
+      "value": 1240,
+      "unit": "KW"
+    },
+    {
       "code": "IDLE_CAPACITY_RATIO",
-      "label": "Capacidad ociosa pagada",
-      "value": 0.344,
-      "unit": "RATIO",
-      "benchmarkMedian": 0.28
+      "label": "Porcentaje de subutilización",
+      "value": 0.62,
+      "unit": "RATIO"
     },
     {
       "code": "IDLE_CAPACITY_ANNUAL_COST",
-      "label": "Costo anual de capacidad ociosa",
-      "value": 3278160.0,
-      "unit": "CURRENCY",
-      "benchmarkMedian": null
+      "label": "Costo anual desperdiciado",
+      "value": 1303488,
+      "unit": "CURRENCY"
+    },
+    {
+      "code": "IDLE_COST_PER_RACK_ANNUAL",
+      "label": "Costo por rack / año",
+      "value": 27156,
+      "unit": "CURRENCY"
     }
   ],
-  "lockedKpiCount": 4
+  "lockedKpiCount": 2
+}
+```
+
+### `POST /public/calculator/estimate/unlock-results` 🔒
+Calcula y devuelve los KPIs completos desbloqueados del usuario autenticado que los solicitó. Requiere autenticación.
+
+**Request**
+```json
+{
+  "installedCapacityKw": 2000.0,
+  "usedCapacityKw": 760.0,
+  "electricityRatePerKwh": 0.12,
+  "rackCount": 48
+}
+```
+
+**Response `200`**
+```json
+{
+  "estimateId": "c07c4f5b-498b-48d1-805f-74b4496412f2",
+  "calculationVersion": "1.0.0",
+  "createdAt": "2026-08-14T00:52:49Z",
+  "unlocked": true,
+  "kpis": [
+    {
+      "code": "IDLE_CAPACITY_KW",
+      "label": "Capacidad subutilizada estimada",
+      "value": 1240,
+      "unit": "KW"
+    },
+    {
+      "code": "IDLE_CAPACITY_RATIO",
+      "label": "Porcentaje de subutilización",
+      "value": 0.62,
+      "unit": "RATIO"
+    },
+    {
+      "code": "IDLE_CAPACITY_ANNUAL_COST",
+      "label": "Costo anual desperdiciado",
+      "value": 1303488,
+      "unit": "CURRENCY"
+    },
+    {
+      "code": "IDLE_COST_MONTHLY",
+      "label": "Costo mensual estimado",
+      "value": 108624,
+      "unit": "CURRENCY"
+    },
+    {
+      "code": "IDLE_COST_3Y_PROJECTION",
+      "label": "Proyección a 3 años",
+      "value": 3910464,
+      "unit": "CURRENCY"
+    },
+    {
+      "code": "IDLE_COST_PER_RACK_ANNUAL",
+      "label": "Costo por rack / año",
+      "value": 27156,
+      "unit": "CURRENCY"
+    }
+  ],
+  "lockedKpiCount": 0
 }
 ```
 
 ### `GET /public/calculator/estimates/{estimateId}`
 Recupera un cálculo. Si se envía Bearer token del lead dueño, devuelve el desglose completo.
 
-**Response `200`** — igual que el anterior, con `unlocked: true` y los KPIs completos, más `breakdown` y `assumptions`.
+**Response `200`** — igual que el anterior, con `unlocked: true` y los KPIs completos.
 **Errores:** `404` si no existe.
 
 ### `GET /public/calculator/defaults`
-Valores por defecto de industria para prellenar el formulario.
+Valores por defecto de industria para rellenar el formulario.
 
 **Response `200`**
 ```json
-{ "pue": 1.55, "energyCostPerKwh": 0.09, "designPowerPerRackKw": 8.0 }
+{
+  "installedCapacityKw": 2000.0,
+  "usedCapacityKw": 760.0,
+  "electricityRatePerKwh": 0.12,
+  "rackCount": 48
+}
 ```
 
 ---

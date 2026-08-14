@@ -2,9 +2,11 @@ package com.dcplatform.api.security.jwt;
 
 import com.dcplatform.api.shared.ApiException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -101,8 +103,7 @@ public class JwtServiceImpl implements JwtService {
 			throw new ApiException(
 					HttpStatus.BAD_REQUEST,
 					"validation-error",
-					"El formato del email es inválido"
-			);
+					"El formato del email es inválido");
 		}
 	}
 

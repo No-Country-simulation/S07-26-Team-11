@@ -32,6 +32,16 @@ public class ApiException extends RuntimeException {
     public static ApiException unauthorized(String message) {
         return new ApiException(HttpStatus.UNAUTHORIZED, "auth", message);
     }
+       public static ApiException badRequest(String message) {
+        return new ApiException(HttpStatus.BAD_REQUEST, "bad-request", message);
+    }
+    public static ApiException ratLimited(String message) {
+        return new ApiException(HttpStatus.TOO_MANY_REQUESTS, "rate-limited", message);
+    }
+    public static ApiException noConsent(String message) {
+        return new ApiException(HttpStatus.FORBIDDEN, "no-consent", message);
+    }
+
 
     public HttpStatus getStatus() {
         return status;

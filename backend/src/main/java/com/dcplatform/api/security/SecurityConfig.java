@@ -4,6 +4,7 @@ import com.dcplatform.api.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,7 +33,9 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-		http.csrf(AbstractHttpConfigurer::disable)
+		http
+				.cors(Customizer.withDefaults()) // deja pasar las peticiones OPTIONS preflight (ver CorsConfig.java)
+				.csrf(AbstractHttpConfigurer::disable)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(exceptions -> exceptions
 						.authenticationEntryPoint(exceptionDelegator) // 401 UNAUTHORIZED
@@ -45,22 +48,26 @@ public class SecurityConfig {
 						.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
 						// endpoints públicos explícitos
-						// unico punto de entrada al sistema de auth: sin esto, nadie puede solicitar acceso
+						// único punto de entrada al sistema de auth: sin esto, nadie puede solicitar acceso
 						.requestMatchers(HttpMethod.POST, "/api/v1/auth/request-access").permitAll()
-						// registro/login basico de email+password (ver modulo auth). logout y /me
+						// registro/login básico de email+password (ver módulo auth) logout y /me
 						// requieren token, quedan cubiertos por el anyRequest().authenticated() de abajo
 						.requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+
+						// ---------------- CALCULADORA ----------------
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/calculator/estimate").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/calculator/defaults").permitAll()
+
+						// ---------------- LEAD y MAGIC LINK ----------------
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/leads").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/leads/verify").permitAll()
+
+						// ---------------- BENCHMARK ----------------
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/benchmark/instrument").permitAll()
+
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/industry/stats").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/webhooks/email/*").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/public/unsubscribe").permitAll()
-
-						// endpoint híbrido, requiere validar contexto de autenticación en servicio o controlador
-						.requestMatchers(HttpMethod.GET, "/api/v1/public/calculator/estimates/*").permitAll()
 
 						// ---------------- ADMIN ----------------
 						.requestMatchers(HttpMethod.POST, "/api/v1/admin/auth/login").permitAll() // público
@@ -68,8 +75,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "VIEWER")
 
 						// el resto debe ser autenticado
-						.anyRequest().authenticated()
-				)
+						.anyRequest().authenticated())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();

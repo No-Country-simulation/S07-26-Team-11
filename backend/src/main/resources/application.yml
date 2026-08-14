@@ -74,11 +74,12 @@ app:
   openapi:
     # URL publica del backend de staging (Render) para el selector de
     # servidores de Swagger UI. Si esta vacia solo se publica el local.
-    staging-url: ${OPENAPI_STAGING_URL:https://s07-26-team-11.onrender.com}
+    staging-url: ${OPENAPI_STAGING_URL:https://s07-26-team-11-api.onrender.com}
   cors:
     # Lista separada por comas. Nunca "*": la API envia credenciales.
     # El frontend de staging esta en Vercel.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,https://capacia.vercel.app}
+    frontend-url: ${FRONTEND_URL:https://capacia.vercel.app}
   db-status:
     # GET /api/v1/public/db-status. En true agrega host, usuario y estado del pool:
     # util en local, informacion de infraestructura de mas en un endpoint publico.
@@ -119,8 +120,9 @@ app:
       footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
-    api-key: ${EMAIL_API_KEY:}
+    api-key: ${EMAIL_API_KEY:x-dummy-api-key}
     from-address: ${EMAIL_FROM:}
+    from-name: ${EMAIL_FROM_NAME:Capacia}
     daily-quota: ${EMAIL_DAILY_QUOTA:300}
   storage:
     # Oracle Cloud Object Storage, bucket privado, SDK nativo (firma con par de
@@ -163,6 +165,14 @@ logging:
     # El motor de PDF avisa aqui del CSS que no soporta y de los recursos que no pudo
     # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
     com.openhtmltopdf: WARN
+
+# ---------------------------------------------------------
+# VARIABLES GLOBALES (Aplica a todos los perfiles)
+# ---------------------------------------------------------
+client:
+  api:
+    mock:
+      enabled: true # cambiar a false cuando el cliente libere los servicios
 
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica

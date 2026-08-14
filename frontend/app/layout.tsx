@@ -15,7 +15,7 @@ const redHatDisplay = Red_Hat_Display({
 });
 
 export const metadata: Metadata = {
-  title: "[Nombre del proyecto]",
+  title: "Capacia",
   description:
     "Calculadora de capacidad ociosa y benchmark de madurez para operadores de data centers.",
 };
