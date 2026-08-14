@@ -111,7 +111,7 @@ Header opcional: `Idempotency-Key`.
       "unit": "CURRENCY"
     }
   ],
-  "lockedKpiCount": 0
+  "lockedKpiCount": 2
 }
 ```
 
