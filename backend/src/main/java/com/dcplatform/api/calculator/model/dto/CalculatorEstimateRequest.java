@@ -1,4 +1,4 @@
-package com.dcplatform.api.calculator;
+package com.dcplatform.api.calculator.model.dto;
 
 import com.dcplatform.api.shared.ApiException;
 import jakarta.validation.constraints.NotNull;

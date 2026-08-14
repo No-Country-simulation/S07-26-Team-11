@@ -1,5 +1,8 @@
-package com.dcplatform.api.calculator;
+package com.dcplatform.api.calculator.service;
 
+import com.dcplatform.api.calculator.model.KpiCode;
+import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
+import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
 import com.dcplatform.api.shared.annotations.MockIntegration;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -17,8 +20,10 @@ public class MockCalculatorService implements CalculatorService {
 	private final Logger logger = org.slf4j.LoggerFactory.getLogger(MockCalculatorService.class);
 
 	@Override
-	public CalculatorEstimateResponse calculate(CalculatorEstimateRequest request) {
+	public CalculatorEstimateResponse calculate(CalculatorEstimateRequest request, boolean isUnlocked) {
 		logger.info("Using mock calculator service");
+
+		final String CALCULATOR_VERSION = "1.0.0";
 
 		double installedKw = request.installedCapacityKw();
 		double usedKw = request.usedCapacityKw();
@@ -53,56 +58,60 @@ public class MockCalculatorService implements CalculatorService {
 
 		List<CalculatorEstimateResponse.KpiResult> listOfKpi = List.of(
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_CAPACITY_KW",
+						KpiCode.IDLE_CAPACITY_KW,
 						"Capacidad subutilizada estimada",
 						finalIdleKw,
-						"KW",
-						null
+						KpiCode.UnitType.KW
 				),
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_CAPACITY_RATIO",
+						KpiCode.IDLE_CAPACITY_RATIO,
 						"Porcentaje de subutilización",
 						finalIdleRatio,
-						"RATIO",
-						null
+						KpiCode.UnitType.RATIO
 				),
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_CAPACITY_ANNUAL_COST",
+						KpiCode.IDLE_CAPACITY_ANNUAL_COST,
 						"Costo anual desperdiciado",
 						finalAnnualCost,
-						"CURRENCY",
-						null
+						KpiCode.UnitType.CURRENCY
 				),
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_COST_MONTHLY",
+						KpiCode.IDLE_COST_MONTHLY,
 						"Costo mensual estimado",
 						finalCostMonthly,
-						"CURRENCY",
-						null
+						KpiCode.UnitType.CURRENCY
 				),
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_COST_3Y_PROJECTION",
+						KpiCode.IDLE_COST_3Y_PROJECTION,
 						"Proyección a 3 años",
 						finalCost3y,
-						"CURRENCY",
-						null
+						KpiCode.UnitType.CURRENCY
 				),
 				new CalculatorEstimateResponse.KpiResult(
-						"IDLE_COST_PER_RACK_ANNUAL",
+						KpiCode.IDLE_COST_PER_RACK_ANNUAL,
 						"Costo por rack / año",
 						finalCostPerRack,
-						"CURRENCY",
-						null
+						KpiCode.UnitType.CURRENCY
 				)
 		);
 
+		int lockedKpiCount = 0;
+
+		if (!isUnlocked) {
+			listOfKpi = listOfKpi.stream()
+					.filter(kpi -> !kpi.code().equals(KpiCode.IDLE_COST_MONTHLY) &&
+							!kpi.code().equals(KpiCode.IDLE_COST_3Y_PROJECTION))
+					.toList();
+			lockedKpiCount = 2;
+		}
+
 		return new CalculatorEstimateResponse(
 				UUID.randomUUID().toString(),
-				"1.0.0",
+				CALCULATOR_VERSION,
 				createdAt,
-				true,
+				isUnlocked,
 				listOfKpi,
-				0
+				lockedKpiCount
 		);
 	}
 }
