@@ -1,4 +1,4 @@
-package com.dcplatform.api.leads;
+package com.dcplatform.api.magiclink.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MagicLinkNotifer {
+public class MagicLinkNotifier {
 
     private final List<INotification> observers;
-    private static final Logger log = LoggerFactory.getLogger(MagicLinkNotifer.class);
+    private static final Logger log = LoggerFactory.getLogger(MagicLinkNotifier.class);
 
-    public MagicLinkNotifer(List<INotification> observers) {
+    public MagicLinkNotifier(List<INotification> observers) {
         this.observers = observers != null ? observers : new ArrayList<>();
     }
 

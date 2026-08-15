@@ -1,8 +1,7 @@
-package com.dcplatform.api.leads;
+package com.dcplatform.api.magiclink.service;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;

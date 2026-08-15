@@ -5,6 +5,8 @@ import com.dcplatform.api.calculator.model.KpiCode;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
 import com.dcplatform.api.calculator.repository.CalculatorRepository;
+import com.dcplatform.api.leads.model.LeadEntity;
+import com.dcplatform.api.leads.service.LeadService;
 import com.dcplatform.api.shared.ApiException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,21 @@ import java.time.OffsetDateTime;
 public class CalculatorPersistenceService {
 
 	private final Logger logger = org.slf4j.LoggerFactory.getLogger(CalculatorPersistenceService.class);
-	private final CalculatorRepository repository;
 
-	public CalculatorPersistenceService(CalculatorRepository repository) {
+	private final CalculatorRepository repository;
+	private final LeadService leadService;
+
+	public CalculatorPersistenceService(CalculatorRepository repository, LeadService leadService) {
 		this.repository = repository;
+		this.leadService = leadService;
 	}
 
 	public void save(String leadEmail, CalculatorEstimateRequest request, CalculatorEstimateResponse response) {
 		logger.info("Saving estimate for lead {}", leadEmail);
 		CalculatorEstimateEntity entity = new CalculatorEstimateEntity();
 
-		// TODO: insert lead entity here with LeadRepository.findByEmail(leadEmail)
+		LeadEntity lead = leadService.getLeadEntityByEmail(leadEmail);
+		entity.setLead(lead);
 		entity.setCalculationVersion(response.calculationVersion());
 		entity.setInputsJson(request);
 		entity.setOutputsJson(response);
