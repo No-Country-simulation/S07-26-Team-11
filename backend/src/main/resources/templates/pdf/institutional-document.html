@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="utf-8"/>
@@ -70,8 +70,8 @@
 <div id="page-footer">
     <table>
         <tr>
-            <td th:text="${footerText}">Capacia � Informe de capacidad | 29 de julio de 2026 � Confidencial</td>
-            <td class="footer-right">P�gina <span class="page-number"></span> de <span class="page-total"></span></td>
+            <td th:text="${footerText}">Capacia — Informe de capacidad | 29 de julio de 2026 — Confidencial</td>
+            <td class="footer-right">Página <span class="page-number"></span> de <span class="page-total"></span></td>
         </tr>
     </table>
 </div>
@@ -104,9 +104,9 @@
     <tr>
         <td>
             <div class="eyebrow">INFORME EJECUTIVO</div>
-            <h1 class="doc-title" th:text="${title}">Informe de capacidad � Northbridge Data Systems</h1>
+            <h1 class="doc-title" th:text="${title}">Informe de capacidad — Northbridge Data Systems</h1>
             <div class="subtitle-label">RESUMEN EJECUTIVO</div>
-            <p class="description" th:text="${executiveSummary}">Su infraestructura opera hoy con una utilizaci�n promedio del 70%...</p>
+            <p class="description" th:text="${executiveSummary}">Su infraestructura opera hoy con una utilización promedio del 70%...</p>
             <div class="highlight-card">
                 <div class="highlight-label">COSTO ANUAL DESPERDICIADO</div>
                 <div class="highlight-value" th:text="${annualCost}">US$ 48.200</div>
@@ -118,16 +118,16 @@
                 </tr>
             </table>
             <div style="page-break-before: always;"></div>
-            <div class="page-subtitle">P�GINA 2</div>
+            <div class="page-subtitle">PÁGINA 2</div>
             <h2>Indicadores clave</h2>
             <table class="three-cards-table">
                 <tr>
                     <td><span class="indicator-label">kW subutilizados</span><span class="indicator-value" th:text="${kwUnderutilized}">142 kW</span></td>
-                    <td><span class="indicator-label">% de utilizaci�n</span><span class="indicator-value" th:text="${utilizationPercent}">38%</span></td>
-                    <td><span class="indicator-label">Costo por rack / a�o</span><span class="indicator-value" th:text="${costPerRack}">US$ 1.004</span></td>
+                    <td><span class="indicator-label">% de utilización</span><span class="indicator-value" th:text="${utilizationPercent}">38%</span></td>
+                    <td><span class="indicator-label">Costo por rack / año</span><span class="indicator-value" th:text="${costPerRack}">US$ 1.004</span></td>
                 </tr>
             </table>
-            <h2>Posici�n frente a la industria</h2>
+            <h2>Posición frente a la industria</h2>
             <p class="chart-note">Score de madurez (0-100) por segmento. Patrones de trama distinguen las barras si se imprime en blanco y negro.</p>
             <table class="chart-table">
                 <tr th:each="item : ${industryScores}">
@@ -137,19 +137,19 @@
                 </tr>
             </table>
             <div style="page-break-before: always;"></div>
-            <div class="page-subtitle">P�GINA 3</div>
+            <div class="page-subtitle">PÁGINA 3</div>
             <h2>Recomendaciones</h2>
             <table class="rec-table" th:each="rec, iter : ${recommendations}">
                 <tr>
                     <td class="rec-num-cell"><span class="rec-number" th:text="${#strings.padStart((iter.index + 1) + '', 2, '0')}">01</span></td>
-                    <td class="rec-text-cell" th:text="${rec}">Implement� monitoreo por carga de trabajo...</td>
+                    <td class="rec-text-cell" th:text="${rec}">Implementá monitoreo por carga de trabajo...</td>
                 </tr>
             </table>
             <div class="cta-card">
                 <div class="cta-title">HABLEMOS DE ESTOS RESULTADOS</div>
-                <p>Un especialista de Capacia puede revisar este informe con su equipo y estimar el plan de recuperaci�n.</p>
-                <a th:href="${meetingLink}" class="link-primary">Agend� una reuni�n: capacia.com/agenda</a>
-                <a th:href="'mailto:' + ${contactEmail}" class="link-secondary">o escrib� a enterprise@capacia.com</a>
+                <p>Un especialista de Capacia puede revisar este informe con su equipo y estimar el plan de recuperación.</p>
+                <a th:href="${meetingLink}" class="link-primary">Agendá una reunión: capacia.com/agenda</a>
+                <a th:href="'mailto:' + ${contactEmail}" class="link-secondary">o escribí a enterprise@capacia.com</a>
             </div>
         </td>
     </tr>

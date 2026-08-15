@@ -16,6 +16,7 @@ import com.dcplatform.api.leads.DTO.MagicLinkRequest;
 import com.dcplatform.api.leads.DTO.MagicLinkResponse;
 import com.dcplatform.api.leads.DTO.TokenRequest;
 import com.dcplatform.api.leads.DTO.TokenResponse;
+import com.dcplatform.api.auth.UserAuthService;
 import com.dcplatform.api.security.jwt.JwtService;
 import com.dcplatform.api.shared.ApiException;
 
@@ -24,6 +25,7 @@ public class MagicLinkService {
 
     private final MagicLinkNotifer magicLinkNotifier;
     private final JwtService jwtService;
+    private final UserAuthService userAuthService;
     private final TokenHasher tokenHasher;
     private final LeandAccessTokenRepository leandAccessTokenRepository;
     private final LeadRepository leadRepository;
@@ -32,11 +34,13 @@ public class MagicLinkService {
     @Value("${app.cors.frontend-url}")
     private String frontendUrl;
 
-    public MagicLinkService(MagicLinkNotifer magicLinkNotifier, JwtService jwtService, TokenHasher tokenHasher,
+    public MagicLinkService(MagicLinkNotifer magicLinkNotifier, JwtService jwtService,
+            UserAuthService userAuthService, TokenHasher tokenHasher,
             LeandAccessTokenRepository leandAccessTokenRepository, LeadRepository leadRepository,
             ApiApplication apiApplication) {
         this.magicLinkNotifier = magicLinkNotifier;
         this.jwtService = jwtService;
+        this.userAuthService = userAuthService;
         this.tokenHasher = tokenHasher;
         this.leandAccessTokenRepository = leandAccessTokenRepository;
         this.leadRepository = leadRepository;
@@ -109,7 +113,10 @@ public class MagicLinkService {
         accessToken.setUsedAt(LocalDateTime.now());
         leandAccessTokenRepository.save(accessToken);
 
-        String newAccessToken = jwtService.generateAccessToken(leadBd.getEmail(), "LEAD");
+        // El token se emite contra la cuenta de `users`, no contra la fila de `lead`: es la
+        // identidad que el resto de la API sabe resolver (ver UserAuthService). `leads` sigue
+        // siendo el registro del funnel; quien opera en la API es la cuenta.
+        String newAccessToken = userAuthService.issueAccessTokenForVerifiedEmail(leadBd.getEmail());
         Date expiration = jwtService.extractExpiration(newAccessToken);
 
         var leadDtoResponse = new LeadResponse(leadBd.getId(), leadBd.getEmail(), leadBd.getCompanyName());
