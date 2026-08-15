@@ -9,6 +9,9 @@
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
 
+/** La URL contra la que se esta trabajando. Util para mostrarla en diagnostico. */
+export const apiBaseUrl = BASE_URL;
+
 /** Formato de error uniforme de la API (RFC 9457 Problem Details). */
 export interface ProblemDetail {
   type: string;
@@ -85,4 +88,79 @@ export const benchmarkApi = {
 
 export const pdfApi = {
   jobStatus: (jobId: string) => api.get<unknown>(`/public/pdf/jobs/${jobId}`),
+};
+
+/* ------------------------------------------------------------------ */
+/* Diagnostico. No pasa por request(): /db-status responde 503 con un   */
+/* cuerpo que igual queremos leer, y estos endpoints son publicos, asi  */
+/* que se piden sin credenciales.                                       */
+/* ------------------------------------------------------------------ */
+
+/** GET /public/ping */
+export interface PingResponse {
+  status: string;
+  service: string;
+  timestamp: string;
+}
+
+/** GET /public/db-status. Los detalles solo llegan si DB_STATUS_DETAILS=true. */
+export interface DbStatusResponse {
+  status: "UP" | "DOWN";
+  timestamp: string;
+  latencyMs?: number;
+  sqlState?: string;
+  database?: string;
+  schema?: string;
+  readOnly?: boolean;
+  pool?: {
+    name: string;
+    active: number;
+    idle: number;
+    total: number;
+    waiting: number;
+    max: number;
+  };
+}
+
+/** Resultado de una sonda: siempre resuelve, nunca lanza. */
+export interface HealthProbe<T> {
+  ok: boolean;
+  /** null si la peticion no llego a salir (backend caido, CORS, DNS). */
+  httpStatus: number | null;
+  /** Medido en el navegador: incluye red, no solo el trabajo del servidor. */
+  latencyMs: number;
+  body: T | null;
+  error?: string;
+}
+
+async function probe<T>(path: string): Promise<HealthProbe<T>> {
+  const startedAt = performance.now();
+
+  try {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    const body = (await response.json().catch(() => null)) as T | null;
+
+    return {
+      ok: response.ok,
+      httpStatus: response.status,
+      latencyMs: Math.round(performance.now() - startedAt),
+      body,
+    };
+  } catch (cause) {
+    return {
+      ok: false,
+      httpStatus: null,
+      latencyMs: Math.round(performance.now() - startedAt),
+      body: null,
+      error: cause instanceof Error ? cause.message : "Error de red",
+    };
+  }
+}
+
+export const healthApi = {
+  ping: () => probe<PingResponse>("/public/ping"),
+  dbStatus: () => probe<DbStatusResponse>("/public/db-status"),
 };

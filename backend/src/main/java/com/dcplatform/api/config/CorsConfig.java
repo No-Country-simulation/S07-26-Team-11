@@ -21,6 +21,9 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                // El cliente del frontend envia las peticiones con credentials: "include",
+                // asi que el navegador descarta la respuesta si falta esta cabecera.
+                .allowCredentials(true)
                 .maxAge(3600);
     }
 }
