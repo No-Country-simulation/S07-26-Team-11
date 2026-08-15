@@ -72,7 +72,7 @@ function VerifyContent() {
         localStorage.setItem("leadInfo", JSON.stringify(data.lead));
       }
 
-      router.push("/benchmark/cuestionario");
+      router.push("/benchmark");
     } catch (err) {
       console.error("Error capturado en la petición:", err);
       setErrorType("server_error");
