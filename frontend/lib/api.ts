@@ -7,6 +7,8 @@
  * Asi la desincronizacion entre frontend y backend se vuelve imposible.
  */
 
+import { readAccessToken } from "./session";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
 
 /** La URL contra la que se esta trabajando. Util para mostrarla en diagnostico. */
@@ -30,10 +32,15 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // El token viaja en cada peticion si hay sesion. Los endpoints publicos lo
+  // ignoran, asi que no hace falta distinguirlos aca.
+  const token = readAccessToken();
+
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
     credentials: "include",
@@ -63,6 +70,36 @@ export const api = {
 /* ------------------------------------------------------------------ */
 /* Endpoints. Reflejan docs/API.md. Ampliar a medida que se implementen. */
 /* ------------------------------------------------------------------ */
+
+/** POST /auth/login y POST /auth/register devuelven esto. */
+export interface AccessTokenResponse {
+  accessToken: string;
+  tokenType: string;
+  expiresInSeconds: number;
+}
+
+/** GET /auth/me. Los roles llegan con el prefijo ROLE_ de Spring Security. */
+export interface AuthenticatedUser {
+  email: string;
+  roles: string[];
+}
+
+/** POST /auth/register. */
+export interface RegisteredUser {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
+export const authApi = {
+  login: (email: string, password: string) =>
+    api.post<AccessTokenResponse>("/auth/login", { email, password }),
+  register: (email: string, password: string) =>
+    api.post<RegisteredUser>("/auth/register", { email, password }),
+  /** Revoca el token en el servidor: no alcanza con borrarlo del navegador. */
+  logout: () => api.post<void>("/auth/logout"),
+  me: () => api.get<AuthenticatedUser>("/auth/me"),
+};
 
 export const calculatorApi = {
   estimate: (input: Record<string, unknown>) =>

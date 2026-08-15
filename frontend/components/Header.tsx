@@ -1,10 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import UserMenu from "@/components/UserMenu";
 
 type HeaderProps = {
   subtitle?: ReactNode;
+  /** Contenido propio de la pantalla (un CTA, por ejemplo). Se ubica antes del
+   *  estado de sesion, que aparece siempre y no hace falta pasarlo. */
   children?: ReactNode;
+  /** Solo para las pantallas donde mostrar el estado de sesion no aporta, como
+   *  el propio formulario de login. */
+  hideSessionControls?: boolean;
 };
 
 function Logo() {
@@ -26,7 +32,11 @@ function Logo() {
   );
 }
 
-export default function Header({ subtitle, children }: HeaderProps) {
+export default function Header({
+  subtitle,
+  children,
+  hideSessionControls = false,
+}: HeaderProps) {
   return (
     <header className="w-full bg-white shadow-sm">
       <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center justify-between px-6 sm:px-8">
@@ -38,7 +48,11 @@ export default function Header({ subtitle, children }: HeaderProps) {
             </div>
           )}
         </div>
-        {children}
+
+        <div className="flex items-center gap-4 sm:gap-5">
+          {children}
+          {!hideSessionControls && <UserMenu />}
+        </div>
       </div>
     </header>
   );
