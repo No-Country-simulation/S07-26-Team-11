@@ -1,11 +1,11 @@
 package com.dcplatform.api.leads.service;
 
-import com.dcplatform.api.leads.repository.LeadRepository;
 import com.dcplatform.api.leads.model.LeadEntity;
 import com.dcplatform.api.leads.model.dto.LeadAuthenticationResponse;
 import com.dcplatform.api.leads.model.dto.LeadMagicLinkTokenRequest;
 import com.dcplatform.api.leads.model.dto.LeadRegistrationRequest;
 import com.dcplatform.api.leads.model.dto.LeadRegistrationResponse;
+import com.dcplatform.api.leads.repository.LeadRepository;
 import com.dcplatform.api.magiclink.service.MagicLinkService;
 import com.dcplatform.api.security.jwt.JwtService;
 import com.dcplatform.api.shared.ApiException;
@@ -29,13 +29,8 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public LeadRegistrationResponse createLead(String clientIp, LeadRegistrationRequest request) {
-		LeadEntity lead = new LeadEntity();
-		lead.setCompanyName(request.companyName());
-		lead.setSource(request.source());
-		lead.setConsentAt(LocalDateTime.now());
+		LeadEntity lead = mapToLeadEntity(request);
 		lead.setConsentIp(clientIp);
-		lead.setPrivacyPolicyVersion(request.privacyPolicyVersion());
-		lead.setCreatedAt(LocalDateTime.now());
 
 		lead = leadRepository.save(lead);
 
@@ -72,5 +67,18 @@ public class LeadServiceImpl implements LeadService {
 
 		return leadRepository.findByEmail(email)
 				.orElseThrow(() -> ApiException.notFound("Recurso no encontrado: entidad Lead."));
+	}
+
+	private LeadEntity mapToLeadEntity(LeadRegistrationRequest request) {
+		LeadEntity lead = new LeadEntity();
+
+		lead.setEmail(request.email());
+		lead.setCompanyName(request.companyName());
+		lead.setRole(request.role());
+		lead.setSource(request.source());
+		lead.setConsentAt(LocalDateTime.now());
+		lead.setPrivacyPolicyVersion(request.privacyPolicyVersion());
+		lead.setCreatedAt(LocalDateTime.now());
+		return lead;
 	}
 }
