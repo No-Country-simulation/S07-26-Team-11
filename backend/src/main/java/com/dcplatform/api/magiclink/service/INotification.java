@@ -1,4 +1,4 @@
-package com.dcplatform.api.leads;
+package com.dcplatform.api.magiclink.service;
 
 
 
