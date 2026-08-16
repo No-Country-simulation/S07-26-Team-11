@@ -106,7 +106,7 @@ public class MockCalculatorService implements CalculatorService {
 		}
 
 		return new CalculatorEstimateResponse(
-				UUID.randomUUID().toString(),
+				null,
 				CALCULATOR_VERSION,
 				createdAt,
 				isUnlocked,

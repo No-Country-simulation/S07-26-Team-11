@@ -28,8 +28,10 @@ public class CalculatorPersistenceService {
 		this.leadService = leadService;
 	}
 
-	public void save(String leadEmail, CalculatorEstimateRequest request, CalculatorEstimateResponse response) {
+	public CalculatorEstimateEntity save(String leadEmail, CalculatorEstimateRequest request,
+	                                     CalculatorEstimateResponse response) {
 		logger.info("Saving estimate for lead {}", leadEmail);
+
 		CalculatorEstimateEntity entity = new CalculatorEstimateEntity();
 
 		LeadEntity lead = leadService.getLeadEntityByEmail(leadEmail);
@@ -49,7 +51,7 @@ public class CalculatorPersistenceService {
 		entity.setCurrency(currency);
 		entity.setCreatedAt(OffsetDateTime.parse(response.createdAt()));
 
-		repository.save(entity);
+		return repository.save(entity);
 	}
 
 	public CalculatorEstimateEntity findById(UUID id) {
