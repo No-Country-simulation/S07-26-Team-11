@@ -201,14 +201,14 @@ class JwtServiceImplTest {
 
 	@Test
 	void isTokenValid_shouldReturnFalseForMalformedOrNullToken() {
-		assertThat(jwtService.isTokenValid("not.a.valid.tokenFromMagicLink")).isFalse();
+		assertThat(jwtService.isTokenValid("not.a.valid.token")).isFalse();
 
 		assertThat(jwtService.isTokenValid(null)).isFalse();
 	}
 
 	@Test
 	void extractionMethods_shouldThrowExceptionsOnMalformedOrNullTokens() {
-		String malformedToken = "invalid.tokenFromMagicLink.here";
+		String malformedToken = "invalid.token.here";
 
 		// Para tokens malformados, jjwt lanza una subclase de JwtException (MalformedJwtException)
 		assertThatThrownBy(() -> jwtService.extractEmail(malformedToken))
@@ -310,7 +310,7 @@ class JwtServiceImplTest {
 
 	@Test
 	void booleanExtractionMethods_shouldThrowExceptionsOnInvalidTokens() {
-		String malformedToken = "invalid.tokenFromMagicLink.here";
+		String malformedToken = "invalid.token.here";
 
 		assertThatThrownBy(() -> jwtService.isAccessToken(malformedToken))
 				.isInstanceOf(io.jsonwebtoken.JwtException.class);
@@ -366,7 +366,7 @@ class JwtServiceImplTest {
 
 	@Test
 	void extractExpiration_shouldThrowJwtExceptionWhenSignatureIsInvalid() {
-		// 1. Simulamos un tokenFromMagicLink generado por un atacante con un secreto diferente
+		// 1. Simulamos un token generado por un atacante con un secreto diferente
 		String attackerSecret = "9999999999abcdef0123456789abcdef";
 		SecretKey attackerKey = Keys.hmacShaKeyFor(attackerSecret.getBytes(StandardCharsets.UTF_8));
 
