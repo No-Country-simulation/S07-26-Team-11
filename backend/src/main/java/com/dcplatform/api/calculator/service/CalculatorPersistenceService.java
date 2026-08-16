@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Service
 public class CalculatorPersistenceService {
@@ -51,7 +52,7 @@ public class CalculatorPersistenceService {
 		repository.save(entity);
 	}
 
-	public CalculatorEstimateEntity findById(String id) {
+	public CalculatorEstimateEntity findById(UUID id) {
 		return repository.findById(id)
 				.orElseThrow(() -> ApiException.notFound("Cálculo de estimación no encontrado para ID " + id));
 	}
