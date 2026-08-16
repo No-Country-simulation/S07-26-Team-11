@@ -5,28 +5,37 @@ import com.dcplatform.api.calculator.model.KpiCode;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
 import com.dcplatform.api.calculator.repository.CalculatorRepository;
+import com.dcplatform.api.leads.model.LeadEntity;
+import com.dcplatform.api.leads.service.LeadService;
 import com.dcplatform.api.shared.ApiException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Service
 public class CalculatorPersistenceService {
 
 	private final Logger logger = org.slf4j.LoggerFactory.getLogger(CalculatorPersistenceService.class);
-	private final CalculatorRepository repository;
 
-	public CalculatorPersistenceService(CalculatorRepository repository) {
+	private final CalculatorRepository repository;
+	private final LeadService leadService;
+
+	public CalculatorPersistenceService(CalculatorRepository repository, LeadService leadService) {
 		this.repository = repository;
+		this.leadService = leadService;
 	}
 
-	public void save(String leadEmail, CalculatorEstimateRequest request, CalculatorEstimateResponse response) {
+	public CalculatorEstimateEntity save(String leadEmail, CalculatorEstimateRequest request,
+	                                     CalculatorEstimateResponse response) {
 		logger.info("Saving estimate for lead {}", leadEmail);
+
 		CalculatorEstimateEntity entity = new CalculatorEstimateEntity();
 
-		// TODO: insert lead entity here with LeadRepository.findByEmail(leadEmail)
+		LeadEntity lead = leadService.getLeadEntityByEmail(leadEmail);
+		entity.setLead(lead);
 		entity.setCalculationVersion(response.calculationVersion());
 		entity.setInputsJson(request);
 		entity.setOutputsJson(response);
@@ -42,10 +51,10 @@ public class CalculatorPersistenceService {
 		entity.setCurrency(currency);
 		entity.setCreatedAt(OffsetDateTime.parse(response.createdAt()));
 
-		repository.save(entity);
+		return repository.save(entity);
 	}
 
-	public CalculatorEstimateEntity findById(String id) {
+	public CalculatorEstimateEntity findById(UUID id) {
 		return repository.findById(id)
 				.orElseThrow(() -> ApiException.notFound("Cálculo de estimación no encontrado para ID " + id));
 	}
