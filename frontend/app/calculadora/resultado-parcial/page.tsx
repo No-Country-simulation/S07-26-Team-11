@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import type { CalculatorEstimate } from "../calculatorUse";
 
 type StoredValues = {
   installedCapacity: string;
@@ -26,6 +27,7 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
 export default function PartialResultPage() {
   const router = useRouter();
   const [values, setValues] = useState(referenceValues);
+  const [estimate, setEstimate] = useState<CalculatorEstimate | null>(null);
   const [email, setEmail] = useState("");
 
   useEffect(() => {
@@ -37,6 +39,15 @@ export default function PartialResultPage() {
     } catch {
       sessionStorage.removeItem("capacity-calculator");
     }
+
+    const storedEstimate = sessionStorage.getItem("capacity-calculator-estimate");
+    if (!storedEstimate) return;
+
+    try {
+      setEstimate(JSON.parse(storedEstimate) as CalculatorEstimate);
+    } catch {
+      sessionStorage.removeItem("capacity-calculator-estimate");
+    }
   }, []);
 
   const result = useMemo(() => {
@@ -45,12 +56,20 @@ export default function PartialResultPage() {
     const idleCapacity = installed - used;
     const usedPercentage = installed > 0 ? (used / installed) * 100 : 0;
 
+    const idleCapacityKpi = estimate?.kpis.find(
+      (kpi) => kpi.code === "IDLE_CAPACITY_KW",
+    );
+    const idleRatioKpi = estimate?.kpis.find(
+      (kpi) => kpi.code === "IDLE_CAPACITY_RATIO",
+    );
+    const idlePercentage = idleRatioKpi ? idleRatioKpi.value * 100 : 100 - usedPercentage;
+
     return {
-      idleCapacity,
-      usedPercentage,
-      idlePercentage: 100 - usedPercentage,
+      idleCapacity: idleCapacityKpi?.value ?? idleCapacity,
+      usedPercentage: 100 - idlePercentage,
+      idlePercentage,
     };
-  }, [values]);
+  }, [estimate, values]);
 
   const submitEmail = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

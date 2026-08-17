@@ -7,7 +7,11 @@
  * Asi la desincronizacion entre frontend y backend se vuelve imposible.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (!BASE_URL) {
+  throw new Error();
+}
 
 /** Formato de error uniforme de la API (RFC 9457 Problem Details). */
 export interface ProblemDetail {
@@ -33,7 +37,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       "Content-Type": "application/json",
       ...options.headers,
     },
-    credentials: "include",
   });
 
   if (!response.ok) {
@@ -62,8 +65,8 @@ export const api = {
 /* ------------------------------------------------------------------ */
 
 export const calculatorApi = {
-  estimate: (input: Record<string, unknown>) =>
-    api.post<unknown>("/public/calculator/estimate", input),
+  estimate: <T = unknown>(input: Record<string, unknown>) =>
+    api.post<T>("/public/calculator/estimate", input),
   defaults: () => api.get<unknown>("/public/calculator/defaults"),
 };
 

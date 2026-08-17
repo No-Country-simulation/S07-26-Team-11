@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { useCalculator } from "./calculatorUse";
 
 type CalculatorValues = {
   installedCapacity: string;
@@ -56,6 +57,7 @@ const fields: Array<{
 export default function CalculatorPage() {
   const router = useRouter();
   const [values, setValues] = useState(emptyValues);
+  const { estimate, isLoading, error } = useCalculator();
 
   const isComplete = Object.values(values).every(
     (value) => value.trim() !== "" && Number(value) > 0,
@@ -65,11 +67,21 @@ export default function CalculatorPage() {
     setValues((current) => ({ ...current, [id]: value }));
   };
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isComplete) return;
 
+    const response = await estimate({
+      installedCapacityKw: Number(values.installedCapacity),
+      usedCapacityKw: Number(values.usedCapacity),
+      electricityRatePerKwh: Number(values.electricityRate),
+      rackCount: Number(values.racks),
+    });
+
+    if (!response) return;
+
     sessionStorage.setItem("capacity-calculator", JSON.stringify(values));
+    sessionStorage.setItem("capacity-calculator-estimate", JSON.stringify(response));
     router.push("/calculadora/resultado-parcial");
   };
 
@@ -120,11 +132,16 @@ export default function CalculatorPage() {
 
             <button
               type="submit"
-              disabled={!isComplete}
+              disabled={!isComplete || isLoading}
               className="mt-5 h-11 w-full rounded bg-forest px-5 text-xs font-medium text-white transition-colors hover:bg-forest-dark focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#e5e9e6] disabled:text-[#898d8a]"
             >
-              Ver mi resultado
+              {isLoading ? "Calculando..." : "Ver mi resultado"}
             </button>
+            {error && (
+              <p role="alert" className="mt-3 text-center text-xs text-red-700">
+                {error}
+              </p>
+            )}
             <p className="mt-3 text-center text-[10px] text-text-secondary">
               {isComplete
                 ? "Los datos están listos para calcular tu resultado."
