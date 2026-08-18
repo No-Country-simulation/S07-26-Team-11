@@ -2,7 +2,7 @@ package com.dcplatform.api.calculator.model;
 
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
-import com.dcplatform.api.leads.Lead;
+import com.dcplatform.api.leads.model.LeadEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -21,7 +21,7 @@ public class CalculatorEstimateEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lead_id")
-	private Lead lead;
+	private LeadEntity lead;
 
 	@Column(name = "calculation_version", length = 20, nullable = false)
 	private String calculationVersion;
@@ -61,11 +61,11 @@ public class CalculatorEstimateEntity {
 		this.id = id;
 	}
 
-	public Lead getLead() {
+	public LeadEntity getLead() {
 		return lead;
 	}
 
-	public void setLead(Lead lead) {
+	public void setLead(LeadEntity lead) {
 		this.lead = lead;
 	}
 

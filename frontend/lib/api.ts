@@ -9,7 +9,15 @@
 
 import { readAccessToken } from "./session";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// Fallar al arrancar y no en la primera peticion: sin esta variable el cliente
+// pegaria contra rutas relativas y el sintoma aparaceria lejos de la causa.
+if (!BASE_URL) {
+  throw new Error(
+    "Falta NEXT_PUBLIC_API_BASE_URL. Copiar frontend/.env.example a .env y completarla.",
+  );
+}
 
 /** La URL contra la que se esta trabajando. Util para mostrarla en diagnostico. */
 export const apiBaseUrl = BASE_URL;
@@ -43,7 +51,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
-    credentials: "include",
   });
 
   if (!response.ok) {
@@ -99,15 +106,18 @@ export const authApi = {
 };
 
 export const calculatorApi = {
-  estimate: (input: Record<string, unknown>) =>
-    api.post<unknown>("/public/calculator/estimate", input),
+  estimate: <T = unknown>(input: Record<string, unknown>) =>
+    api.post<T>("/public/calculator/estimate", input),
   defaults: () => api.get<unknown>("/public/calculator/defaults"),
 };
 
 export const leadsApi = {
   capture: (input: { email: string; consent: boolean; source: string }) =>
     api.post<{ message: string }>("/public/leads", input),
-  verify: (token: string) => api.post<unknown>("/public/leads/verify", { token }),
+  // El backend espera la clave `tokenFromMagicLink`, no `token`
+  // (ver LeadMagicLinkTokenRequest). Mandar `token` devuelve 400.
+  verify: (token: string) =>
+    api.post<unknown>("/public/leads/verify", { tokenFromMagicLink: token }),
 };
 
 export const benchmarkApi = {

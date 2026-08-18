@@ -1,11 +1,9 @@
-package com.dcplatform.api.leads;
+package com.dcplatform.api.magiclink.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.dcplatform.api.config.BrevoConfig;
 
 import sendinblue.ApiException;
 import sibApi.TransactionalEmailsApi;

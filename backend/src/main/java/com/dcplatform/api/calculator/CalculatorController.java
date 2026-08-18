@@ -3,7 +3,7 @@ package com.dcplatform.api.calculator;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
 import com.dcplatform.api.calculator.service.CalculatorService;
-import com.dcplatform.api.calculator.service.GetEstimateById;
+import com.dcplatform.api.calculator.service.GetEstimateByIdUseCase;
 import com.dcplatform.api.calculator.service.UnlockEstimateUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +16,14 @@ public class CalculatorController {
 
 	private final CalculatorService calculatorService;
 	private final UnlockEstimateUseCase unlockEstimateUseCase;
-	private final GetEstimateById getEstimateById;
+	private final GetEstimateByIdUseCase getEstimateByIdUseCase;
 
 	public CalculatorController(CalculatorService calculatorService,
 	                            UnlockEstimateUseCase unlockEstimateUseCase,
-	                            GetEstimateById getEstimateById) {
+	                            GetEstimateByIdUseCase getEstimateByIdUseCase) {
 		this.calculatorService = calculatorService;
 		this.unlockEstimateUseCase = unlockEstimateUseCase;
-		this.getEstimateById = getEstimateById;
+		this.getEstimateByIdUseCase = getEstimateByIdUseCase;
 	}
 
 	@PostMapping("/estimate")
@@ -59,6 +59,6 @@ public class CalculatorController {
 	@GetMapping("/estimates/{id}")
 	public ResponseEntity<CalculatorEstimateResponse> getEstimate(@PathVariable String id,
 	                                                              @AuthenticationPrincipal String leadEmail) {
-		return ResponseEntity.ok(getEstimateById.execute(leadEmail, id));
+		return ResponseEntity.ok(getEstimateByIdUseCase.execute(leadEmail, id));
 	}
 }
