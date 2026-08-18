@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Cuentas basicas de email + password: registro, login y logout.
+ * Cuentas de email + password: registro, login y logout.
  *
- * Es la base minima para probar el ciclo completo de emision/validacion/revocacion
- * de JWT mientras se integra el flujo real de magic link (ver backend/magic_link/).
- * No toca nada del modulo `leads` (esa integracion es responsabilidad de otra
- * persona del equipo).
+ * <p><strong>El alta de cuentas nuevas ya no pasa por aca.</strong> Los usuarios del producto
+ * entran por magic link ({@code POST /api/v1/public/leads}), que crea la cuenta sola en el
+ * primer canje. El registro por password quedo reservado a ADMIN y existe solo para las cuentas
+ * de manejo interno de la aplicacion.
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -37,6 +37,10 @@ public class UserAuthController {
         this.tokenRevocationService = tokenRevocationService;
     }
 
+    /**
+     * Crea una cuenta de manejo interno. <strong>Requiere rol ADMIN</strong>
+     * (ver SecurityConfig): no es el alta de usuarios del producto, esa es el magic link.
+     */
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userAuthService.register(request));

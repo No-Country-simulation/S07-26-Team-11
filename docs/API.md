@@ -578,7 +578,8 @@ en el log del servidor.
 | `GET /public/industry/stats` | 2 | ☐ |
 | `GET /public/pdf/jobs/{id}` | 3 | ☑ |
 | `GET /public/pdf/documents/{id}/download` | 3 | ☑ |
-| `POST /auth/register` · `POST /auth/login` · `POST /auth/logout` · `GET /auth/me` | 3 | ☑ |
+| `POST /auth/login` · `POST /auth/logout` · `GET /auth/me` | 3 | ☑ |
+| `POST /auth/register` 🔒 **ADMIN** — alta manual de cuentas internas; el alta de usuarios del producto es por magic link | 3 | ☑ |
 | `POST /documents` · `POST /documents/preview` | 3 | ☑ |
 | `GET /documents` · `GET /documents/{name}` · `GET /documents/{name}/download` | 3 | ☑ |
 | `GET /admin/documents` | 3 | ☑ |

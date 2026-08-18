@@ -117,6 +117,8 @@ public class MagicLinkService {
         // identidad que el resto de la API sabe resolver (ver UserAuthService). `leads` sigue
         // siendo el registro del funnel; quien opera en la API es la cuenta.
         String newAccessToken = userAuthService.issueAccessTokenForVerifiedEmail(leadBd.getEmail());
+        /// # String newAccessToken = jwtService.generateAccessToken(leadBd.getEmail(), "LEAD");
+        
         Date expiration = jwtService.extractExpiration(newAccessToken);
 
         var leadDtoResponse = new LeadResponse(leadBd.getId(), leadBd.getEmail(), leadBd.getCompanyName());

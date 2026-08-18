@@ -9,9 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 /**
- * Registro y login basicos (email + password). Emite los mismos JWT de acceso
- * que despues consume JwtAuthenticationFilter, para que el resto de la API (y el
- * futuro flujo de magic link) no tengan que distinguir de donde vino el token.
+ * Cuentas de email + password. Emite los mismos JWT de acceso que consume
+ * JwtAuthenticationFilter, para que el resto de la API no tenga que distinguir de donde vino
+ * el token: da igual si nacio de este login o de un canje de magic link.
+ *
+ * <p>Hay dos formas de que exista una fila en {@code users}, y solo una es autoservicio:
+ * <ul>
+ *   <li>{@link #issueAccessTokenForVerifiedEmail} — la crea el magic link al canjear el enlace.
+ *       Es el camino de todos los usuarios del producto.</li>
+ *   <li>{@link #register} — alta manual de una cuenta con password. Reservada a ADMIN
+ *       (ver SecurityConfig), solo para cuentas de manejo interno.</li>
+ * </ul>
  */
 @Service
 public class UserAuthService {

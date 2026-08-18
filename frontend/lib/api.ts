@@ -84,18 +84,15 @@ export interface AuthenticatedUser {
   roles: string[];
 }
 
-/** POST /auth/register. */
-export interface RegisteredUser {
-  id: string;
-  email: string;
-  createdAt: string;
-}
-
+/**
+ * No hay `register` a proposito: el alta de cuentas nuevas es solo por magic link
+ * (`leadsApi.capture` -> el enlace del correo -> `leadsApi.verify`), que crea la cuenta sola
+ * en el primer canje. `POST /auth/register` sigue existiendo en la API pero exige rol ADMIN
+ * y es para cuentas de manejo interno, no para el producto.
+ */
 export const authApi = {
   login: (email: string, password: string) =>
     api.post<AccessTokenResponse>("/auth/login", { email, password }),
-  register: (email: string, password: string) =>
-    api.post<RegisteredUser>("/auth/register", { email, password }),
   /** Revoca el token en el servidor: no alcanza con borrarlo del navegador. */
   logout: () => api.post<void>("/auth/logout"),
   me: () => api.get<AuthenticatedUser>("/auth/me"),
