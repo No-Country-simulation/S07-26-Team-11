@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 @MockIntegration
 @Service
@@ -106,7 +105,7 @@ public class MockCalculatorService implements CalculatorService {
 		}
 
 		return new CalculatorEstimateResponse(
-				UUID.randomUUID().toString(),
+				null,
 				CALCULATOR_VERSION,
 				createdAt,
 				isUnlocked,

@@ -97,3 +97,5 @@ AGENTS.md
 skills/
 *.rules
 *.mdc
+
+aux/

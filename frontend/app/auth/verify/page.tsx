@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/components/AuthProvider";
 import { leadsApi, ApiError } from "@/lib/api";
 
 type ErrorType = "invalid_link" | "server_error" | null;
@@ -17,6 +18,7 @@ interface VerifyResponse {
 function VerifyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { adoptAccessToken } = useAuth();
   const token = searchParams.get("token");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -46,12 +48,19 @@ function VerifyContent() {
     try {
       const data = (await leadsApi.verify(token)) as VerifyResponse;
 
-      if (data?.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
+      if (!data?.accessToken) {
+        setErrorType("server_error");
+        return;
       }
-      if (data?.lead) {
+
+      if (data.lead) {
         localStorage.setItem("leadInfo", JSON.stringify(data.lead));
       }
+
+      // adoptAccessToken guarda el token y ademas avisa al proveedor de sesion,
+      // para que el header y las pantallas protegidas vean al usuario ya
+      // logueado sin esperar a una recarga completa.
+      await adoptAccessToken(data.accessToken);
 
       router.push("/benchmark");
     } catch (err) {
@@ -137,7 +146,9 @@ function VerifyContent() {
 export default function VerifyPage() {
   return (
     <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header />
+      {/* La sesion se esta resolviendo en esta misma pantalla: mostrar
+          "Iniciar sesion" mientras tanto solo confunde. */}
+      <Header hideSessionControls />
 
       <main className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-12 sm:px-8">
         <img
