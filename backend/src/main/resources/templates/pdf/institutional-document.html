@@ -132,7 +132,7 @@
             <table class="chart-table">
                 <tr th:each="item : ${industryScores}">
                     <td class="chart-label" th:text="${item.label}">Tu resultado</td>
-                    <td class="chart-bar"><div class="bar-bg"><div class="bar-fill" th:class="${item.barClass}" th:style="'width:' + ${item.value} + '%;'"></div></div></td>
+                    <td class="chart-bar"><div class="bar-bg"><div class="bar-fill" th:classappend="${item.barClass}" th:style="'width:' + ${item.value} + '%;'"></div></div></td>
                     <td class="chart-value" th:text="${item.value}">54</td>
                 </tr>
             </table>
@@ -141,7 +141,7 @@
             <h2>Recomendaciones</h2>
             <table class="rec-table" th:each="rec, iter : ${recommendations}">
                 <tr>
-                    <td class="rec-num-cell"><span class="rec-number" th:text="${#strings.padStart((iter.index + 1) + '', 2, '0')}">01</span></td>
+                    <td class="rec-num-cell"><span class="rec-number" th:text="${#numbers.formatInteger(iter.index + 1, 2)}">01</span></td>
                     <td class="rec-text-cell" th:text="${rec}">Implementá monitoreo por carga de trabajo...</td>
                 </tr>
             </table>

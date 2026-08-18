@@ -135,6 +135,82 @@ export const pdfApi = {
 };
 
 /* ------------------------------------------------------------------ */
+/* Documentos institucionales (informe de capacidad). Ver docs/API.md  */
+/* seccion "documents": el cuerpo refleja 1:1 las variables que        */
+/* consume la plantilla del PDF, no texto libre.                       */
+/* ------------------------------------------------------------------ */
+
+export interface IndustryScoreInput {
+  label: string;
+  /** 0-100. Tambien fija el ancho de la barra en el PDF. */
+  value: number;
+  /** true solo en la fila del propio operador (se imprime en dorado). */
+  own: boolean;
+}
+
+export interface GenerateDocumentInput {
+  metadata: { name: string };
+  /** Vacio usa la fecha del servidor. */
+  date?: string;
+  title: string;
+  executiveSummary: string;
+  /** Ya formateados como texto ("US$ 48.200", "38%"): el backend no aplica locale. */
+  annualCost: string;
+  maturityLevel: string;
+  score: string;
+  kwUnderutilized: string;
+  utilizationPercent: string;
+  costPerRack: string;
+  industryScores: IndustryScoreInput[];
+  recommendations: string[];
+}
+
+export interface DocumentSummary {
+  id: string;
+  owner: string;
+  name: string;
+  fileName: string;
+  title: string;
+  sizeBytes: number;
+  createdAt: string;
+  updatedAt: string;
+  downloadUrl: string;
+}
+
+/**
+ * Descarga autenticada que devuelve los bytes del PDF, no JSON.
+ *
+ * `fetch` sigue el 302 hacia la URL firmada del bucket de forma transparente
+ * (comportamiento por defecto, sin nada especial que hacer): el Blob que llega
+ * ya es el PDF final. No se puede resolver con un simple `<a href>` porque el
+ * token viaja como header Bearer, no como cookie.
+ */
+async function downloadAuthenticated(path: string): Promise<Blob> {
+  const token = readAccessToken();
+  const response = await fetch(`${BASE_URL}${path}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!response.ok) {
+    const problem = (await response.json().catch(() => ({
+      type: "about:blank",
+      title: "Error de red",
+      status: response.status,
+    }))) as ProblemDetail;
+    throw new ApiError(problem);
+  }
+
+  return response.blob();
+}
+
+export const documentsApi = {
+  generate: (input: GenerateDocumentInput) =>
+    api.post<DocumentSummary>("/documents", input),
+  downloadBlob: (name: string) =>
+    downloadAuthenticated(`/documents/${encodeURIComponent(name)}/download`),
+};
+
+/* ------------------------------------------------------------------ */
 /* Diagnostico. No pasa por request(): /db-status responde 503 con un   */
 /* cuerpo que igual queremos leer, y estos endpoints son publicos, asi  */
 /* que se piden sin credenciales.                                       */

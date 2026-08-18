@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireAuth from "@/components/RequireAuth";
@@ -45,6 +46,26 @@ function AccountDetail() {
         <Row label="Email" value={user?.email ?? "—"} />
         <Row label="Rol" value={roles} />
         <Row label="La sesión vence" value={expiry} />
+      </div>
+
+      <div className="mt-8 border-t border-base-border/60 pt-6">
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+          Accesos rápidos
+        </p>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/benchmark"
+            className="flex-1 rounded-md border border-forest px-5 py-3 text-center text-sm font-semibold text-forest-dark transition-colors hover:bg-base-natural"
+          >
+            Maturity Benchmark
+          </Link>
+          <Link
+            href="/reporte"
+            className="flex-1 rounded-md border border-forest px-5 py-3 text-center text-sm font-semibold text-forest-dark transition-colors hover:bg-base-natural"
+          >
+            Reporte de la industria
+          </Link>
+        </div>
       </div>
     </div>
   );

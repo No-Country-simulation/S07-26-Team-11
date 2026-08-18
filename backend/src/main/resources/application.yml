@@ -118,6 +118,9 @@ app:
       name: ${DOCUMENTS_ORG_NAME:Capacia}
       tagline: ${DOCUMENTS_ORG_TAGLINE:Plataforma de Benchmark de Data Centers}
       footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
+      # Tarjeta final del informe ("Hablemos de estos resultados"). Copy fijo del diseno.
+      meeting-link: ${DOCUMENTS_ORG_MEETING_LINK:https://capacia.com/agenda}
+      contact-email: ${DOCUMENTS_ORG_CONTACT_EMAIL:enterprise@capacia.com}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
     api-key: ${EMAIL_API_KEY:x-dummy-api-key}

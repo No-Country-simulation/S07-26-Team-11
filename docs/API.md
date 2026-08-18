@@ -358,22 +358,52 @@ forma síncrona y cuelgan de la cuenta del usuario. Comparten bucket, con prefij
 documentos de quien presenta el token. El dueño **nunca** viaja en la ruta ni en el cuerpo.
 
 ### `POST /documents` 🔒
-Genera el PDF, lo sube al object storage privado y registra sus metadatos.
-Regenerar con el mismo `metadata.name` **reemplaza** el documento; no crea un duplicado.
+Genera el informe de capacidad (PDF), lo sube al object storage privado y registra sus
+metadatos. Regenerar con el mismo `metadata.name` **reemplaza** el documento; no crea un
+duplicado.
+
+> **Actualizado 2026-08-18.** El cuerpo cambió: antes recibía `message: string[]` (párrafos
+> libres) pero la plantilla nunca los renderizaba — el informe siempre fue un reporte
+> estructurado de benchmark, no un documento de texto libre. Ahora el cuerpo refleja
+> exactamente las secciones del informe. Ver `aux/decisiones.md` D-004 en el repo de quien
+> hizo el cambio para el detalle completo.
 
 **Request**
 ```json
 {
-  "metadata": { "name": "informe-julio" },
+  "metadata": { "name": "informe-benchmark" },
   "date": "Thu Jul 30 09:27:13 PM -05 2026",
-  "title": "Informe de posición en el benchmark",
-  "message": ["Primer párrafo.", "Segundo párrafo."]
+  "title": "Informe de capacidad — Northbridge Data Systems",
+  "executiveSummary": "Su infraestructura opera hoy con una utilización promedio del 70%...",
+  "annualCost": "US$ 48.200",
+  "maturityLevel": "Gestionado",
+  "score": "54 / 100",
+  "kwUnderutilized": "142 kW",
+  "utilizationPercent": "38%",
+  "costPerRack": "US$ 1.004",
+  "industryScores": [
+    { "label": "Tu resultado", "value": 54, "own": true },
+    { "label": "Hyperscale", "value": 71, "own": false },
+    { "label": "Colocation", "value": 58, "own": false },
+    { "label": "Enterprise (promedio)", "value": 46, "own": false }
+  ],
+  "recommendations": [
+    "Implementá monitoreo por carga de trabajo para reducir el punto ciego de visibilidad.",
+    "Establecé un proceso de baja de recursos ociosos con revisión trimestral."
+  ]
 }
 ```
 `metadata.name`: único por usuario, sin la extensión `.pdf`. Solo `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`
 — termina siendo parte de la clave del objeto en el bucket.
 `date`: acepta la salida de `date(1)` y ISO-8601; si no se reconoce se imprime tal cual. Vacío usa
 la fecha del servidor.
+Los valores numéricos formateados (`annualCost`, `score`, `kwUnderutilized`, `utilizationPercent`,
+`costPerRack`) viajan **ya formateados como texto**: el backend los imprime tal cual, sin aplicar
+moneda ni locale. `industryScores[].value` es la excepción — va como número (0-100): fija el
+ancho de la barra en el PDF. `industryScores[].own` marca la fila propia (se imprime en dorado,
+el resto en verde). `industryScores` admite hasta 6 filas, `recommendations` hasta 6 items.
+`meetingLink` y `contactEmail` de la tarjeta final **no** viajan en la petición: son configuración
+del servidor (`app.documents.organization`), iguales para todos los informes.
 
 **Response `201`** (cabecera `Location` con la URL de descarga)
 ```json
