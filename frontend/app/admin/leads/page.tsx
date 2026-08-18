@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 
-export const mockLeads = [
+const mockLeads = [
   { id: "1", email: "gerencia@northbridge.com", date: "29 jul 2026", status: "Parcial", source: "Landing" },
   { id: "2", email: "ops@velarion.io", date: "28 jul 2026", status: "Completado", source: "Outreach" },
   { id: "3", email: "it@metrocore.com", date: "25 jul 2026", status: "Parcial", source: "Landing" },
