@@ -5,8 +5,14 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { leadsApi, ApiError } from "@/lib/api";
 
 type ErrorType = "invalid_link" | "server_error" | null;
+
+interface VerifyResponse {
+  accessToken?: string;
+  lead?: unknown;
+}
 
 function VerifyContent() {
   const searchParams = useSearchParams();
@@ -37,45 +43,28 @@ function VerifyContent() {
     setIsLoading(true);
     setErrorType(null);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      console.log("Llamando a la API en:", `${API_URL}/api/v1/public/leads/verify`);
+      const data = (await leadsApi.verify(token)) as VerifyResponse;
 
-      const response = await fetch(`${API_URL}/api/v1/public/leads/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      console.log("Status de respuesta:", response.status);
-
-      if (response.status === 400 || response.status === 404) {
-        setErrorType("invalid_link");
-        return;
+      if (data?.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
       }
-
-      if (!response.ok) {
-        setErrorType("server_error");
-        return;
-      }
-
-      const data = await response.json();
-
-      localStorage.setItem("accessToken", data.accessToken);
-      if (data.lead) {
+      if (data?.lead) {
         localStorage.setItem("leadInfo", JSON.stringify(data.lead));
       }
 
-      router.push("/benchmark/cuestionario");
+      router.push("/benchmark");
     } catch (err) {
-      console.error("Error capturado en la petición:", err);
-      setErrorType("server_error");
+      console.error("Error capturado en la verificación:", err);
+
+      if (
+        err instanceof ApiError &&
+        (err.problem.status === 400 || err.problem.status === 404)
+      ) {
+        setErrorType("invalid_link");
+      } else {
+        setErrorType("server_error");
+      }
     } finally {
       setIsLoading(false);
     }
