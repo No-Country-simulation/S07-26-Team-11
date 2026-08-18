@@ -1,5 +1,6 @@
 package com.dcplatform.api.magiclink.service;
 
+import com.dcplatform.api.auth.UserAuthService;
 import com.dcplatform.api.magiclink.model.MagicLinkAccessToken;
 import com.dcplatform.api.magiclink.repository.MagicLinkAccessTokenRepository;
 import com.dcplatform.api.magiclink.utils.TokenHasher;
@@ -17,6 +18,7 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
 	private final MagicLinkNotifier magicLinkNotifier;
 	private final JwtService jwtService;
+	private final UserAuthService userAuthService;
 	private final TokenHasher tokenHasher;
 	private final MagicLinkAccessTokenRepository magicLinkRepository;
 	private final RateLimiterService rateLimiterService;
@@ -26,11 +28,13 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 
 	public MagicLinkServiceImpl(MagicLinkNotifier magicLinkNotifier,
 	                            JwtService jwtService,
+	                            UserAuthService userAuthService,
 	                            TokenHasher tokenHasher,
 	                            MagicLinkAccessTokenRepository magicLinkRepository,
 	                            RateLimiterService rateLimiterService) {
 		this.magicLinkNotifier = magicLinkNotifier;
 		this.jwtService = jwtService;
+		this.userAuthService = userAuthService;
 		this.tokenHasher = tokenHasher;
 		this.magicLinkRepository = magicLinkRepository;
 		this.rateLimiterService = rateLimiterService;
@@ -95,7 +99,8 @@ public class MagicLinkServiceImpl implements MagicLinkService {
 		accessToken.setUsedAt(LocalDateTime.now());
 		magicLinkRepository.save(accessToken);
 
-		return jwtService.generateAccessToken(emailJwt, "LEAD");
+		// return jwtService.generateAccessToken(emailJwt, "LEAD");
+		return userAuthService.issueAccessTokenForVerifiedEmail(emailJwt); /// Modificación en el PR#39
 	}
 
 	private void validateInputs(String email, UUID subjectId) {

@@ -50,9 +50,17 @@ public class SecurityConfig {
 						// endpoints públicos explícitos
 						// único punto de entrada al sistema de auth: sin esto, nadie puede solicitar acceso
 						.requestMatchers(HttpMethod.POST, "/api/v1/auth/request-access").permitAll()
-						// registro/login básico de email+password (ver módulo auth) logout y /me
-						// requieren token, quedan cubiertos por el anyRequest().authenticated() de abajo
-						.requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+
+						// El alta de cuentas nuevas es SOLO por magic link (POST /api/v1/public/leads).
+						// El registro por password queda reservado a ADMIN, para las cuentas de manejo
+						// interno; ya no es autoservicio. Ademas cierra una fuga: /register respondia
+						// 409 "ya existe una cuenta con ese email" a cualquiera, y eso permitia
+						// enumerar que correos estan registrados, justo lo que /login y /public/leads
+						// se cuidan de no revelar.
+						.requestMatchers(HttpMethod.POST, "/api/v1/auth/register").hasRole("ADMIN")
+						// login es publico; logout y /me requieren token y quedan cubiertos por el
+						// anyRequest().authenticated() de abajo
+						.requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
 
 						// ---------------- CALCULADORA ----------------
 						.requestMatchers(HttpMethod.POST, "/api/v1/public/calculator/estimate").permitAll()

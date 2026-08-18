@@ -36,6 +36,9 @@ export default function Footer() {
           <Link href="" className="text-forest-dark">
             Contacto
           </Link>
+          <Link href="/api-status" className="text-forest-dark">
+            Estado de la API
+          </Link>
         </nav>
 
         <p className="text-forest-dark">© 2026 Capacia, Inc.</p>
