@@ -2,6 +2,7 @@ package com.dcplatform.api.config;
 
 import com.dcplatform.api.shared.annotations.ApiJsonExample;
 import com.dcplatform.api.shared.annotations.ApiJsonExamples;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +47,7 @@ public class OpenApiConfig {
 	}
 
 	@Bean
-	public OperationCustomizer customJsonExampleCustomizer() {
+	public OperationCustomizer customJsonExampleCustomizer(JsonExampleLoader jsonExampleLoader) {
 		return (operation, handlerMethod) -> {
 			List<ApiJsonExample> annotations = new ArrayList<>();
 
@@ -76,10 +74,10 @@ public class OpenApiConfig {
 
 			// 2. Procesar cada anotación e inyectar el ejemplo JSON
 			for (ApiJsonExample ann : annotations) {
-				String jsonContent = loadClasspathFile(ann.path());
+				JsonNode jsonContent = jsonExampleLoader.load(ann.path());
 
 				ApiResponse apiResponse = responses.computeIfAbsent(
-						ann.status().toString(),
+						ann.status(),
 						k -> new ApiResponse().description(ann.description())
 				);
 
@@ -107,14 +105,5 @@ public class OpenApiConfig {
 
 			return operation;
 		};
-	}
-
-	private String loadClasspathFile(String path) {
-		try {
-			ClassPathResource resource = new ClassPathResource(path);
-			return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("No se pudo cargar el archivo de ejemplo JSON desde el classpath: " + path, e);
-		}
 	}
 }

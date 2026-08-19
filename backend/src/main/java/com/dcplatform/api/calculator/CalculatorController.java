@@ -9,7 +9,6 @@ import com.dcplatform.api.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,26 +31,26 @@ public class CalculatorController {
 	}
 
 	@PostMapping("/estimate")
-	@Operation(summary = "Calcula una estimación", description = "Devuelve los KPI públicos y mantiene bloqueados los resultados de costo mensual y proyección a 3 anos.")
+	@Operation(summary = "Calcula una estimación",
+			description = "Devuelve los KPI públicos y mantiene bloqueados los resultados de costo mensual y proyección a 3 anos.")
 	@ApiJsonExample(
-			status = HttpStatus.OK,
 			description = "Estimación calculada con KPIs como teasers",
-			path = "/swagger/examples/calculator/estimation-200.json"
+			path = "/static/swagger/examples/calculator/estimation-200.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "Datos de entrada inválidos",
-			path = "/swagger/examples/calculator/estimation-400-invalid-values.json"
+			path = "/static/swagger/examples/calculator/estimation-400-invalid-values.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "La capacidad utilizada es mayor que la capacidad instalada",
-			path = "/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
+			path = "/static/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "Campos o datos faltantes",
-			path = "/swagger/examples/calculator/estimation-400-missing-fields.json"
+			path = "/static/swagger/examples/calculator/estimation-400-missing-fields.json"
 	)
 	public ResponseEntity<CalculatorEstimateResponse> estimate(@Valid @RequestBody CalculatorEstimateRequest request) {
 		CalculatorEstimateResponse response = calculatorService.calculate(request, false);
@@ -59,31 +58,31 @@ public class CalculatorController {
 	}
 
 	@PostMapping("/estimate/unlock-results")
-	@Operation(summary = "Desbloquea los resultados de costo", description = "Calcula y guarda una estimación completa para el lead autenticado.")
+	@Operation(summary = "Desbloquea los resultados de costo",
+			description = "Calcula y guarda una estimación completa para el lead autenticado.")
 	@ApiJsonExample(
-			status = HttpStatus.OK,
-			path = "/swagger/examples/calculator/estimation-200-unlocked-results.json",
-			description = "Estimación calculada con todos los KPIs desbloqueados"
+			description = "Estimación calculada con todos los KPIs desbloqueados",
+			path = "/static/swagger/examples/calculator/estimation-200-unlocked-results.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "Datos de entrada inválidos",
-			path = "/swagger/examples/calculator/estimation-400-invalid-values.json"
+			path = "/static/swagger/examples/calculator/estimation-400-invalid-values.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "La capacidad utilizada es mayor que la capacidad instalada",
-			path = "/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
+			path = "/static/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "Campos o datos faltantes",
-			path = "/swagger/examples/calculator/estimation-400-missing-fields.json"
+			path = "/static/swagger/examples/calculator/estimation-400-missing-fields.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.UNAUTHORIZED,
-			description = "Lead/usuario no autenticado",
-			path = "/swagger/examples/auth/authentication-401.json"
+			status = "401",
+			description = "Lead o usuario no autenticado",
+			path = "/static/swagger/examples/auth/authentication-401.json"
 	)
 	public ResponseEntity<CalculatorEstimateResponse> unlockEstimate(
 			@Valid @RequestBody CalculatorEstimateRequest request, @AuthenticationPrincipal String leadEmail) {
@@ -92,11 +91,11 @@ public class CalculatorController {
 	}
 
 	@GetMapping("/defaults")
-	@Operation(summary = "Obtiene valores de ejemplo", description = "Devuelve valores iniciales que pueden enviarse directamente a POST /estimate.")
+	@Operation(summary = "Obtiene valores de ejemplo",
+			description = "Devuelve valores iniciales que pueden enviarse directamente a POST /estimate.")
 	@ApiJsonExample(
-			status = HttpStatus.OK,
-			description = "Valores para ser usados como ejemplo/rellenar campos",
-			path = "/swagger/examples/calculator/default-200.json"
+			description = "Valores para ser usados como ejemplo o para rellenar campos",
+			path = "/static/swagger/examples/calculator/default-200.json"
 	)
 	public ResponseEntity<CalculatorEstimateRequest> getDefaults() {
 		final double installedCapacityKw = 2000.0;
@@ -115,26 +114,26 @@ public class CalculatorController {
 	}
 
 	@GetMapping("/estimates/{id}")
-	@Operation(summary = "Consulta una estimación guardada")
+	@Operation(summary = "Buscar una estimación guardada",
+			description = "Consulta una estimación guardada mediante el ID. Requiere autenticación.")
 	@ApiJsonExample(
-			status = HttpStatus.OK,
 			description = "Estimación calculada con todos los KPIs desbloqueados",
-			path = "/swagger/examples/calculator/estimation-200-unlocked-results.json"
+			path = "/static/swagger/examples/calculator/estimation-200-unlocked-results.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.NOT_FOUND,
+			status = "404",
 			description = "No se logra encontrar un cálculo con el ID proporcionado",
-			path = "/swagger/examples/calculator/estimation-200-unlocked-results.json"
+			path = "/static/swagger/examples/calculator/estimation-404-not-found.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.BAD_REQUEST,
+			status = "400",
 			description = "El ID no contiene un formato válido UUIDv4",
-			path = "/swagger/examples/calculator/estimation-400-invalid-id.json"
+			path = "/static/swagger/examples/calculator/estimation-400-invalid-id.json"
 	)
 	@ApiJsonExample(
-			status = HttpStatus.UNAUTHORIZED,
-			description = "Lead/usuario no autenticado",
-			path = "/swagger/examples/auth/authentication-401.json"
+			status = "401",
+			description = "Lead o usuario no autenticado",
+			path = "/static/swagger/examples/auth/authentication-401.json"
 	)
 	public ResponseEntity<CalculatorEstimateResponse> getEstimate(@PathVariable String id,
 	                                                              @AuthenticationPrincipal String leadEmail) {
