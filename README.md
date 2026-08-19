@@ -24,6 +24,7 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 | Nombre | Rol | LinkedIn | GitHub / Sitio personal |
 |---|---|---|---|
 | Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [link](https://seba-dg-portfolio.ai.studio) |
+| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [link](https://andres-segura.dev) |
 | Rider Renato Manrique | Backend Developer | [link](https://www.linkedin.com/in/rider-manrique/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Héctor Armando Cortez | Backend Developer | [link](https://www.linkedin.com/in/hector-cortez-cy/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Matias Almaraz | Backend Developer | [link](https://www.linkedin.com/in/matias-almaraz-197005275/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
@@ -32,7 +33,6 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 | Maria Daniela Monti Julien | Frontend Developer | [link](https://www.linkedin.com/in/mariamonti/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Vanina Restelli | UX/UI Designer | [link](https://www.linkedin.com/in/vaninarestelli/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Pamela Calafate | QA Tester | [link](https://www.linkedin.com/in/pamelacalafate/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
-| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 
 ---
 
@@ -83,23 +83,6 @@ Un secreto es cualquier cadena que dé acceso a algo: contraseñas de base de da
 2. Cada persona copia `.env.example` a `.env` en su máquina y pone ahí los valores reales. El archivo `.env` **está en `.gitignore` y nunca se sube**.
 3. Los valores reales se comparten por el **chat privado del equipo o un gestor de contraseñas**, nunca por el repositorio, nunca en un issue, nunca en un PR.
 4. Cuando alguien agrega una variable nueva, **la agrega también a `.env.example`** en el mismo PR. Si no, el resto del equipo no puede levantar el proyecto y lo van a descubrir a las 11 de la noche.
-
-### Si se filtró un secreto
-
-Pasa. No es motivo de vergüenza, es motivo de urgencia:
-
-1. Avisar de inmediato en el chat del equipo.
-2. **Rotar la credencial en el proveedor** (invalidarla y generar una nueva). Borrarla del repositorio no basta: queda en el historial de Git y en los forks.
-3. Solo después, limpiar el historial si aplica.
-
-### Secretos en GitHub
-
-Se configuran en **`Settings → Secrets and variables → Actions`** del repositorio:
-
-- **Secrets** para valores sensibles (`DB_PASSWORD`, `BREVO_API_KEY`, `JWT_SECRET`). Una vez guardados, no se pueden volver a leer, solo reemplazar.
-- **Variables** para valores no sensibles (`API_BASE_URL`, `ENVIRONMENT`).
-
-En los proveedores de despliegue (Render, Vercel, Neon) las variables se cargan en el panel del servicio, en su sección de *Environment Variables*. **Nunca en el código.**
 
 ---
 
