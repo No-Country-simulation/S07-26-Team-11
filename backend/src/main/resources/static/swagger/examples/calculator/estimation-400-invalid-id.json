@@ -1,0 +1,7 @@
+{
+  "detail": "El UUID proporcionado tiene un formato incorrecto: not-a-valid-uuid",
+  "instance": "/api/v1/public/calculator/estimates/not-a-valid-uuid",
+  "status": 400,
+  "title": "bad-request",
+  "type": "/errors/bad-request"
+}
