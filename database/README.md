@@ -1,6 +1,6 @@
 # database/ — PostgreSQL: esquema, migraciones y datos semilla
 
-**Responsable principal (Data Owner):** - — Backend Developer
+**Responsable principal (Data Owner):** - — Andrés Segura
 **Revisor técnico:** - — Backend Developer (índices y rendimiento)
 **Aprueba cambios de modelo:** Andrés Segura — Solution Architect
 **Objetivo:** ser la fuente de verdad del modelo de datos y el único lugar por donde cambia el esquema.
