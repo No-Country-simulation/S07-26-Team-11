@@ -1,10 +1,8 @@
 package com.dcplatform.api.calculator.model.dto;
 
-import com.dcplatform.api.shared.ApiException;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.http.HttpStatus;
 
 public record CalculatorEstimateRequest(
 
@@ -24,18 +22,4 @@ public record CalculatorEstimateRequest(
 		@PositiveOrZero(message = "La cantidad de racks no puede ser negativa")
 		Integer rackCount
 ) {
-
-	// validación cruzada de negocio
-	public CalculatorEstimateRequest {
-		if (installedCapacityKw != null && usedCapacityKw != null) {
-			if (usedCapacityKw > installedCapacityKw) {
-				throw new ApiException(
-						HttpStatus.BAD_REQUEST,
-						"business-rule",
-						"La capacidad utilizada (" + usedCapacityKw +
-								" kW) no puede ser mayor a la capacidad instalada (" + installedCapacityKw + " kW)."
-				);
-			}
-		}
-	}
 }
