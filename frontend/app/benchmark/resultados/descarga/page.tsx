@@ -91,6 +91,12 @@ function GenerandoPdf() {
             <p className="mt-6 text-base font-semibold text-text-primary">
               Tu informe ejecutivo esta listo.
             </p>
+            <button
+              onClick={() => router.push("/benchmark/resultados")}
+              className="mt-6 rounded-md border border-forest px-5 py-2 text-sm font-semibold text-forest-dark transition-colors hover:bg-base-natural"
+            >
+              ← Volver
+            </button>
           </>
         )}
 

@@ -27,20 +27,14 @@ public class PdfStorageProperties {
      */
     private String namespace;
 
-    /** Region del bucket. Ej: us-ashburn-1, sa-saopaulo-1 */
     private String region;
 
     private String tenancyOcid;
 
     private String userOcid;
 
-    /** Huella de la clave publica de API cargada en el usuario de OCI. */
     private String fingerprint;
 
-    /**
-     * Ruta al PEM de la clave privada de API. Comodo en local.
-     * En Render conviene privateKeyBase64, que no necesita archivo en disco.
-     */
     private String privateKeyPath;
 
     /** PEM de la clave privada codificado en base64, en una sola linea. */
@@ -49,20 +43,11 @@ public class PdfStorageProperties {
     /** Solo si la clave privada esta protegida con passphrase. */
     private String privateKeyPassphrase;
 
-    /**
-     * Vigencia de la URL firmada que se entrega en el redirect de descarga.
-     * Corta a proposito: la URL viaja al navegador y el enlace permanente
-     * es el endpoint de la API, no el del storage.
-     */
     private Duration signedUrlTtl = Duration.ofMinutes(15);
 
     /** Prefijo de las claves de objeto dentro del bucket. */
     private String keyPrefix = "benchmark-reports/";
 
-    /**
-     * true solo si estan todos los datos necesarios para firmar contra OCI.
-     * Lo consulta PdfStorageConfig para decidir que implementacion registrar.
-     */
     public boolean isConfigured() {
         // namespace queda fuera a proposito: es el unico dato derivable de las
         // credenciales, asi que se descubre solo si no viene configurado.
