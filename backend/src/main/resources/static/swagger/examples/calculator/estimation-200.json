@@ -1,0 +1,33 @@
+{
+  "estimateId": null,
+  "calculationVersion": "1.0.0",
+  "createdAt": "2026-08-18T12:00:00Z",
+  "unlocked": false,
+  "kpis": [
+    {
+      "code": "IDLE_CAPACITY_KW",
+      "label": "Capacidad subutilizada estimada",
+      "value": 1240.0,
+      "unit": "KW"
+    },
+    {
+      "code": "IDLE_CAPACITY_RATIO",
+      "label": "Porcentaje de subutilizacion",
+      "value": 0.62,
+      "unit": "RATIO"
+    },
+    {
+      "code": "IDLE_CAPACITY_ANNUAL_COST",
+      "label": "Costo anual desperdiciado",
+      "value": 1303296.0,
+      "unit": "CURRENCY"
+    },
+    {
+      "code": "IDLE_COST_PER_RACK_ANNUAL",
+      "label": "Costo por rack / año",
+      "value": 27152.0,
+      "unit": "CURRENCY"
+    }
+  ],
+  "lockedKpiCount": 2
+}

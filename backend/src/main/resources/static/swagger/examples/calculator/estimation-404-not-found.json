@@ -1,0 +1,7 @@
+{
+  "detail": "Cálculo de estimación no encontrado para ID eb8f3c51-6eaf-4d5e-b32c-5e12f610ec32",
+  "instance": "/api/v1/public/calculator/estimates/eb8f3c51-6eaf-4d5e-b32c-5e12f610ec32",
+  "status": 404,
+  "title": "not-found",
+  "type": "/errors/not-found"
+}
