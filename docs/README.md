@@ -1,28 +1,9 @@
 # docs/ — Documentación técnica
 
-**Responsable principal:** Andrés Segura — Software / Solution Architect
 **Objetivo:** ser la fuente de verdad de las decisiones técnicas y de los contratos entre equipos.
 
-## Contenido
+Los documentos tecnicos finales ya están listos y se entregan en la plataforma de No-Country.
 
-| Archivo | Qué contiene | Quién lo mantiene |
-|---|---|---|
-| [`API.md`](API.md) | **Catálogo de todos los endpoints.** Contrato entre backend y frontend | Arquitecto + backend |
-| [`ci-cd-notas.md`](ci-cd-notas.md) | Qué hay que decidir sobre CI/CD y repositorio público vs. privado | Arquitecto |
-| [`architecture/`](architecture/) | Diagramas C4, despliegue y secuencia | Arquitecto |
-| [`architecture/adr/`](architecture/adr/) | Registro de decisiones de arquitectura | Cualquiera que decida algo |
-| [`conventions/datos.md`](conventions/datos.md) | Convenciones de datos y formatos de intercambio | Arquitecto |
+Alternativamente puedes consultar https://s07-26-team-11-api.onrender.com/swagger-ui/index.html o levantando el proyecto backend de este repositorio.
 
-## Regla
-
-Una decisión que solo existe en el chat no existe. Si el equipo acordó algo que afecta a más de una persona, alguien escribe un ADR el mismo día.
-
-## Estado actual
-
-Actualizado en la carpeta compartida del equipo
-
-- ☑ Catálogo de endpoints v1 propuesto
-- ☑ Convenciones de datos publicadas
-- ☑ Diagramas C1 y C2 (Semana 0)
-- ☑ Diagrama de despliegue (Semana 0)
-- ☐ Diagrama de secuencia del flujo principal (Semana 1)
+También puedes ver la preview en: https://drive.google.com/drive/folders/1hU8DI6Qs4nO6_Oz9nK-2J3KZCLZraUkF?usp=sharing

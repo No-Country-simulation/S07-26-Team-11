@@ -16,10 +16,6 @@ import java.util.UUID;
 
 /**
  * Implementacion sobre Oracle Cloud Object Storage.
- *
- * El bucket es privado: no hay URL publica. La descarga se resuelve con un
- * Pre-Authenticated Request (PAR) de solo lectura y vida corta, al que el
- * controller redirige con 302.
  */
 public class OciPdfStorage implements PdfStorage {
 
