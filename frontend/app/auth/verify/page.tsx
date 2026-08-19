@@ -5,12 +5,20 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/components/AuthProvider";
+import { leadsApi, ApiError } from "@/lib/api";
 
 type ErrorType = "invalid_link" | "server_error" | null;
+
+interface VerifyResponse {
+  accessToken?: string;
+  lead?: unknown;
+}
 
 function VerifyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { adoptAccessToken } = useAuth();
   const token = searchParams.get("token");
 
   const [isLoading, setIsLoading] = useState(true);
@@ -37,45 +45,35 @@ function VerifyContent() {
     setIsLoading(true);
     setErrorType(null);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      console.log("Llamando a la API en:", `${API_URL}/api/v1/public/leads/verify`);
+      const data = (await leadsApi.verify(token)) as VerifyResponse;
 
-      const response = await fetch(`${API_URL}/api/v1/public/leads/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      console.log("Status de respuesta:", response.status);
-
-      if (response.status === 400 || response.status === 404) {
-        setErrorType("invalid_link");
-        return;
-      }
-
-      if (!response.ok) {
+      if (!data?.accessToken) {
         setErrorType("server_error");
         return;
       }
 
-      const data = await response.json();
-
-      localStorage.setItem("accessToken", data.accessToken);
       if (data.lead) {
         localStorage.setItem("leadInfo", JSON.stringify(data.lead));
       }
 
-      router.push("/benchmark/cuestionario");
+      // adoptAccessToken guarda el token y ademas avisa al proveedor de sesion,
+      // para que el header y las pantallas protegidas vean al usuario ya
+      // logueado sin esperar a una recarga completa.
+      await adoptAccessToken(data.accessToken);
+
+      router.push("/benchmark");
     } catch (err) {
-      console.error("Error capturado en la petición:", err);
-      setErrorType("server_error");
+      console.error("Error capturado en la verificación:", err);
+
+      if (
+        err instanceof ApiError &&
+        (err.problem.status === 400 || err.problem.status === 404)
+      ) {
+        setErrorType("invalid_link");
+      } else {
+        setErrorType("server_error");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +146,9 @@ function VerifyContent() {
 export default function VerifyPage() {
   return (
     <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header />
+      {/* La sesion se esta resolviendo en esta misma pantalla: mostrar
+          "Iniciar sesion" mientras tanto solo confunde. */}
+      <Header hideSessionControls />
 
       <main className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-12 sm:px-8">
         <img

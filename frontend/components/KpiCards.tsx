@@ -1,12 +1,10 @@
-export default function KpiCards() {
+export interface KpiCardData {
+  label: string;
+  value: string;
+  isGold: boolean;
+}
 
-  const data = [
-    { label: "kW subutilizados", value: "142 Kw", isGold: true },
-    { label: "Costo anual", value: "US$ 48.200", isGold: true },
-    { label: "% de utilización", value: "38%", isGold: false },
-    { label: "Costo por rack", value: "US$ 1.004", isGold: false },
-  ];
-
+export default function KpiCards({ data }: { data: KpiCardData[] }) {
   return (
     <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 -mt-8 relative z-10">
       {data.map((kpi, index) => (

@@ -3,6 +3,7 @@ package com.dcplatform.api.calculator.service;
 import com.dcplatform.api.calculator.model.KpiCode;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateRequest;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
+import com.dcplatform.api.shared.ApiException;
 import com.dcplatform.api.shared.annotations.MockIntegration;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 @MockIntegration
 @Service
@@ -24,6 +24,11 @@ public class MockCalculatorService implements CalculatorService {
 		logger.info("Using mock calculator service");
 
 		final String CALCULATOR_VERSION = "1.0.0";
+
+		if (request.usedCapacityKw() > request.installedCapacityKw()) {
+			throw ApiException.badRequest("La capacidad utilizada (" + request.usedCapacityKw() +
+					" kW) no puede ser mayor a la capacidad instalada (" + request.installedCapacityKw() + " kW).");
+		}
 
 		double installedKw = request.installedCapacityKw();
 		double usedKw = request.usedCapacityKw();
@@ -106,7 +111,7 @@ public class MockCalculatorService implements CalculatorService {
 		}
 
 		return new CalculatorEstimateResponse(
-				UUID.randomUUID().toString(),
+				null,
 				CALCULATOR_VERSION,
 				createdAt,
 				isUnlocked,

@@ -145,19 +145,46 @@ public class DocumentService {
                 .toList();
     }
 
-    /** Variables que consume el template. Es el contrato con quien disena el PDF. */
+    /**
+     * Variables que consume el template. Es el contrato con quien disena el PDF: cada clave de
+     * aca tiene que existir como {@code th:text}/{@code th:each} en
+     * {@code pdf/institutional-document.html}, y viceversa.
+     */
     private Map<String, Object> model(User user, DocumentRequest request) {
+        DocumentProperties.Organization org = properties.organization();
+        String dateText = dateFormatter.format(request.date());
+
         Map<String, Object> model = new HashMap<>();
         model.put("title", request.title().trim());
-        model.put("dateText", dateFormatter.format(request.date()));
         model.put("owner", user.getEmail());
-        model.put("documentName", request.metadata().name().trim());
-        model.put("paragraphs", request.message().stream()
-                .filter(p -> p != null && !p.isBlank())
+        model.put("assets", assets.images());
+        model.put("org", org);
+
+        model.put("executiveSummary", request.executiveSummary().trim());
+        model.put("annualCost", request.annualCost().trim());
+        model.put("maturityLevel", request.maturityLevel().trim());
+        model.put("score", request.score().trim());
+        model.put("kwUnderutilized", request.kwUnderutilized().trim());
+        model.put("utilizationPercent", request.utilizationPercent().trim());
+        model.put("costPerRack", request.costPerRack().trim());
+
+        model.put("industryScores", request.industryScores().stream()
+                .map(item -> Map.of(
+                        "label", item.label().trim(),
+                        "value", item.value(),
+                        // Sin CSS para una clase que no sea alguna de estas dos: ver
+                        // .bar-gold / .bar-dark-green en el template.
+                        "barClass", item.own() ? "bar-gold" : "bar-dark-green"))
+                .toList());
+        model.put("recommendations", request.recommendations().stream()
                 .map(String::trim)
                 .toList());
-        model.put("assets", assets.images());
-        model.put("org", properties.organization());
+
+        model.put("meetingLink", org.meetingLink());
+        model.put("contactEmail", org.contactEmail());
+        // "Capacia — Informe de capacidad | 29 de julio de 2026 · Confidencial"
+        model.put("footerText", org.name() + " — Informe de capacidad | " + dateText + " · Confidencial");
+
         return model;
     }
 

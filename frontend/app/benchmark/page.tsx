@@ -3,11 +3,14 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import RequireAuth from "@/components/RequireAuth";
+import { useAuth } from "@/components/AuthProvider";
 
-export default function BenchmarkWelcomePage() {
+function BenchmarkGate() {
+  const { user } = useAuth();
+
   return (
-    <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
-      <Header />
+    <>
 
       <main className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-12 sm:px-8">
         <img
@@ -33,8 +36,8 @@ export default function BenchmarkWelcomePage() {
               Vas a completar el benchmark como
             </p>
 
-            <div className="mx-auto mt-3 max-w-[165px] rounded border border-text-secondary bg-base-internal py-2.5 text-[12.45px] text-text-primary">
-              nombre@ejemplo.com
+            <div className="mx-auto mt-3 max-w-fit rounded border border-text-secondary bg-base-internal px-4 py-2.5 text-[12.45px] text-text-primary">
+              {user?.email}
             </div>
 
             <Link
@@ -50,6 +53,18 @@ export default function BenchmarkWelcomePage() {
           </div>
         </div>
       </main>
+    </>
+  );
+}
+
+export default function BenchmarkWelcomePage() {
+  return (
+    <div className="flex min-h-screen flex-col bg-base-natural font-display text-text-primary">
+      <Header />
+
+      <RequireAuth>
+        <BenchmarkGate />
+      </RequireAuth>
 
       <Footer />
     </div>

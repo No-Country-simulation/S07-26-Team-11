@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Red_Hat_Display, Alegreya_Sans } from "next/font/google";
+import AuthProvider from "@/components/AuthProvider";
 import "./globals.css";
 
 const alegreyaSans = Alegreya_Sans({
@@ -23,7 +24,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${redHatDisplay.variable} ${alegreyaSans.variable}`}>
-      <body className="font-display">{children}</body>
+      <body className="font-display">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

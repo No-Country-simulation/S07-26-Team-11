@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { useCalculator } from "./calculatorUse";
 
 type CalculatorValues = {
   installedCapacity: string;
@@ -56,20 +57,43 @@ const fields: Array<{
 export default function CalculatorPage() {
   const router = useRouter();
   const [values, setValues] = useState(emptyValues);
+  const { estimate, isLoading, error } = useCalculator();
 
   const isComplete = Object.values(values).every(
     (value) => value.trim() !== "" && Number(value) > 0,
   );
+  const exceedsInstalledCapacity =
+    values.installedCapacity.trim() !== "" &&
+    values.usedCapacity.trim() !== "" &&
+    Number(values.usedCapacity) > Number(values.installedCapacity);
+  const isFormValid = isComplete && !exceedsInstalledCapacity;
+  let formStatusMessage = "Los datos están listos para calcular tu resultado.";
+
+  if (exceedsInstalledCapacity) {
+    formStatusMessage = "Corregí la capacidad utilizada para continuar.";
+  } else if (!isComplete) {
+    formStatusMessage = "Completá los 4 campos para habilitar el botón.";
+  }
 
   const updateValue = (id: keyof CalculatorValues, value: string) => {
     setValues((current) => ({ ...current, [id]: value }));
   };
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isComplete) return;
+    if (!isFormValid) return;
+
+    const response = await estimate({
+      installedCapacityKw: Number(values.installedCapacity),
+      usedCapacityKw: Number(values.usedCapacity),
+      electricityRatePerKwh: Number(values.electricityRate),
+      rackCount: Number(values.racks),
+    });
+
+    if (!response) return;
 
     sessionStorage.setItem("capacity-calculator", JSON.stringify(values));
+    sessionStorage.setItem("capacity-calculator-estimate", JSON.stringify(response));
     router.push("/calculadora/resultado-parcial");
   };
 
@@ -109,26 +133,40 @@ export default function CalculatorPage() {
                     placeholder={field.placeholder}
                     value={values[field.id]}
                     onChange={(event) => updateValue(field.id, event.target.value)}
+                    aria-invalid={
+                      field.id === "usedCapacity" && exceedsInstalledCapacity
+                    }
                     className="mt-1 h-10 w-full rounded border border-base-border bg-base-natural px-3 text-xs text-text-primary outline-none placeholder:text-text-secondary/70 focus:border-forest focus:ring-1 focus:ring-forest"
                   />
                   <span className="mt-1 block text-[10px] leading-3 text-text-secondary">
                     {field.hint}
                   </span>
+                  {field.id === "usedCapacity" && exceedsInstalledCapacity && (
+                    <span
+                      role="alert"
+                      className="mt-1 block text-[10px] leading-3 text-red-700"
+                    >
+                      La capacidad utilizada no puede superar la capacidad instalada.
+                    </span>
+                  )}
                 </label>
               ))}
             </div>
 
             <button
               type="submit"
-              disabled={!isComplete}
+              disabled={!isFormValid || isLoading}
               className="mt-5 h-11 w-full rounded bg-forest px-5 text-xs font-medium text-white transition-colors hover:bg-forest-dark focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#e5e9e6] disabled:text-[#898d8a]"
             >
-              Ver mi resultado
+              {isLoading ? "Calculando..." : "Ver mi resultado"}
             </button>
+            {error && (
+              <p role="alert" className="mt-3 text-center text-xs text-red-700">
+                {error}
+              </p>
+            )}
             <p className="mt-3 text-center text-[10px] text-text-secondary">
-              {isComplete
-                ? "Los datos están listos para calcular tu resultado."
-                : "Completá los 4 campos para habilitar el botón."}
+              {formStatusMessage}
             </p>
           </form>
 

@@ -25,10 +25,13 @@ public record DocumentProperties(
         Organization organization) {
 
     /**
-     * @param name       nombre de la institucion que emite el documento
-     * @param tagline    linea de apoyo bajo el nombre, en el encabezado
-     * @param footerNote texto legal o de contacto del pie de pagina
+     * @param name        nombre de la institucion que emite el documento
+     * @param tagline     linea de apoyo bajo el nombre, en el encabezado
+     * @param footerNote  texto legal o de contacto del pie de pagina
+     * @param meetingLink URL de agenda que se imprime en la tarjeta final del informe
+     * @param contactEmail email de contacto de la tarjeta final del informe
      */
-    public record Organization(String name, String tagline, String footerNote) {
+    public record Organization(String name, String tagline, String footerNote,
+                                String meetingLink, String contactEmail) {
     }
 }
