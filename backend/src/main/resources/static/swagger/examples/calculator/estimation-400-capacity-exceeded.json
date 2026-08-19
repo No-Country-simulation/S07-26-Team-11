@@ -1,0 +1,7 @@
+{
+  "type": "/errors/bad-request",
+  "title": "Violación de regla de negocio",
+  "status": 400,
+  "detail": "La capacidad utilizada (2500.0 kW) no puede superar la capacidad instalada (2000.0 kW)",
+  "instance": "/api/v1/calculator/estimate"
+}
