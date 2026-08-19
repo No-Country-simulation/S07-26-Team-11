@@ -23,14 +23,16 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 
 | Nombre | Rol | LinkedIn | GitHub / Sitio personal |
 |---|---|---|---|
-| Sebastian Di Giuseppe | Project Manager | - | - |
-| Rider Renato Manrique | Backend Developer | - | - |
-| Héctor Armando Cortez | Backend Developer | - | - |
-| Oskar Morales | Full Stack Developer | - | - |
-| Maria Daniela Monti Julien | Frontend Developer | - | - |
-| Vanina Restelli | UX/UI Designer | - | - |
-| Pamela Calafate | QA Tester | - | - |
-| Andrés Segura | Software / Solution Architect | - | - |
+| Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [link](https://seba-dg-portfolio.ai.studio) |
+| Rider Renato Manrique | Backend Developer | [link](https://www.linkedin.com/in/rider-manrique/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Héctor Armando Cortez | Backend Developer | [link](https://www.linkedin.com/in/hector-cortez-cy/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Matias Almaraz | Backend Developer | [link](https://www.linkedin.com/in/matias-almaraz-197005275/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Augusto Zanetta | Backend Developer | [link](https://www.linkedin.com/in/augusto-zanetta-8745012b8/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3BqQ1Kj%2BpOQv%2BheNLtnVrzhw%3D%3D) | - |
+| Oskar Morales | Full Stack Developer | [link](https://www.linkedin.com/in/oskarmorales/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Maria Daniela Monti Julien | Frontend Developer | [link](https://www.linkedin.com/in/mariamonti/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Vanina Restelli | UX/UI Designer | [link](https://www.linkedin.com/in/vaninarestelli/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Pamela Calafate | QA Tester | [link](https://www.linkedin.com/in/pamelacalafate/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 
 ---
 
