@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -26,6 +26,7 @@ function saveBlob(blob: Blob, fileName: string) {
 function GenerandoPdf() {
   const router = useRouter();
   const [status, setStatus] = useState<PdfStatus>("loading");
+  const isMountedRef = useRef(true);
 
   const generarYDescargar = useCallback(async () => {
     setStatus("loading");
@@ -46,16 +47,26 @@ function GenerandoPdf() {
       };
       const summary = await documentsApi.generate(input);
       const blob = await documentsApi.downloadBlob(summary.name);
-      saveBlob(blob, summary.fileName);
-      setStatus("success");
+
+      if (isMountedRef.current) {
+        saveBlob(blob, summary.fileName);
+        setStatus("success");
+      }
     } catch {
-      setStatus("retry");
+      if (isMountedRef.current) {
+        setStatus("retry");
+      }
     }
   }, [router]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     generarYDescargar();
-  }, []);
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [generarYDescargar]);
 
   return (
     <main className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-12 sm:px-8">
