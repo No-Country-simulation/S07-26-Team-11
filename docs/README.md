@@ -1,28 +1,30 @@
 # docs/ — Documentación técnica
 
-**Responsable principal:** Andrés Segura — Software / Solution Architect
-**Objetivo:** ser la fuente de verdad de las decisiones técnicas y de los contratos entre equipos.
+**Responsable** Andrés Segura 
+
+**Objetivo:** ser la fuente de verdad de las decisiones técnicas y de los contratos entre equipos (actualización datos finales).
 
 ## Contenido
 
-| Archivo | Qué contiene | Quién lo mantiene |
-|---|---|---|
-| [`API.md`](API.md) | **Catálogo de todos los endpoints.** Contrato entre backend y frontend | Arquitecto + backend |
-| [`ci-cd-notas.md`](ci-cd-notas.md) | Qué hay que decidir sobre CI/CD y repositorio público vs. privado | Arquitecto |
-| [`architecture/`](architecture/) | Diagramas C4, despliegue y secuencia | Arquitecto |
-| [`architecture/adr/`](architecture/adr/) | Registro de decisiones de arquitectura | Cualquiera que decida algo |
-| [`conventions/datos.md`](conventions/datos.md) | Convenciones de datos y formatos de intercambio | Arquitecto |
+- [`stack.md`](stack.md) — stack técnico: backend, base de datos, proveedor del bucket, frontend.
+- [`api-architecture.md`](api-architecture.md) — arquitectura de la API: autenticación, niveles de acceso, catálogo de endpoints.
 
-## Regla
+- [`swagger-backend`](./openapi.yaml) — Puedes previsualizar con este documento o levantando el backend de este repositorio.
 
-Una decisión que solo existe en el chat no existe. Si el equipo acordó algo que afecta a más de una persona, alguien escribe un ADR el mismo día.
+## Diagrama C4
 
-## Estado actual
+- Contexto
 
-Actualizado en la carpeta compartida del equipo
+![contexto](./diagramas/Contexto-dark.png)
 
-- ☑ Catálogo de endpoints v1 propuesto
-- ☑ Convenciones de datos publicadas
-- ☑ Diagramas C1 y C2 (Semana 0)
-- ☑ Diagrama de despliegue (Semana 0)
-- ☐ Diagrama de secuencia del flujo principal (Semana 1)
+- Contenedores
+
+![contenedores](./diagramas/Contenedores-dark.png)
+
+- Componntes API
+
+![componentes](./diagramas/ComponentesAPI-dark.png)
+
+
+El modelo fue generado usando el software Structurizr https://structurizr.com/
+

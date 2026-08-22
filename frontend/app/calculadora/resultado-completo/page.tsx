@@ -159,12 +159,6 @@ export default function CompleteResultPage() {
             >
               Ir al Maturity Benchmark <span aria-hidden="true">↗</span>
             </Link>
-            <button
-              type="button"
-              className="mx-auto mt-4 flex items-center gap-2 text-[10px] font-medium text-forest hover:underline"
-            >
-              Descargar este resultado del Calculator <span aria-hidden="true">↗</span>
-            </button>
           </section>
         </div>
       </main>

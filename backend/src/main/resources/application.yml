@@ -119,8 +119,8 @@ app:
       tagline: ${DOCUMENTS_ORG_TAGLINE:Plataforma de Benchmark de Data Centers}
       footer-note: ${DOCUMENTS_ORG_FOOTER:Documento generado automáticamente. Uso interno.}
       # Tarjeta final del informe ("Hablemos de estos resultados"). Copy fijo del diseno.
-      meeting-link: ${DOCUMENTS_ORG_MEETING_LINK:https://capacia.com/agenda}
-      contact-email: ${DOCUMENTS_ORG_CONTACT_EMAIL:enterprise@capacia.com}
+      meeting-link: ${DOCUMENTS_ORG_MEETING_LINK:https://capacia.vercel.app/benchmark/reunion}
+      contact-email: ${DOCUMENTS_ORG_CONTACT_EMAIL:andres.segura.dev@gmail.com}
   email:
     provider: ${EMAIL_PROVIDER:brevo}
     api-key: ${EMAIL_API_KEY:x-dummy-api-key}

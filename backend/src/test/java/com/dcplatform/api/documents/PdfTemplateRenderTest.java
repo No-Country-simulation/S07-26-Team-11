@@ -171,10 +171,10 @@ public class PdfTemplateRenderTest {
                         <div class="cta-card">
                             <div class="cta-title">HABLEMOS DE ESTOS RESULTADOS</div>
                             <p>Un especialista de Capacia puede revisar este informe con su equipo y estimar el plan de recuperación.</p>
-                            <a th:href="${meetingLink}" class="link-primary">Agendá una reunión: capacia.com/agenda</a>
+                            <a th:href="${meetingLink}" class="link-primary">Agendá una reunión: capacia.vercel.app/reporte</a>
                             <a th:href="'mailto:' + ${contactEmail}" class="link-secondary">o escribí a enterprise@capacia.com</a>
                         </div>
-                    </td>
+                    </td> 
                 </tr>
                 </tbody>
             </table>

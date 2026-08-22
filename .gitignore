@@ -7,6 +7,10 @@
 secrets/
 db.txt
 
+# ---- Structurizr (diagramas C4): artefactos del contenedor, no el modelo ----
+docs/architecture/structurizr/.structurizr/
+docs/architecture/structurizr/workspace.json
+
 # ---- Java / Maven ----
 target/
 !.mvn/wrapper/maven-wrapper.jar
