@@ -1,0 +1,32 @@
+{
+  "instance": "/api/v1/public/leads",
+  "status": 400,
+  "title": "Datos de entrada inválidos",
+  "type": "/errors/validation",
+  "errors": [
+    {
+      "field": "companyName",
+      "message": "El nombre de la empresa es obligatorio"
+    },
+    {
+      "field": "role",
+      "message": "Debe especificar el rol que cumple en su empresa"
+    },
+    {
+      "field": "source",
+      "message": "El origen (source) es obligatorio"
+    },
+    {
+      "field": "email",
+      "message": "El email es obligatorio"
+    },
+    {
+      "field": "privacyPolicyVersion",
+      "message": "La versión de la política de privacidad es obligatoria"
+    },
+    {
+      "field": "consent",
+      "message": "El consentimiento es obligatorio"
+    }
+  ]
+}

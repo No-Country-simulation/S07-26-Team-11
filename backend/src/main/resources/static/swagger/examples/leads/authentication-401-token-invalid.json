@@ -1,0 +1,7 @@
+{
+  "type": "/errors/auth",
+  "title": "Autenticación",
+  "status": 401,
+  "detail": "El token de acceso es inválido, ha expirado o no fue proporcionado",
+  "instance": "/api/v1/public/calculator/estimate/unlock-results"
+}
