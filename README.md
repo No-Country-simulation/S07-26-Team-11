@@ -2,8 +2,13 @@
 
 ## Infraestructura y PDF Generator
 
-Plataforma Integrada de Benchmark de Data Centers
+![Demo](./docs/assets/center.png)
 
+https://capacia.vercel.app/benchmark/reunion
+
+[Documento-demo](./docs/assets/PDF-demo.pdf)
+
+Plataforma Integrada de Benchmark de Data Centers
 
 ## Objetivo
 
@@ -23,8 +28,8 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 
 | Nombre | Rol | LinkedIn | GitHub / Sitio personal |
 |---|---|---|---|
-| Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [link](https://seba-dg-portfolio.ai.studio) |
-| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [link](https://andres-segura.dev) |
+| Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [https://seba-dg-portfolio.ai.studio](https://seba-dg-portfolio.ai.studio) |
+| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [https://andres-segura.dev](https://andres-segura.dev) |
 | Rider Renato Manrique | Backend Developer | [link](https://www.linkedin.com/in/rider-manrique/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Héctor Armando Cortez | Backend Developer | [link](https://www.linkedin.com/in/hector-cortez-cy/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Matias Almaraz | Backend Developer | [link](https://www.linkedin.com/in/matias-almaraz-197005275/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
@@ -134,79 +139,5 @@ Ninguna está decidida. El equipo elige y lo registra en un ADR.
 | **Storage de PDFs** | Cloudflare R2, Supabase Storage | R2 no cobra egreso |
 | **Email** | Brevo (campañas, 300/día gratis), Resend (transaccional, ~3.000/mes) | Separarlos evita que una campaña bloquee los correos críticos del sistema |
 
-> Verificar las capas gratuitas antes de comprometerse: cambiaron mucho entre 2024 y 2026. Railway, Fly.io y Koyeb ya no son opciones gratuitas sostenibles.
-
-### CI/CD
-
-**Todavía no hay CI/CD.** Es una decisión consciente de la Semana 0. Lo que hay que saber para decidirlo después está en [`docs/ci-cd-notes.md`](docs/ci-cd-notes.md) — **incluida una recomendación importante sobre repositorio público vs. privado que conviene leer.**
-
 ---
 
-## Cómo contribuir
-
-El flujo completo está en [`CONTRIBUTING.md`](CONTRIBUTING.md). El resumen:
-
-```
-main  ← solo recibe merges desde dev, una vez por semana, y solo el encargado de la semana
- └── dev  ← rama de integración. Todo el trabajo llega aquí por Pull Request
-      ├── backend/nombre-de-la-tarea
-      ├── frontend/nombre-de-la-tarea
-      ├── database/nombre-de-la-tarea
-      ├── testing/nombre-de-la-tarea
-      ├── design/nombre-de-la-tarea
-      └── docs/nombre-de-la-tarea
-```
-
-**Reglas:**
-
-1. **Nadie hace push directo a `main` ni a `dev`.** Todo entra por Pull Request.
-2. Tu rama sale de `dev` y vuelve a `dev`.
-3. **Modificas solo el directorio de tu área.** Si necesitas tocar el directorio de otra persona, se lo pides a esa persona o la etiquetas en el PR. Excepción: `docs/API.md` y `.env.example`, que son de todos y se actualizan cuando cambia un contrato.
-4. Un PR necesita **al menos una aprobación** antes del merge. Los PR que tocan `docs/API.md`, `database/migrations/` o la arquitectura necesitan **la aprobación del arquitecto**.
-5. Cada semana, **un encargado rotativo** hace el merge de `dev` a `main`. El calendario de rotación está en [`PROJECT.md`](PROJECT.md).
-
-### Directorio que puede modificar cada rol
-
-| Rol | Directorio propio | Lectura obligatoria |
-|---|---|---|
-| Arquitecto | `docs/`, arquetipos de todos | — |
-| Backend Developers | `backend/`, `database/` | `docs/API.md` |
-| Frontend Developer | `frontend/` | `docs/API.md`, `design/` |
-| Full Stack Developer | `backend/` (módulo PDF), `frontend/` | `docs/API.md`, `design/` |
-| UX/UI Designer | `design/` | `design/README.md` (restricciones del PDF) |
-| QA Tester | `testing/` | `docs/API.md` |
-| Project Manager | `PROJECT.md`, `README.md` (tabla de integrantes) | Todo |
-
----
-
-## Qué hacer en cada caso
-
-La regla general: **la comunicación técnica ocurre en el chat privado del equipo, y las decisiones quedan escritas en el repositorio.** Un acuerdo que solo existe en el chat no existe.
-
-| Situación | Qué hacer |
-|---|---|
-| **No sé cómo hacer algo de mi tarea** | Pregunta en el chat del equipo. Nadie va a juzgarte por preguntar; sí vamos a tener un problema si te bloqueas tres días en silencio. Regla práctica: **si llevas más de 45 minutos atascado en lo mismo, pregunta.** |
-| **Tengo una recomendación para otra persona** | Dísela primero de forma directa y en privado, o como comentario en su PR. Comenta el código y la decisión, nunca a la persona: "este endpoint podría devolver 404 en vez de 200 con lista vacía", no "esto está mal hecho". Si es una mejora opcional, dilo explícitamente para que no se lea como un bloqueo. |
-| **Encontré un error en el trabajo de otro** | Abre un issue con: qué esperabas, qué pasó, cómo reproducirlo, y captura o log. Etiqueta a la persona responsable. Si es urgente y bloquea a alguien más, además avisa en el chat. |
-| **Necesito un cambio en la API** | No lo implementes por tu cuenta. Abre un PR sobre [`docs/API.md`](docs/API.md) proponiendo el cambio y etiqueta al arquitecto y a quien consume ese endpoint. El contrato se cambia antes que el código. |
-| **Necesito un campo nuevo en la base de datos** | Pídelo al responsable de `database/`. Nadie modifica el esquema a mano en staging: se hace por migración versionada. |
-| **Mi tarea depende de algo que no está listo** | Avísalo el mismo día en el chat y en el daily. Mientras tanto, trabaja contra un mock. Una dependencia bloqueada que se reporta el viernes ya costó una semana. |
-| **No voy a alcanzar a entregar a tiempo** | Dilo apenas lo sepas, no el día de la entrega. Se puede recortar alcance, pedir ayuda o reasignar — pero solo si hay tiempo de reaccionar. |
-| **No voy a poder seguir en el proyecto** | Avísale al PM y al arquitecto lo antes posible. Se reasigna sin drama. Lo que sí hace daño es desaparecer sin avisar: el README de cada directorio existe justamente para que otra persona pueda retomar el trabajo. |
-| **Se filtró un secreto** | Avisa de inmediato en el chat y **rota la credencial**. Ver la sección de secretos arriba. |
-| **Staging se cayó** | Avisa en el chat con la hora y qué estabas haciendo. Si es antes de una demo, es prioridad sobre cualquier otra tarea. |
-| **Tengo una duda para el cliente** | No contactes al cliente directamente. Pásasela al PM, que las agrupa y las lleva a la reunión semanal. |
-
-### Sobre reasignaciones
-
-Es normal que la disponibilidad de las personas cambie durante un proyecto. Por eso:
-
-- Cada directorio tiene un **responsable principal nombrado en su README**, y ese README se actualiza cuando hay una reasignación.
-- Cada README de directorio incluye una sección de **"Estado actual"** que debe permitir a alguien nuevo entender en 10 minutos qué está hecho, qué falta y dónde está lo pendiente.
-- Ninguna tarea crítica debería tener una sola persona que sepa cómo funciona. Si tienes conocimiento que nadie más tiene, escríbelo.
-
----
-
-## Licencia y confidencialidad
-
-[Definir con el equipo y el PM antes de hacer público el repositorio: si el contenido del reporte de industria, las fórmulas de la calculadora o los datos de marca son confidenciales, el repositorio debe ser privado o esos activos deben quedar fuera del repositorio.]
