@@ -26,5 +26,5 @@
 ![componentes](./diagramas/ComponentesAPI-dark.png)
 
 
-El modelo fue generado usando el sofware Structurizr https://structurizr.com/
+El modelo fue generado usando el software Structurizr https://structurizr.com/
 
