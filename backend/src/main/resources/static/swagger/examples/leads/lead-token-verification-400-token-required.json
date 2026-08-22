@@ -1,0 +1,12 @@
+{
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
+  "status": 400,
+  "instance": "/api/v1/public/leads/verify",
+  "errors": [
+    {
+      "field": "tokenFromMagicLink",
+      "message": "El token de verificación es obligatorio para realizar el intercambio por un token de acceso."
+    }
+  ]
+}

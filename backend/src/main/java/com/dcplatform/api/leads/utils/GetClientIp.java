@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class GetClientIp {
 
-    public String getClienwtIp(HttpServletRequest request) {
+    public String getClientIp(HttpServletRequest request) {
     String xfHeader = request.getHeader("X-Forwarded-For");
     if (xfHeader == null || xfHeader.isEmpty()) {
         return request.getRemoteAddr();

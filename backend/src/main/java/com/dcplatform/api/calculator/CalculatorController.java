@@ -9,6 +9,7 @@ import com.dcplatform.api.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -30,25 +31,31 @@ public class CalculatorController {
 		this.getEstimateByIdUseCase = getEstimateByIdUseCase;
 	}
 
-	@PostMapping("/estimate")
-	@Operation(summary = "Calcula una estimación",
-			description = "Devuelve los KPI públicos y mantiene bloqueados los resultados de costo mensual y proyección a 3 anos.")
+	@PostMapping(value = "/estimate", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Calcula una estimación",
+			description = "Devuelve los KPI públicos y mantiene bloqueados los resultados de costo mensual y proyección a 3 anos."
+	)
 	@ApiJsonExample(
+			summary = "Estimación con KPIs públicos",
 			description = "Estimación calculada con KPIs como teasers",
 			path = "/static/swagger/examples/calculator/estimation-200.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Valores de entrada inválidos",
 			description = "Datos de entrada inválidos",
 			path = "/static/swagger/examples/calculator/estimation-400-invalid-values.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Capacidad utilizada superior a la instalada",
 			description = "La capacidad utilizada es mayor que la capacidad instalada",
 			path = "/static/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Campos obligatorios faltantes",
 			description = "Campos o datos faltantes",
 			path = "/static/swagger/examples/calculator/estimation-400-missing-fields.json"
 	)
@@ -57,30 +64,37 @@ public class CalculatorController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PostMapping("/estimate/unlock-results")
-	@Operation(summary = "Desbloquea los resultados de costo",
-			description = "Calcula y guarda una estimación completa para el lead autenticado.")
+	@PostMapping(value = "/estimate/unlock-results", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Desbloquea los resultados de costo",
+			description = "Calcula y guarda una estimación completa para el lead autenticado."
+	)
 	@ApiJsonExample(
+			summary = "Estimación con resultados desbloqueados",
 			description = "Estimación calculada con todos los KPIs desbloqueados",
 			path = "/static/swagger/examples/calculator/estimation-200-unlocked-results.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Valores de entrada inválidos",
 			description = "Datos de entrada inválidos",
 			path = "/static/swagger/examples/calculator/estimation-400-invalid-values.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Capacidad utilizada superior a la instalada",
 			description = "La capacidad utilizada es mayor que la capacidad instalada",
 			path = "/static/swagger/examples/calculator/estimation-400-capacity-exceeded.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "Campos obligatorios faltantes",
 			description = "Campos o datos faltantes",
 			path = "/static/swagger/examples/calculator/estimation-400-missing-fields.json"
 	)
 	@ApiJsonExample(
 			status = "401",
+			summary = "Autenticación requerida",
 			description = "Lead o usuario no autenticado",
 			path = "/static/swagger/examples/auth/authentication-401.json"
 	)
@@ -90,10 +104,12 @@ public class CalculatorController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/defaults")
-	@Operation(summary = "Obtiene valores de ejemplo",
+	@GetMapping(value = "/defaults", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Obtiene valores de ejemplo",
 			description = "Devuelve valores iniciales que pueden enviarse directamente a POST /estimate.")
 	@ApiJsonExample(
+			summary = "Valores predeterminados de la calculadora",
 			description = "Valores para ser usados como ejemplo o para rellenar campos",
 			path = "/static/swagger/examples/calculator/default-200.json"
 	)
@@ -107,31 +123,36 @@ public class CalculatorController {
 				installedCapacityKw,
 				usedCapacityKw,
 				electricityRatePerKwh,
-				rackCount
-		);
+				rackCount);
 
 		return ResponseEntity.ok(defaultsValues);
 	}
 
-	@GetMapping("/estimates/{id}")
-	@Operation(summary = "Buscar una estimación guardada",
-			description = "Consulta una estimación guardada mediante el ID. Requiere autenticación.")
+	@GetMapping(value = "/estimates/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "Buscar una estimación guardada",
+			description = "Consulta una estimación guardada mediante el ID. Requiere autenticación."
+	)
 	@ApiJsonExample(
+			summary = "Estimación guardada con resultados desbloqueados",
 			description = "Estimación calculada con todos los KPIs desbloqueados",
 			path = "/static/swagger/examples/calculator/estimation-200-unlocked-results.json"
 	)
 	@ApiJsonExample(
 			status = "404",
+			summary = "Estimación no encontrada",
 			description = "No se logra encontrar un cálculo con el ID proporcionado",
 			path = "/static/swagger/examples/calculator/estimation-404-not-found.json"
 	)
 	@ApiJsonExample(
 			status = "400",
+			summary = "ID con formato inválido",
 			description = "El ID no contiene un formato válido UUIDv4",
 			path = "/static/swagger/examples/calculator/estimation-400-invalid-id.json"
 	)
 	@ApiJsonExample(
 			status = "401",
+			summary = "Autenticación requerida",
 			description = "Lead o usuario no autenticado",
 			path = "/static/swagger/examples/auth/authentication-401.json"
 	)

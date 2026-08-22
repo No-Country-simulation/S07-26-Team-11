@@ -1,0 +1,7 @@
+{
+  "type": "/errors/rate-limited",
+  "title": "rate-limited",
+  "status": 429,
+  "detail": "Has superado el límite de solicitudes por IP. Intenta más tarde.",
+  "instance": "/api/v1/public/leads"
+}

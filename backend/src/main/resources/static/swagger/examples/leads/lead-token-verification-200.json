@@ -1,0 +1,9 @@
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYW5lLmRvZUBjYXBhY2lhLmNvbSIsInR5cGUiOiJBQ0NFU1MiLCJyb2xlIjoiTEVBRCIsImlhdCI6MTc1NTg4MDIwMCwiZXhwIjoxNzU1OTY2NjAwfQ.5jzYI4hK9f2U2Q7jv0Y8u4rM3gE6wL1pC8xN0qR7tYw",
+  "expiresAt": "2026-08-23T18:30:00.000+00:00",
+  "lead": {
+    "id": "3f8f62d5-2c2e-4f29-b8c7-61fb8fd8f6b1",
+    "email": "jane.doe@capacia.com",
+    "companyName": "Capacia"
+  }
+}

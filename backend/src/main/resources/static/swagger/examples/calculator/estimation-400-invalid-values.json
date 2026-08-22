@@ -1,9 +1,8 @@
 {
-  "type": "about:blank",
-  "title": "Bad Request",
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
   "status": 400,
-  "detail": "Se encontraron errores de validación en la petición",
-  "instance": "/api/v1/calculator/estimate",
+  "instance": "/api/v1/public/calculator/estimate",
   "errors": [
     {
       "field": "installedCapacityKw",

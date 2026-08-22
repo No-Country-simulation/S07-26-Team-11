@@ -20,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class RootController {
 
-	@Value("${springdoc.swagger-ui.path}")
+	@Value("${springdoc.swagger-ui.path:/swagger-ui.html}")
 	private String swaggerUrl;
 
 	@GetMapping(
@@ -55,9 +55,7 @@ public class RootController {
 		model.add(linkTo(methodOn(HealthController.class).ping()).withRel("ping"));
 		model.add(linkTo(methodOn(DatabaseStatusController.class).databaseStatus()).withRel("database-status"));
 
-		return ResponseEntity.ok()
-				.contentType(MediaTypes.HAL_JSON)
-				.body(model);
+		return ResponseEntity.ok().body(model);
 	}
 
 	static class RootModel extends RepresentationModel<RootModel> {
