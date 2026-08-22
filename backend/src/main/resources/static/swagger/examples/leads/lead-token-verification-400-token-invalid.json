@@ -1,0 +1,7 @@
+{
+  "type": "/errors/bad-request",
+  "title": "bad-request",
+  "status": 400,
+  "detail": "El token de acceso es inválido o ha expirado",
+  "instance": "/api/v1/public/leads/verify"
+}

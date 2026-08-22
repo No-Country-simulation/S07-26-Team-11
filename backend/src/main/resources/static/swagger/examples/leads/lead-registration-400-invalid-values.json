@@ -1,0 +1,20 @@
+{
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
+  "status": 400,
+  "instance": "/api/v1/public/leads",
+  "errors": [
+    {
+      "field": "email",
+      "message": "El formato del email no es válido"
+    },
+    {
+      "field": "consent",
+      "message": "Debes aceptar los términos para continuar"
+    },
+    {
+      "field": "privacyPolicyVersion",
+      "message": "La versión de la política de privacidad es obligatoria"
+    }
+  ]
+}

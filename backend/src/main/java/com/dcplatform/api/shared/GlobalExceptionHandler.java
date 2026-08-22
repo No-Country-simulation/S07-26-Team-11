@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Un unico formato de error para toda la API (RFC 9457).
+ * Un único formato de error para toda la API (RFC 9457).
  * Regla: nunca exponer trazas ni mensajes internos al cliente.
  */
 @RestControllerAdvice
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setType(URI.create("/errors/validation"));
-        problem.setTitle("Datos de entrada invalidos");
+        problem.setTitle("Datos de entrada inválidos");
         problem.setInstance(URI.create(request.getRequestURI()));
 
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
@@ -47,22 +47,26 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
-    @ExceptionHandler({ 
-        MethodArgumentTypeMismatchException.class, 
-        HttpMessageNotReadableException.class, 
-        IllegalArgumentException.class 
+    @ExceptionHandler({
+        MethodArgumentTypeMismatchException.class,
+        HttpMessageNotReadableException.class,
+        IllegalArgumentException.class
     })
     public ProblemDetail handleMalformedRequest(Exception ex, HttpServletRequest request) {
+        log.debug("Error de entrada mal formada: {}", ex.getMessage());
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setType(URI.create("/errors/validation"));
-        problem.setTitle("Datos de entrada invalidos");
-        problem.setDetail("El formato o tipo de un parametro o campo del cuerpo de la solicitud es invalido");
+        problem.setTitle("Datos de entrada inválidos");
+        problem.setDetail("El formato o tipo de un parámetro o campo del cuerpo de la solicitud es invalido");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        log.debug("Recurso no encontrado: {}", ex.getMessage());
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problem.setType(URI.create("/errors/not-found"));
         problem.setTitle("Recurso no encontrado");
@@ -82,7 +86,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED.value());
+        log.debug("Error de autenticación: {}", ex.getMessage());
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
         problem.setType(URI.create("/errors/auth"));
         problem.setTitle("Autenticación");
         problem.setDetail("El token de acceso es inválido, ha expirado o no fue proporcionado");
@@ -92,7 +98,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN.value());
+        log.debug("Acceso no permitido: {}", ex.getMessage());
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
         problem.setType(URI.create("/errors/auth"));
         problem.setTitle("Acceso no permitido");
         problem.setDetail("No se tienen los privilegios necesarios para acceder a esta ruta");

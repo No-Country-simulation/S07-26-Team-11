@@ -1,25 +1,24 @@
 {
-  "type": "about:blank",
-  "title": "Bad Request",
+  "instance": "/api/v1/public/calculator/estimate",
   "status": 400,
-  "detail": "Se encontraron errores de validación en la petición",
-  "instance": "/api/v1/calculator/estimate",
+  "title": "Datos de entrada inválidos",
+  "type": "/errors/validation",
   "errors": [
+    {
+      "field": "rackCount",
+      "message": "La cantidad de racks es obligatoria"
+    },
     {
       "field": "installedCapacityKw",
       "message": "La capacidad instalada es obligatoria"
-    },
-    {
-      "field": "usedCapacityKw",
-      "message": "La capacidad utilizada es obligatoria"
     },
     {
       "field": "electricityRatePerKwh",
       "message": "La tarifa de electricidad es obligatoria"
     },
     {
-      "field": "rackCount",
-      "message": "La cantidad de racks es obligatoria"
+      "field": "usedCapacityKw",
+      "message": "La capacidad utilizada es obligatoria"
     }
   ]
 }
