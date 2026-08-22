@@ -2,8 +2,13 @@
 
 ## Infraestructura y PDF Generator
 
-Plataforma Integrada de Benchmark de Data Centers
+![Demo](./docs/assets/center.png)
 
+https://capacia.vercel.app/benchmark/reunion
+
+[Documento-demo](./docs/assets/PDF-demo.pdf)
+
+Plataforma Integrada de Benchmark de Data Centers
 
 ## Objetivo
 
@@ -23,8 +28,8 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 
 | Nombre | Rol | LinkedIn | GitHub / Sitio personal |
 |---|---|---|---|
-| Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [link](https://seba-dg-portfolio.ai.studio) |
-| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [link](https://andres-segura.dev) |
+| Sebastian Di Giuseppe | Project Manager | [link](https://www.linkedin.com/in/sebadigiuseppe/) | [https://seba-dg-portfolio.ai.studio](https://seba-dg-portfolio.ai.studio) |
+| Andrés Segura | Software / Solution Architect | [link](https://www.linkedin.com/in/andresseguradev/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [https://andres-segura.dev](https://andres-segura.dev) |
 | Rider Renato Manrique | Backend Developer | [link](https://www.linkedin.com/in/rider-manrique/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Héctor Armando Cortez | Backend Developer | [link](https://www.linkedin.com/in/hector-cortez-cy/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Matias Almaraz | Backend Developer | [link](https://www.linkedin.com/in/matias-almaraz-197005275/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |

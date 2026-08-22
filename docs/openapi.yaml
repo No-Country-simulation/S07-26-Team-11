@@ -1,0 +1,1101 @@
+openapi: 3.1.0
+info:
+  title: Plataforma de Benchmark de Data Centers
+  description: Calculadora, benchmark de madurez, generación de PDF y outreach. CAPACIA
+  version: v1
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+security:
+- BearerAuth: []
+tags:
+- name: Calculator
+  description: Calcula costos y capacidad subutilizada de un data center
+- name: PDF
+  description: Estado de la generación y descarga del informe
+- name: Documentos
+  description: Genera, lista y descarga los PDF institucionales del usuario
+- name: Documentos (admin)
+  description: Inventario de documentos de todos los usuarios
+paths:
+  /api/v1/public/leads:
+    post:
+      tags:
+      - lead-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadRegistrationRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LeadRegistrationResponse'
+  /api/v1/public/leads/verify:
+    post:
+      tags:
+      - lead-controller
+      operationId: verifyMagicLinkToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadMagicLinkTokenRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LeadAuthenticationResponse'
+  /api/v1/public/calculator/estimate:
+    post:
+      tags:
+      - Calculator
+      summary: Calcula una estimación
+      description: Devuelve los KPI públicos y mantiene bloqueados los resultados
+        de costo mensual y proyección a 3 anos.
+      operationId: estimate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculatorEstimateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculatorEstimateResponse'
+            application/json:
+              examples:
+                Ejemplo 200:
+                  value:
+                    estimateId: null
+                    calculationVersion: 1.0.0
+                    createdAt: '2026-08-18T12:00:00Z'
+                    unlocked: false
+                    kpis:
+                    - code: IDLE_CAPACITY_KW
+                      label: Capacidad subutilizada estimada
+                      value: 1240.0
+                      unit: KW
+                    - code: IDLE_CAPACITY_RATIO
+                      label: Porcentaje de subutilizacion
+                      value: 0.62
+                      unit: RATIO
+                    - code: IDLE_CAPACITY_ANNUAL_COST
+                      label: Costo anual desperdiciado
+                      value: 1303296.0
+                      unit: CURRENCY
+                    - code: IDLE_COST_PER_RACK_ANNUAL
+                      label: Costo por rack / año
+                      value: 27152.0
+                      unit: CURRENCY
+                    lockedKpiCount: 2
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              examples:
+                Ejemplo 400:
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: Se encontraron errores de validación en la petición
+                    instance: /api/v1/calculator/estimate
+                    errors:
+                    - field: installedCapacityKw
+                      message: La capacidad instalada es obligatoria
+                    - field: usedCapacityKw
+                      message: La capacidad utilizada es obligatoria
+                    - field: electricityRatePerKwh
+                      message: La tarifa de electricidad es obligatoria
+                    - field: rackCount
+                      message: La cantidad de racks es obligatoria
+  /api/v1/public/calculator/estimate/unlock-results:
+    post:
+      tags:
+      - Calculator
+      summary: Desbloquea los resultados de costo
+      description: Calcula y guarda una estimación completa para el lead autenticado.
+      operationId: unlockEstimate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculatorEstimateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculatorEstimateResponse'
+            application/json:
+              examples:
+                Ejemplo 200:
+                  value:
+                    estimateId: c07c4f5b-498b-48d1-805f-74b4496412f2
+                    calculationVersion: 1.0.0
+                    createdAt: '2026-08-14T00:52:49Z'
+                    unlocked: true
+                    kpis:
+                    - code: IDLE_CAPACITY_KW
+                      label: Capacidad subutilizada estimada
+                      value: 1240
+                      unit: KW
+                    - code: IDLE_CAPACITY_RATIO
+                      label: Porcentaje de subutilización
+                      value: 0.62
+                      unit: RATIO
+                    - code: IDLE_CAPACITY_ANNUAL_COST
+                      label: Costo anual desperdiciado
+                      value: 1303488
+                      unit: CURRENCY
+                    - code: IDLE_COST_MONTHLY
+                      label: Costo mensual estimado
+                      value: 108624
+                      unit: CURRENCY
+                    - code: IDLE_COST_3Y_PROJECTION
+                      label: Proyección a 3 años
+                      value: 3910464
+                      unit: CURRENCY
+                    - code: IDLE_COST_PER_RACK_ANNUAL
+                      label: Costo por rack / año
+                      value: 27156
+                      unit: CURRENCY
+                    lockedKpiCount: 0
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              examples:
+                Ejemplo 400:
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: Se encontraron errores de validación en la petición
+                    instance: /api/v1/calculator/estimate
+                    errors:
+                    - field: installedCapacityKw
+                      message: La capacidad instalada es obligatoria
+                    - field: usedCapacityKw
+                      message: La capacidad utilizada es obligatoria
+                    - field: electricityRatePerKwh
+                      message: La tarifa de electricidad es obligatoria
+                    - field: rackCount
+                      message: La cantidad de racks es obligatoria
+        '401':
+          description: Lead o usuario no autenticado
+          content:
+            application/json:
+              examples:
+                Ejemplo 401:
+                  value:
+                    detail: El token de acceso es inválido, ha expirado o no fue proporcionado
+                    instance: /api/v1/public/calculator/estimate/unlock-results
+                    status: 401
+                    title: Autenticación
+                    type: /errors/auth
+  /api/v1/public/benchmark/submit:
+    post:
+      tags:
+      - benchmark-controller
+      operationId: submitBenchmark
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchmarkRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/documents:
+    get:
+      tags:
+      - Documentos
+      summary: Lista los documentos del usuario autenticado
+      description: 'Del mas reciente al mas antiguo. Sin documentos devuelve `count:
+        0`, no 404.'
+      operationId: listMine
+      responses:
+        '200':
+          description: Listado del usuario
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OwnerDocuments'
+      security:
+      - bearer-jwt: []
+    post:
+      tags:
+      - Documentos
+      summary: Genera un PDF institucional y lo guarda en el bucket
+      description: 'Renderiza la plantilla con los datos recibidos, sube el PDF al
+        object storage
+
+        privado y registra sus metadatos. El dueno es el usuario del token. Regenerar
+
+        con el mismo `metadata.name` **reemplaza** el documento anterior.'
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentRequest'
+        required: true
+      responses:
+        '201':
+          description: PDF generado y almacenado
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DocumentSummary'
+        '400':
+          description: Faltan campos o el nombre tiene caracteres no permitidos
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '401':
+          description: Token ausente, invalido o revocado
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '503':
+          description: El object storage no esta configurado
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+      - bearer-jwt: []
+  /api/v1/documents/preview:
+    post:
+      tags:
+      - Documentos
+      summary: Devuelve el HTML intermedio, sin generar el PDF
+      description: 'Iteracion rapida del diseno: mismo modelo que el PDF, salida HTML
+        para abrir en
+
+        el navegador. No sube nada al bucket. Recordar que el navegador es mas permisivo
+
+        que el motor de PDF: la paginacion y los limites de CSS solo se ven en el
+        PDF.'
+      operationId: preview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentRequest'
+        required: true
+      responses:
+        '200':
+          description: HTML de la plantilla ya renderizado
+          content:
+            text/html:
+              schema:
+                type: string
+      security:
+      - bearer-jwt: []
+  /api/v1/auth/register:
+    post:
+      tags:
+      - user-auth-controller
+      operationId: register_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - user-auth-controller
+      operationId: logout
+      responses:
+        '200':
+          description: OK
+  /api/v1/auth/login:
+    post:
+      tags:
+      - user-auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccessTokenResponse'
+  /api/v1/public/ping:
+    get:
+      tags:
+      - health-controller
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/public/pdf/jobs/{jobId}:
+    get:
+      tags:
+      - PDF
+      summary: Estado del trabajo de generación
+      description: El frontend consulta este endpoint cada 2 segundos mientras el
+        estado sea PENDING o PROCESSING.
+      operationId: getJobStatus
+      parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Estado actual del trabajo
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PdfJobStatus'
+        '400':
+          description: Formato de ID de trabajo inválido o ausente
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PdfJobStatus'
+        '404':
+          description: El trabajo no existe
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PdfJobStatus'
+  /api/v1/public/pdf/documents/{documentId}/download:
+    get:
+      tags:
+      - PDF
+      summary: Descarga del informe
+      description: Registra la descarga y redirige con 302 a una URL firmada y temporal
+        del object storage.
+      operationId: downloadDocument
+      parameters:
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '302':
+          description: Redirección a la URL firmada
+        '400':
+          description: Formato de ID de documento inválido o ausente
+        '404':
+          description: El documento no existe
+        '422':
+          description: El enlace venció
+        '503':
+          description: El object storage no está configurado
+  /api/v1/public/db-status:
+    get:
+      tags:
+      - database-status-controller
+      operationId: databaseStatus
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/public/calculator/estimates/{id}:
+    get:
+      tags:
+      - Calculator
+      summary: Buscar una estimación guardada
+      description: Consulta una estimación guardada mediante el ID. Requiere autenticación.
+      operationId: getEstimate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculatorEstimateResponse'
+            application/json:
+              examples:
+                Ejemplo 200:
+                  value:
+                    estimateId: c07c4f5b-498b-48d1-805f-74b4496412f2
+                    calculationVersion: 1.0.0
+                    createdAt: '2026-08-14T00:52:49Z'
+                    unlocked: true
+                    kpis:
+                    - code: IDLE_CAPACITY_KW
+                      label: Capacidad subutilizada estimada
+                      value: 1240
+                      unit: KW
+                    - code: IDLE_CAPACITY_RATIO
+                      label: Porcentaje de subutilización
+                      value: 0.62
+                      unit: RATIO
+                    - code: IDLE_CAPACITY_ANNUAL_COST
+                      label: Costo anual desperdiciado
+                      value: 1303488
+                      unit: CURRENCY
+                    - code: IDLE_COST_MONTHLY
+                      label: Costo mensual estimado
+                      value: 108624
+                      unit: CURRENCY
+                    - code: IDLE_COST_3Y_PROJECTION
+                      label: Proyección a 3 años
+                      value: 3910464
+                      unit: CURRENCY
+                    - code: IDLE_COST_PER_RACK_ANNUAL
+                      label: Costo por rack / año
+                      value: 27156
+                      unit: CURRENCY
+                    lockedKpiCount: 0
+        '404':
+          description: No se logra encontrar un cálculo con el ID proporcionado
+          content:
+            application/json:
+              examples:
+                Ejemplo 404:
+                  value:
+                    detail: Cálculo de estimación no encontrado para ID eb8f3c51-6eaf-4d5e-b32c-5e12f610ec32
+                    instance: /api/v1/public/calculator/estimates/eb8f3c51-6eaf-4d5e-b32c-5e12f610ec32
+                    status: 404
+                    title: not-found
+                    type: /errors/not-found
+        '400':
+          description: El ID no contiene un formato válido UUIDv4
+          content:
+            application/json:
+              examples:
+                Ejemplo 400:
+                  value:
+                    detail: 'El UUID proporcionado tiene un formato incorrecto: not-a-valid-uuid'
+                    instance: /api/v1/public/calculator/estimates/not-a-valid-uuid
+                    status: 400
+                    title: bad-request
+                    type: /errors/bad-request
+        '401':
+          description: Lead o usuario no autenticado
+          content:
+            application/json:
+              examples:
+                Ejemplo 401:
+                  value:
+                    detail: El token de acceso es inválido, ha expirado o no fue proporcionado
+                    instance: /api/v1/public/calculator/estimate/unlock-results
+                    status: 401
+                    title: Autenticación
+                    type: /errors/auth
+  /api/v1/public/calculator/defaults:
+    get:
+      tags:
+      - Calculator
+      summary: Obtiene valores de ejemplo
+      description: Devuelve valores iniciales que pueden enviarse directamente a POST
+        /estimate.
+      operationId: getDefaults
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculatorEstimateRequest'
+            application/json:
+              examples:
+                Ejemplo 200:
+                  value:
+                    installedCapacityKw: 2000.0
+                    usedCapacityKw: 760.0
+                    electricityRatePerKwh: 0.12
+                    rackCount: 48
+  /api/v1/documents/{name}:
+    get:
+      tags:
+      - Documentos
+      summary: Metadatos de un documento propio
+      operationId: getOne
+      parameters:
+      - name: name
+        in: path
+        description: Nombre del documento, sin .pdf
+        required: true
+        schema:
+          type: string
+        example: informe-julio
+      responses:
+        '200':
+          description: Metadatos del documento
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DocumentSummary'
+        '404':
+          description: El documento no existe en la cuenta
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+      - bearer-jwt: []
+  /api/v1/documents/{name}/download:
+    get:
+      tags:
+      - Documentos
+      summary: Descarga el PDF
+      description: 'Responde `302` hacia una URL firmada y temporal del object storage.
+        El binario
+
+        no pasa por la API. Con curl hay que seguir el redirect: `curl -L`.'
+      operationId: download
+      parameters:
+      - name: name
+        in: path
+        description: Nombre del documento, sin .pdf
+        required: true
+        schema:
+          type: string
+        example: informe-julio
+      responses:
+        '302':
+          description: Redireccion a la URL firmada
+        '404':
+          description: El documento no existe en la cuenta
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '503':
+          description: El object storage no esta configurado
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+      - bearer-jwt: []
+  /api/v1/auth/me:
+    get:
+      tags:
+      - user-auth-controller
+      operationId: me
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/admin/documents:
+    get:
+      tags:
+      - Documentos (admin)
+      summary: Lista los documentos de todos los usuarios
+      description: Un elemento por usuario con documentos, en orden alfabetico de
+        email.
+      operationId: listAll
+      responses:
+        '200':
+          description: Inventario completo
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OwnerDocuments'
+        '403':
+          description: El token no tiene rol ADMIN
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OwnerDocuments'
+      security:
+      - bearer-jwt: []
+  /:
+    get:
+      tags:
+      - root-controller
+      operationId: handleRoot
+      parameters:
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: '*/*'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            text/html:
+              schema:
+                type: object
+components:
+  schemas:
+    LeadRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        companyName:
+          type: string
+          minLength: 1
+        role:
+          type: string
+          minLength: 1
+        source:
+          type: string
+          enum:
+          - CALCULATOR
+          - BENCHMARK
+          - REPORT
+          - OUTREACH
+        estimateId:
+          type: string
+          format: uuid
+        consent:
+          type: boolean
+        privacyPolicyVersion:
+          type: string
+          minLength: 1
+      required:
+      - companyName
+      - consent
+      - email
+      - privacyPolicyVersion
+      - role
+      - source
+    LeadRegistrationResponse:
+      type: object
+      properties:
+        registrationMessage:
+          type: string
+    LeadMagicLinkTokenRequest:
+      type: object
+      properties:
+        tokenFromMagicLink:
+          type: string
+          minLength: 1
+      required:
+      - tokenFromMagicLink
+    LeadAuthenticationResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        lead:
+          $ref: '#/components/schemas/LeadRegistrationResponse'
+    CalculatorEstimateRequest:
+      type: object
+      description: Entradas para estimar capacidad y costos de energia
+      properties:
+        installedCapacityKw:
+          type: number
+          format: double
+          description: Capacidad electrica total instalada
+          example: 2000.0
+          minimum: 0
+        usedCapacityKw:
+          type: number
+          format: double
+          description: Capacidad actualmente utilizada. No puede superar la capacidad
+            instalada
+          example: 760.0
+          minimum: 0
+        electricityRatePerKwh:
+          type: number
+          format: double
+          description: Tarifa de electricidad por kWh
+          example: 0.12
+          minimum: 0
+        rackCount:
+          type: integer
+          format: int32
+          description: Cantidad de racks del data center
+          example: 48
+          minimum: 0
+      required:
+      - electricityRatePerKwh
+      - installedCapacityKw
+      - rackCount
+      - usedCapacityKw
+    CalculatorEstimateResponse:
+      type: object
+      description: Resultado de una estimacion del calculator
+      properties:
+        estimateId:
+          type:
+          - string
+          - 'null'
+          description: Identificador de la estimacion guardada. Es null antes de desbloquearla
+          example: 8f7e6d5c-4b3a-2918-1706-5e4d3c2b1a09
+        calculationVersion:
+          type: string
+          description: Version del algoritmo utilizado
+          example: 1.0.0
+        createdAt:
+          type: string
+          description: Fecha de calculo en UTC
+          example: '2026-08-18T12:00:00Z'
+        unlocked:
+          type: boolean
+          description: Indica si los KPI de costo estan desbloqueados
+          example: false
+        kpis:
+          type: array
+          description: Lista de KPI visibles para esta estimacion
+          items:
+            $ref: '#/components/schemas/KpiResult'
+        lockedKpiCount:
+          type: integer
+          format: int32
+          description: Cantidad de KPI ocultos hasta desbloquear los resultados
+          example: 2
+    KpiResult:
+      type: object
+      description: KPI calculado y su unidad
+      properties:
+        code:
+          type: string
+          description: Codigo estable del KPI
+          enum:
+          - IDLE_CAPACITY_KW
+          - IDLE_CAPACITY_RATIO
+          - IDLE_CAPACITY_ANNUAL_COST
+          - IDLE_COST_MONTHLY
+          - IDLE_COST_3Y_PROJECTION
+          - IDLE_COST_PER_RACK_ANNUAL
+          example: IDLE_CAPACITY_KW
+        label:
+          type: string
+          description: Nombre legible del KPI
+          example: Capacidad subutilizada estimada
+        value:
+          type: number
+          format: double
+          description: Valor numerico del KPI
+          example: 1240.0
+        unit:
+          type: string
+          description: Unidad del valor
+          enum:
+          - KW
+          - RATIO
+          - CURRENCY
+    BenchmarkRequest:
+      type: object
+      properties:
+        operadorId:
+          type: integer
+          format: int64
+        respuestasCuestionario:
+          type: object
+          additionalProperties: {}
+      required:
+      - operadorId
+      - respuestasCuestionario
+    DocumentRequest:
+      type: object
+      description: Datos con los que se rellena el informe de capacidad
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        date:
+          type: string
+          description: Fecha a imprimir. Acepta la salida de date(1) y el formato
+            ISO-8601; si no se reconoce se imprime tal cual. Vacio usa la fecha del
+            servidor.
+          example: Thu Jul 30 09:27:13 PM -05 2026
+        title:
+          type: string
+          description: Titulo del documento
+          example: Informe de capacidad — Northbridge Data Systems
+          maxLength: 300
+          minLength: 0
+        executiveSummary:
+          type: string
+          description: Parrafo de resumen ejecutivo, primera pagina
+          maxLength: 1000
+          minLength: 0
+        annualCost:
+          type: string
+          description: Costo anual desperdiciado, ya formateado
+          example: US$ 48.200
+          minLength: 1
+        maturityLevel:
+          type: string
+          description: Nivel de madurez
+          example: Gestionado
+          minLength: 1
+        score:
+          type: string
+          description: Score de madurez, ya formateado
+          example: 54 / 100
+          minLength: 1
+        kwUnderutilized:
+          type: string
+          description: kW subutilizados, ya formateado
+          example: 142 kW
+          minLength: 1
+        utilizationPercent:
+          type: string
+          description: Porcentaje de utilizacion, ya formateado
+          example: 38%
+          minLength: 1
+        costPerRack:
+          type: string
+          description: Costo por rack al año, ya formateado
+          example: US$ 1.004
+          minLength: 1
+        industryScores:
+          type: array
+          description: Comparacion contra la industria. Una fila por barra del grafico.
+          items:
+            $ref: '#/components/schemas/IndustryScore'
+          maxItems: 6
+          minItems: 0
+        recommendations:
+          type: array
+          description: Recomendaciones personalizadas, en orden de prioridad
+          items:
+            type: string
+            maxLength: 300
+            minLength: 0
+          maxItems: 6
+          minItems: 0
+      required:
+      - annualCost
+      - costPerRack
+      - executiveSummary
+      - industryScores
+      - kwUnderutilized
+      - maturityLevel
+      - metadata
+      - recommendations
+      - score
+      - title
+      - utilizationPercent
+    IndustryScore:
+      type: object
+      properties:
+        label:
+          type: string
+          maxLength: 60
+          minLength: 0
+        value:
+          type: integer
+          format: int32
+          maximum: 100
+          minimum: 0
+        own:
+          type: boolean
+      required:
+      - label
+    Metadata:
+      type: object
+      description: Identidad del documento dentro de la cuenta del usuario
+      properties:
+        name:
+          type: string
+          description: 'Nombre del documento, sin la extension .pdf. Unico por usuario:
+            regenerar con el mismo nombre reemplaza el documento anterior. Solo letras,
+            digitos, ''.'', ''-'' y ''_''.'
+          example: informe-benchmark
+          minLength: 1
+          pattern: '[A-Za-z0-9][A-Za-z0-9._-]{0,63}'
+      required:
+      - name
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        properties:
+          type: object
+          additionalProperties: {}
+    DocumentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          type: string
+        name:
+          type: string
+        fileName:
+          type: string
+        title:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        downloadUrl:
+          type: string
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          maxLength: 72
+          minLength: 8
+      required:
+      - email
+      - password
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - email
+      - password
+    AccessTokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+        expiresInSeconds:
+          type: integer
+          format: int64
+    PdfJobStatus:
+      type: object
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        attempts:
+          type: integer
+          format: int32
+        documentId:
+          type: string
+          format: uuid
+        downloadUrl:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        failureReason:
+          type: string
+    OwnerDocuments:
+      type: object
+      properties:
+        owner:
+          type: string
+        count:
+          type: integer
+          format: int32
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentSummary'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      name: BearerAuth
+      scheme: bearer
+      bearerFormat: JWT
