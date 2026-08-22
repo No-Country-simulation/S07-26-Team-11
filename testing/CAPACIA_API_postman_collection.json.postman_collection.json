@@ -1,0 +1,1590 @@
+{
+  "info": {
+    "_postman_id": "0198d563-088f-4ccd-84c6-9c0d833acb1f",
+    "name": "CAPACIA_API_postman_collection.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52379920",
+    "_collection_link": "https://go.postman.co/collection/52379920-0198d563-088f-4ccd-84c6-9c0d833acb1f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "POST - CALCULATOR - CONTROLLER",
+      "item": [
+        {
+          "name": "TC_CALC_001_Happy_Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"estimateId is string or null\", function () {",
+                  "    pm.expect(response).to.have.property(\"estimateId\");",
+                  "",
+                  "    pm.expect(",
+                  "        response.estimateId === null ||",
+                  "        typeof response.estimateId === \"string\"",
+                  "    ).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains calculationVersion\", function () {",
+                  "    pm.expect(response).to.have.property(\"calculationVersion\");",
+                  "    pm.expect(response.calculationVersion).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains createdAt\", function () {",
+                  "    pm.expect(response).to.have.property(\"createdAt\");",
+                  "    pm.expect(response.createdAt).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains unlocked\", function () {",
+                  "    pm.expect(response).to.have.property(\"unlocked\");",
+                  "    pm.expect(response.unlocked).to.be.a(\"boolean\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains kpis array\", function () {",
+                  "    pm.expect(response).to.have.property(\"kpis\");",
+                  "    pm.expect(response.kpis).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains lockedKpiCount\", function () {",
+                  "    pm.expect(response).to.have.property(\"lockedKpiCount\");",
+                  "    pm.expect(response.lockedKpiCount).to.be.a(\"number\");",
+                  "});",
+                  "",
+                  "pm.test(\"Each KPI has the expected fields\", function () {",
+                  "    response.kpis.forEach(function (kpi) {",
+                  "        pm.expect(kpi).to.have.property(\"code\");",
+                  "        pm.expect(kpi).to.have.property(\"label\");",
+                  "        pm.expect(kpi).to.have.property(\"value\");",
+                  "        pm.expect(kpi).to.have.property(\"unit\");",
+                  "",
+                  "        pm.expect(kpi.code).to.be.a(\"string\");",
+                  "        pm.expect(kpi.label).to.be.a(\"string\");",
+                  "        pm.expect(kpi.value).to.be.a(\"number\");",
+                  "        pm.expect(kpi.unit).to.be.a(\"string\");",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": 2000,\n  \"usedCapacityKw\": 760,\n  \"electricityRatePerKwh\": 0.12,\n  \"rackCount\": 48\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_002_Empty_Body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC002 - Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"TC002 - Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC002 - Response contains validation errors\", function () {",
+                  "    pm.expect(response).to.have.property(\"errors\");",
+                  "    pm.expect(response.errors).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC002 - All required fields are reported\", function () {",
+                  "    const fields = response.errors.map(error => error.field);",
+                  "",
+                  "    pm.expect(fields).to.include(\"installedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"usedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"electricityRatePerKwh\");",
+                  "    pm.expect(fields).to.include(\"rackCount\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_003_Negative_Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC003 - Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"TC003 - Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC003 - Response contains validation errors\", function () {",
+                  "    pm.expect(response).to.have.property(\"errors\");",
+                  "    pm.expect(response.errors).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC003 - All negative values are rejected\", function () {",
+                  "    const fields = response.errors.map(error => error.field);",
+                  "",
+                  "    pm.expect(fields).to.include(\"installedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"usedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"electricityRatePerKwh\");",
+                  "    pm.expect(fields).to.include(\"rackCount\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC003 - Correct validation message for installed capacity\", function () {",
+                  "    const error = response.errors.find(",
+                  "        error => error.field === \"installedCapacityKw\"",
+                  "    );",
+                  "",
+                  "    pm.expect(error.message).to.include(\"debe ser mayor a 0\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC003 - Correct validation messages for other negative values\", function () {",
+                  "    const messages = response.errors.map(error => error.message);",
+                  "",
+                  "    pm.expect(messages).to.include(\"La capacidad utilizada no puede ser negativa\");",
+                  "    pm.expect(messages).to.include(\"La tarifa de electricidad no puede ser negativa\");",
+                  "    pm.expect(messages).to.include(\"La cantidad de racks no puede ser negativa\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": -0.1,\n  \"usedCapacityKw\": -0.1,\n  \"electricityRatePerKwh\": -0.1,\n  \"rackCount\": -1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_004_Invalid_Data_Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct status\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.status).to.eql(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct title\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.title).to.eql(\"Datos de entrada invalidos\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct error type\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.type).to.eql(\"/errors/validation\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains error detail\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.detail).to.eql(",
+                  "        \"El formato o tipo de un parametro o campo del cuerpo de la solicitud es invalido\"",
+                  "    );",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains correct endpoint\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.instance).to.eql(",
+                  "        \"/api/v1/public/calculator/estimate\"",
+                  "    );",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": \"abc\",\n  \"usedCapacityKw\": \"abc\",\n  \"electricityRatePerKwh\": \"abc\",\n  \"rackCount\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_005_Numeric_String",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains error information\", function () {",
+                  "    pm.expect(response).to.be.an(\"object\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": \"100\",\n  \"usedCapacityKw\": \"50\",\n  \"electricityRatePerKwh\": \"0.15\",\n  \"rackCount\": \"10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_006_Null_Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.title).to.eql(\"Datos de entrada invalidos\");",
+                  "    pm.expect(response.type).to.eql(\"/errors/validation\");",
+                  "});",
+                  "",
+                  "pm.test(\"All null fields are reported as required\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.errors).to.have.lengthOf(4);",
+                  "",
+                  "    const fields = response.errors.map(error => error.field);",
+                  "",
+                  "    pm.expect(fields).to.include(\"installedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"usedCapacityKw\");",
+                  "    pm.expect(fields).to.include(\"electricityRatePerKwh\");",
+                  "    pm.expect(fields).to.include(\"rackCount\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": null,\n  \"usedCapacityKw\": null,\n  \"electricityRatePerKwh\": null,\n  \"rackCount\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_007_Decimal_Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains estimateId\", function () {",
+                  "    pm.expect(response).to.have.property(\"estimateId\");",
+                  "",
+                  "    pm.expect(",
+                  "        response.estimateId === null ||",
+                  "        typeof response.estimateId === \"string\"",
+                  "    ).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains calculationVersion\", function () {",
+                  "    pm.expect(response).to.have.property(\"calculationVersion\");",
+                  "    pm.expect(response.calculationVersion).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains createdAt\", function () {",
+                  "    pm.expect(response).to.have.property(\"createdAt\");",
+                  "    pm.expect(response.createdAt).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains unlocked\", function () {",
+                  "    pm.expect(response).to.have.property(\"unlocked\");",
+                  "    pm.expect(response.unlocked).to.be.a(\"boolean\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains kpis\", function () {",
+                  "    pm.expect(response).to.have.property(\"kpis\");",
+                  "    pm.expect(response.kpis).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "pm.test(\"Each KPI contains expected properties\", function () {",
+                  "    response.kpis.forEach(function (kpi) {",
+                  "        pm.expect(kpi).to.have.property(\"code\");",
+                  "        pm.expect(kpi).to.have.property(\"label\");",
+                  "        pm.expect(kpi).to.have.property(\"value\");",
+                  "        pm.expect(kpi).to.have.property(\"unit\");",
+                  "",
+                  "        pm.expect(kpi.code).to.be.a(\"string\");",
+                  "        pm.expect(kpi.label).to.be.a(\"string\");",
+                  "        pm.expect(kpi.value).to.be.a(\"number\");",
+                  "        pm.expect(kpi.unit).to.be.a(\"string\");",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains lockedKpiCount\", function () {",
+                  "    pm.expect(response).to.have.property(\"lockedKpiCount\");",
+                  "    pm.expect(response.lockedKpiCount).to.be.a(\"number\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": 100.5,\n  \"usedCapacityKw\": 50.25,\n  \"electricityRatePerKwh\": 0.15,\n  \"rackCount\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_008_Large_Value",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.title).to.eql(\"Datos de entrada invalidos\");",
+                  "    pm.expect(response.type).to.eql(\"/errors/validation\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response identifies invalid input\", function () {",
+                  "    const response = pm.response.json();",
+                  "",
+                  "    pm.expect(response.detail).to.eql(",
+                  "        \"El formato o tipo de un parametro o campo del cuerpo de la solicitud es invalido\"",
+                  "    );",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": 999999999999,\n  \"usedCapacityKw\": 888888888888,\n  \"electricityRatePerKwh\": 999999,\n  \"rackCount\": 2147483648\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            },
+            "description": "**Objetivo:** Verificar que el endpoint calcule correctamente los indicadores con un valor válido de entrada.\n\nEl endpoint rechaza correctamente un valor de `rackCount` superior al máximo permitido para `int32` (`2147483647`)."
+          },
+          "response": []
+        },
+        {
+          "name": "TC_CALC_009_Used_Capacity_Exceeds_Installed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains error details\", function () {",
+                  "    pm.expect(response).to.have.property(\"detail\");",
+                  "    pm.expect(response.detail).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains instance\", function () {",
+                  "    pm.expect(response).to.have.property(\"instance\");",
+                  "    pm.expect(response.instance).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains status\", function () {",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response.status).to.be.a(\"number\");",
+                  "    pm.expect(response.status).to.eql(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains title\", function () {",
+                  "    pm.expect(response).to.have.property(\"title\");",
+                  "    pm.expect(response.title).to.eql(\"bad-request\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains type\", function () {",
+                  "    pm.expect(response).to.have.property(\"type\");",
+                  "    pm.expect(response.type).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error message indicates used capacity exceeds installed capacity\", function () {",
+                  "    pm.expect(response.detail).to.include(",
+                  "        \"no puede ser mayor a la capacidad instalada\"",
+                  "    );",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"installedCapacityKw\": 100,\n  \"usedCapacityKw\": 200,\n  \"electricityRatePerKwh\": 0.12,\n  \"rackCount\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/calculator/estimate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "calculator",
+                "estimate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Permite calcular una estimación a partir de la capacidad instalada, la capacidad utilizada, la tarifa de electricidad por kWh y la cantidad de racks. El endpoint procesa estos datos y devuelve un identificador de la estimación, la versión del cálculo, la fecha de creación y los KPIs obtenidos, incluyendo sus valores de referencia (benchmark).\n\nSe validan respuestas exitosas con datos válidos y respuestas de error ante datos nulos, tipos de datos inválidos y valores fuera de rango."
+    },
+    {
+      "name": "GET BASE DE DATOS",
+      "item": [
+        {
+          "name": "GET - Health Check Ping",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response contains status field\", function () {",
+                  "    pm.expect(response).to.have.property(\"status\");",
+                  "    pm.expect(response.status).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Database status is UP\", function () {",
+                  "    pm.expect(response.status).to.eql(\"UP\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains latencyMs\", function () {",
+                  "    pm.expect(response).to.have.property(\"latencyMs\");",
+                  "    pm.expect(response.latencyMs).to.be.a(\"number\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains database\", function () {",
+                  "    pm.expect(response).to.have.property(\"database\");",
+                  "    pm.expect(response.database).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "pm.test(\"Database is PostgreSQL\", function () {",
+                  "    pm.expect(response.database).to.include(\"PostgreSQL\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains schema\", function () {",
+                  "    pm.expect(response).to.have.property(\"schema\");",
+                  "    pm.expect(response.schema).to.eql(\"public\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains readOnly\", function () {",
+                  "    pm.expect(response).to.have.property(\"readOnly\");",
+                  "    pm.expect(response.readOnly).to.be.a(\"boolean\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains pool\", function () {",
+                  "    pm.expect(response).to.have.property(\"pool\");",
+                  "    pm.expect(response.pool).to.be.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"Pool contains expected fields\", function () {",
+                  "    pm.expect(response.pool).to.have.property(\"name\");",
+                  "    pm.expect(response.pool).to.have.property(\"active\");",
+                  "    pm.expect(response.pool).to.have.property(\"idle\");",
+                  "    pm.expect(response.pool).to.have.property(\"total\");",
+                  "    pm.expect(response.pool).to.have.property(\"waiting\");",
+                  "    pm.expect(response.pool).to.have.property(\"max\");",
+                  "});",
+                  "",
+                  "pm.test(\"Pool values have correct types\", function () {",
+                  "    pm.expect(response.pool.name).to.be.a(\"string\");",
+                  "    pm.expect(response.pool.active).to.be.a(\"number\");",
+                  "    pm.expect(response.pool.idle).to.be.a(\"number\");",
+                  "    pm.expect(response.pool.total).to.be.a(\"number\");",
+                  "    pm.expect(response.pool.waiting).to.be.a(\"number\");",
+                  "    pm.expect(response.pool.max).to.be.a(\"number\");",
+                  "});",
+                  "",
+                  "pm.test(\"Timestamp exists\", function () {",
+                  "    pm.expect(response).to.have.property(\"timestamp\");",
+                  "    pm.expect(response.timestamp).to.be.a(\"string\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/db-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "db-status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_BDD_000 Verificar estado de Base de Datos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/db-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "db-status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GET HEALTH CONTROLLER - PING",
+      "item": [
+        {
+          "name": "TC_PING_001_Happy_Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_PING_001 | Status Code should be 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"TC_PING_001 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_PING_001 | Status should be ok\", function () {",
+                  "    pm.expect(response.status).to.eql(\"ok\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_PING_001 | Response should contain timestamp\", function () {",
+                  "    pm.expect(response.timestamp).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"TC_PING_001 | Response should contain service name\", function () {",
+                  "    pm.expect(response.service).to.eql(\"dcplatform-api\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/ping",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "ping"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "USER AUTH CONTROLLER",
+      "item": [
+        {
+          "name": "POST LOGIN",
+          "item": [
+            {
+              "name": "TC_001_Login_Valid_Data",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"Response contains authentication data\", function () {",
+                      "    const response = pm.response.json();",
+                      "",
+                      "    pm.expect(response.accessToken).to.be.a(\"string\");",
+                      "    pm.expect(response.accessToken).to.not.be.empty;",
+                      "",
+                      "    pm.expect(response.tokenType).to.eql(\"Bearer\");",
+                      "",
+                      "    pm.expect(response.expiresInSeconds).to.be.a(\"number\");",
+                      "});",
+                      "",
+                      "pm.test(\"Access token has valid expiration\", function () {",
+                      "    const response = pm.response.json();",
+                      "",
+                      "    pm.expect(response.expiresInSeconds).to.be.above(0);",
+                      "});",
+                      "",
+                      "// Guardar token para los siguientes requests de la collection",
+                      "pm.collectionVariables.set(",
+                      "    \"accessToken\",",
+                      "    pm.response.json().accessToken",
+                      ");"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user.pamec@gmail.com\",\n  \"password\": \"hola12345\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC_002_Login_Invalid_Data_Type",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Debe devolver 400 Bad Request ante un tipo de dato inválido\", function () {",
+                      "    pm.expect(pm.response.code).to.equal(400);",
+                      "});",
+                      "",
+                      "pm.test(\"No debe generar un accessToken\", function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.not.have.property(\"accessToken\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": 12345,\n  \"password\": \"hola12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC_003_Login_Invalid_Email",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Debe devolver 401 Unauthorized\", function () {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test(\"Debe indicar que las credenciales son inválidas\", function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.detail).to.eql(\"Email o contraseña invalidos\");",
+                      "});",
+                      "",
+                      "pm.test(\"No debe generar un accessToken\", function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.not.have.property(\"accessToken\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user.pamec2@gmail.com\",\n  \"password\": \"hola12345\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC_004_Login_Invalid_Password",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Debe devolver 401 Unauthorized\", function () {",
+                      "    pm.expect(pm.response.code).to.equal(401);",
+                      "});",
+                      "",
+                      "pm.test(\"Debe indicar que las credenciales son inválidas\", function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.detail).to.eql(\"Email o contraseña invalidos\");",
+                      "});",
+                      "",
+                      "pm.test(\"No debe generar un accessToken\", function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.not.have.property(\"accessToken\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user.pamec@gmail.com\",\n  \"password\": \"hola123456\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "POST - BENCHMARK- CONTROLADOR",
+      "item": [
+        {
+          "name": "TC_BENCH_001_Happy_Path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_BENCH_001 | Status Code = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_001 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_BENCH_001 | Status is success\", function () {",
+                  "    pm.expect(response.status).to.eql(\"success\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_001 | Success message is correct\", function () {",
+                  "    pm.expect(response.message).to.eql(\"Benchmark procesado correctamente\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_001 | PDF URL exists\", function () {",
+                  "    pm.expect(response.pdf_url).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_001 | PDF URL is not empty\", function () {",
+                  "    pm.expect(response.pdf_url).to.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operadorId\": 1,\n  \"respuestasCuestionario\": {\n    \"additionalProp1\": \"string\",\n    \"additionalProp2\": \"string\",\n    \"additionalProp3\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/benchmark/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "benchmark",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_BENCH_002_Empty_Body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_BENCH_002 | Status Code = 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_002 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_BENCH_002 | Error title is correct\", function () {",
+                  "    pm.expect(response.title).to.eql(\"Datos de entrada invalidos\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_002 | operadorId is required\", function () {",
+                  "    const error = response.errors.find(e => e.field === \"operadorId\");",
+                  "    pm.expect(error).to.exist;",
+                  "    pm.expect(error.message).to.eql(\"must not be null\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_002 | respuestasCuestionario is required\", function () {",
+                  "    const error = response.errors.find(e => e.field === \"respuestasCuestionario\");",
+                  "    pm.expect(error).to.exist;",
+                  "    pm.expect(error.message).to.eql(\"must not be null\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/benchmark/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "benchmark",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_BENCH_003_Non_Existent_Operator_Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_BENCH_003 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_BENCH_003 | Response has a defined status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.a(\"number\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operadorId\": 9999999,\n  \"respuestasCuestionario\": {\n    \"additionalProp1\": \"string\",\n    \"additionalProp2\": \"string\",\n    \"additionalProp3\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/benchmark/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "benchmark",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_BENCH_004_Null_Operator_Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_BENCH_004 | Status Code should be 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_004 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_BENCH_004 | Error title should indicate invalid input\", function () {",
+                  "    pm.expect(response.title).to.eql(\"Datos de entrada invalidos\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_004 | Error type should be validation\", function () {",
+                  "    pm.expect(response.type).to.eql(\"/errors/validation\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_004 | Response contains detail\", function () {",
+                  "    pm.expect(response.detail).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.test(\"Access token exists\", function () {",
+                  "    const token = pm.collectionVariables.get(\"accessToken\");",
+                  "",
+                  "    pm.expect(token).to.be.a(\"string\");",
+                  "    pm.expect(token).to.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operadorId\": null,\n  \"respuestasCuestionario\": {\n    \"additionalProp1\": \"string\",\n    \"additionalProp2\": \"string\",\n    \"additionalProp3\": \"string\"\n  }\n\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/benchmark/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "benchmark",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_BENCH_005_Empty_Answers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"TC_BENCH_005 | Status Code = 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_005 | Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"TC_BENCH_005 | Status is success\", function () {",
+                  "    pm.expect(response.status).to.eql(\"success\");",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_005 | PDF URL exists\", function () {",
+                  "    pm.expect(response.pdf_url).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"TC_BENCH_005 | Success message is correct\", function () {",
+                  "    pm.expect(response.message).to.eql(\"Benchmark procesado correctamente\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operadorId\": 1,\n  \"respuestasCuestionario\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/public/benchmark/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "benchmark",
+                "submit"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{accessToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST LOGOUT",
+      "item": [
+        {
+          "name": "TC_001_LOGOUT_Happy_Path",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user.pamec@gmail.com\",\n  \"password\": \"hola12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "registerEmail",
+      "value": ""
+    }
+  ]
+}
