@@ -35,7 +35,7 @@ Un operador de data center entra por la calculadora, cuantifica cuánta capacida
 | Matias Almaraz | Backend Developer | [link](https://www.linkedin.com/in/matias-almaraz-197005275/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Augusto Zanetta | Backend Developer | [link](https://www.linkedin.com/in/augusto-zanetta-8745012b8/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3BqQ1Kj%2BpOQv%2BheNLtnVrzhw%3D%3D) | - |
 | Oskar Morales | Full Stack Developer | [link](https://www.linkedin.com/in/oskarmorales/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
-| Maria Daniela Monti Julien | Frontend Developer | [link](https://www.linkedin.com/in/mariamonti/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
+| Maria Daniela Monti Julien | Frontend Developer | [link](https://www.linkedin.com/in/mariamonti/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | [https://montimaria.github.io/Portfolio/](https://montimaria.github.io/Portfolio/) |
 | Vanina Restelli | UX/UI Designer | [link](https://www.linkedin.com/in/vaninarestelli/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 | Pamela Calafate | QA Tester | [link](https://www.linkedin.com/in/pamelacalafate/?lipi=urn%3Ali%3Apage%3Ad_flagship3_detail_base%3Bjf4i0OnwQYeGAAi6HP32xA%3D%3D) | - |
 
