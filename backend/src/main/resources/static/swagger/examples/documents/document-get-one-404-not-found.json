@@ -1,0 +1,7 @@
+{
+  "type": "/errors/not-found",
+  "title": "not-found",
+  "status": 404,
+  "detail": "El documento solicitado no existe",
+  "instance": "/api/v1/documents/informe-julio"
+}

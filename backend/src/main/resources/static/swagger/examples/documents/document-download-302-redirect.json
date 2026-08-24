@@ -1,0 +1,6 @@
+{
+  "status": 302,
+  "headers": {
+    "Location": "https://storage.example.com/documents/informe-julio.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=300&X-Amz-Signature=example"
+  }
+}

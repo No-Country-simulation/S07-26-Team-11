@@ -1,0 +1,9 @@
+{
+  "jobId": "9f4cb4d2-8c77-4de0-a8ef-c95f3f7789f5",
+  "status": "DONE",
+  "attempts": 1,
+  "documentId": "2bb9ae7f-3e66-45a9-9d5d-a61f97f0b1a6",
+  "downloadUrl": "/api/v1/public/pdf/documents/2bb9ae7f-3e66-45a9-9d5d-a61f97f0b1a6/download",
+  "expiresAt": "2026-08-31T11:00:00-03:00",
+  "failureReason": null
+}
