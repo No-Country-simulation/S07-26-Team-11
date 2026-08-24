@@ -1,0 +1,7 @@
+{
+  "type": "/errors/auth",
+  "title": "Acceso no permitido",
+  "status": 403,
+  "detail": "No se tienen los privilegios necesarios para acceder a esta ruta",
+  "instance": "/api/v1/admin/documents"
+}

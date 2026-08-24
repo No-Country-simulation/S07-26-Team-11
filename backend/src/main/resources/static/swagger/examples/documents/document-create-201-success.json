@@ -1,0 +1,11 @@
+{
+  "id": "3d4b79f1-7d6f-4a2a-bd87-6f6f5f9d9a11",
+  "owner": "admin@northbridge.com",
+  "name": "informe-benchmark",
+  "fileName": "informe-benchmark.pdf",
+  "title": "Informe de capacidad — Northbridge Data Systems",
+  "sizeBytes": 842156,
+  "createdAt": "2026-08-24T10:20:30-03:00",
+  "updatedAt": "2026-08-24T10:20:30-03:00",
+  "downloadUrl": "/api/v1/documents/informe-benchmark/download"
+}

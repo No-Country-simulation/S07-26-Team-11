@@ -1,0 +1,16 @@
+{
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
+  "status": 400,
+  "errors": [
+    {
+      "field": "metadata.name",
+      "message": "metadata.name solo admite letras, digitos, '.', '-' y '_' (max 64, empezando por letra o digito)"
+    },
+    {
+      "field": "recommendations",
+      "message": "recommendations debe tener al menos un elemento"
+    }
+  ],
+  "instance": "/api/v1/documents"
+}
