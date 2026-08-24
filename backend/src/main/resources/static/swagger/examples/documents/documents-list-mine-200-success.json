@@ -1,0 +1,28 @@
+{
+  "owner": "user@northbridge.com",
+  "count": 2,
+  "documents": [
+    {
+      "id": "3d4b79f1-7d6f-4a2a-bd87-6f6f5f9d9a11",
+      "owner": "user@northbridge.com",
+      "name": "informe-benchmark",
+      "fileName": "informe-benchmark.pdf",
+      "title": "Informe de capacidad — Northbridge Data Systems",
+      "sizeBytes": 842156,
+      "createdAt": "2026-08-24T10:20:30-03:00",
+      "updatedAt": "2026-08-24T10:20:30-03:00",
+      "downloadUrl": "/api/v1/documents/informe-benchmark/download"
+    },
+    {
+      "id": "d2bc3db9-d7aa-4a98-a8b0-8e7fb1aa2f30",
+      "owner": "user@northbridge.com",
+      "name": "informe-julio",
+      "fileName": "informe-julio.pdf",
+      "title": "Informe mensual de capacidad",
+      "sizeBytes": 801233,
+      "createdAt": "2026-07-31T09:05:00-03:00",
+      "updatedAt": "2026-08-01T11:15:00-03:00",
+      "downloadUrl": "/api/v1/documents/informe-julio/download"
+    }
+  ]
+}

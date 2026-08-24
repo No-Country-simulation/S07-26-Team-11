@@ -96,7 +96,7 @@ public class CalculatorController {
 			status = "401",
 			summary = "Autenticación requerida",
 			description = "Lead o usuario no autenticado",
-			path = "/static/swagger/examples/auth/authentication-401.json"
+			path = "/static/swagger/examples/calculator/authentication-401.json"
 	)
 	public ResponseEntity<CalculatorEstimateResponse> unlockEstimate(
 			@Valid @RequestBody CalculatorEstimateRequest request, @AuthenticationPrincipal String leadEmail) {
@@ -154,7 +154,7 @@ public class CalculatorController {
 			status = "401",
 			summary = "Autenticación requerida",
 			description = "Lead o usuario no autenticado",
-			path = "/static/swagger/examples/auth/authentication-401.json"
+			path = "/static/swagger/examples/calculator/authentication-401.json"
 	)
 	public ResponseEntity<CalculatorEstimateResponse> getEstimate(@PathVariable String id,
 	                                                              @AuthenticationPrincipal String leadEmail) {

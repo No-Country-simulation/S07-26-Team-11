@@ -1,0 +1,7 @@
+{
+  "type": "/errors/storage-unavailable",
+  "title": "storage-unavailable",
+  "status": 503,
+  "detail": "El almacenamiento de documentos no esta configurado",
+  "instance": "/api/v1/documents/informe-julio/download"
+}

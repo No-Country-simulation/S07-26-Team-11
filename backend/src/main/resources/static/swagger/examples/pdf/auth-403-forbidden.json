@@ -1,0 +1,7 @@
+{
+  "type": "/errors/auth",
+  "title": "Acceso no permitido",
+  "status": 403,
+  "detail": "No se tienen los privilegios necesarios para acceder a esta ruta",
+  "instance": "/api/v1/public/pdf/documents/2bb9ae7f-3e66-45a9-9d5d-a61f97f0b1a6/download"
+}

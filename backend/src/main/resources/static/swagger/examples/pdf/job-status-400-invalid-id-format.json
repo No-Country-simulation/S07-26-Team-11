@@ -1,0 +1,7 @@
+{
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
+  "status": 400,
+  "detail": "El formato o tipo de un parámetro o campo del cuerpo de la solicitud es invalido",
+  "instance": "/api/v1/public/pdf/jobs/abc"
+}

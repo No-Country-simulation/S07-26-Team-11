@@ -1,0 +1,12 @@
+{
+  "type": "/errors/validation",
+  "title": "Datos de entrada inválidos",
+  "status": 400,
+  "errors": [
+    {
+      "field": "jobId",
+      "message": "El jobId es obligatorio"
+    }
+  ],
+  "instance": "/api/v1/public/pdf/jobs/null"
+}
