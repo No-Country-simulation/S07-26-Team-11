@@ -101,6 +101,19 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- LangChain4j -->
+        <!-- 2. Starter de Spring Boot para autoconfiguración y soporte de @AiService -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- 3. Proveedor oficial de Google AI para interactuar con los modelos Gemini -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-google-ai-gemini</artifactId>
+        </dependency>
+
         <!-- Plantillas para el PDF y los correos -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -221,6 +234,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 1. BOM para gestionar las versiones de todos los módulos de LangChain4J -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>1.19.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <!--
