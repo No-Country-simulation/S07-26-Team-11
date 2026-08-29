@@ -187,3 +187,4 @@ spring:
 app:
   pdf:
     worker-enabled: true
+  enable-mock-services: false # se desactivan los servicios mockeados para ahorrar recursos en el worker
