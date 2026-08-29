@@ -6,26 +6,26 @@ import java.util.UUID;
 public record ActiveBenchmarkResponse(
 		UUID instrumentId,
 		String version,
-		List<BenchmarkStageDto> stages
+		List<BenchmarkStage> stages
 ) {
 
-	public record BenchmarkStageDto(
+	public record BenchmarkStage(
 			UUID dimensionId,
 			String code,
 			String label,
-			List<QuestionDto> questions
+			List<Question> questions
 	) {
 	}
 
-	public record QuestionDto(
+	public record Question(
 			UUID questionId,
 			String text,
 			String helpText,
-			List<OptionDto> options
+			List<Option> options
 	) {
 	}
 
-	public record OptionDto(
+	public record Option(
 			UUID optionId,
 			String label
 	) {
