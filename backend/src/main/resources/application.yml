@@ -146,6 +146,8 @@ app:
       private-key-passphrase: ${OCI_PRIVATE_KEY_PASSPHRASE:}
       signed-url-ttl: ${OCI_SIGNED_URL_TTL:15m}
       key-prefix: ${OCI_KEY_PREFIX:benchmark-reports/}
+  # habilita los servicios simulados (local o produccion)
+  enable-mock-services: ${ENABLE_MOCK_SERVICES:true}
 
 springdoc:
   swagger-ui:
@@ -169,13 +171,12 @@ logging:
     # cargar. Es el canal de feedback de quien maqueta la plantilla del documento.
     com.openhtmltopdf: WARN
 
-# ---------------------------------------------------------
-# VARIABLES GLOBALES (Aplica a todos los perfiles)
-# ---------------------------------------------------------
-client:
+gemini:
   api:
-    mock:
-      enabled: true # cambiar a false cuando el cliente libere los servicios
+    key: ${GEMINI_API_KEY:dummy-key}
+  ai:
+    model: ${GEMINI_AI_MODEL:gemini-1.5-flash-002}
+    temperature: ${GEMINI_TEMPERATURE:0.3}
 
 ---
 # Perfil del worker: mismo artefacto, sin exponer la API publica

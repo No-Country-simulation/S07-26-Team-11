@@ -19,7 +19,7 @@ import java.lang.annotation.*;
  *     <li><b>Definición de Bean:</b> Está meta-anotada con {@link Service @Service}, lo que permite que el framework
  *     detecte e inyecte la clase automáticamente como un componente de servicio.</li>
  *     <li><b>Activación condicional:</b> Utiliza {@link ConditionalOnProperty @ConditionalOnProperty}
- *     evaluando la propiedad de configuración {@code client.api.mock.enabled}.</li>
+ *     evaluando la propiedad de configuración {@code app.enable-mock-services}.</li>
  *     <li><b>Condición estricta:</b> A diferencia de su contraparte, el Bean solo se inicializará si la propiedad
  *     mencionada tiene explícitamente el valor {@code false}. Si la propiedad no existe en la configuración
  *     o es {@code true}, esta implementación real será ignorada por completo.</li>
@@ -42,6 +42,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Service
-@ConditionalOnProperty(name = "client.api.mock.enabled", havingValue = "false")
+@ConditionalOnProperty(name = "app.enable-mock-services", havingValue = "false")
 public @interface RealIntegration {
 }

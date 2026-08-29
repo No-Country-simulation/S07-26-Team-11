@@ -23,7 +23,7 @@ import java.lang.annotation.*;
  *     Esto evita excepciones de ambigüedad en tiempo de ejecución y suprime falsos positivos en el analizador estático
  *     del IDE cuando coexisten múltiples implementaciones de una misma interfaz.</li>
  *     <li><b>Activación condicional:</b> Utiliza {@link ConditionalOnProperty @ConditionalOnProperty} vinculada
- *     a la propiedad {@code client.api.mock.enabled}.
+ *     a la propiedad {@code app.enable-mock-services}.
  *     El Bean solo se inicializará si esta propiedad tiene el valor {@code true}.</li>
  *     <li><b>Seguridad por defecto:</b> Al definir {@code matchIfMissing = true}, asegura que si la propiedad de
  *     configuración se omite accidentalmente en los archivos YAML o properties, el sistema utilizará los datos
@@ -47,6 +47,6 @@ import java.lang.annotation.*;
 @Documented
 @Service
 @Primary
-@ConditionalOnProperty(name = "client.api.mock.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.enable-mock-services", havingValue = "true", matchIfMissing = true)
 public @interface MockIntegration {
 }
