@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 @RestController
 @RequestMapping("/api/v1/public/benchmark")
 public class BenchmarkController {
@@ -30,7 +33,9 @@ public class BenchmarkController {
 			@AuthenticationPrincipal String leadEmail,
 			@RequestBody StartBenchmark.Request request) {
 		StartBenchmark.Response response = benchmarkService.startBenchmark(leadEmail, request);
-		return ResponseEntity.created(URI.create("location")).body(response);
+		String responseId = response.responseId().toString();
+		URI location = fromMethodCall(on(BenchmarkController.class).getResponse(leadEmail, responseId)).build().toUri();
+		return ResponseEntity.created(location).body(response);
 	}
 
 	@PatchMapping(value = "/responses/{responseId}", produces = MediaType.APPLICATION_JSON_VALUE)

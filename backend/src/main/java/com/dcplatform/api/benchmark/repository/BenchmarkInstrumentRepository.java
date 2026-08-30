@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface BenchmarkInstrumentRepository extends JpaRepository<BenchmarkInstrument, UUID> {
 
 	Optional<BenchmarkInstrument> findByIsActiveTrue();
+
+	Optional<BenchmarkInstrument> findByIdAndIsActiveTrue(UUID id);
 }

@@ -1,10 +1,8 @@
 package com.dcplatform.api.benchmark.service.mapper;
 
-import com.dcplatform.api.benchmark.model.BenchmarkDimension;
-import com.dcplatform.api.benchmark.model.BenchmarkInstrument;
-import com.dcplatform.api.benchmark.model.BenchmarkOption;
-import com.dcplatform.api.benchmark.model.BenchmarkQuestion;
+import com.dcplatform.api.benchmark.model.*;
 import com.dcplatform.api.benchmark.model.dto.ActiveBenchmarkResponse;
+import com.dcplatform.api.benchmark.model.dto.StartBenchmark;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +16,15 @@ public class BenchmarkMapperImpl implements BenchmarkMapper {
 				entity.getDimensions().stream()
 						.map(this::mapToStageDto)
 						.toList()
+		);
+	}
+
+	@Override
+	public StartBenchmark.Response toStartBenchmarkResponse(BenchmarkResponse entity) {
+		return new StartBenchmark.Response(
+				entity.getId(),
+				entity.getStartedAt(),
+				entity.getStatus().name()
 		);
 	}
 
