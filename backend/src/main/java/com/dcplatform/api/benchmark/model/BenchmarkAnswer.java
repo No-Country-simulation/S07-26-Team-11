@@ -6,7 +6,13 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "benchmark_answers")
+@Table(name = "benchmark_answers",
+		uniqueConstraints = @UniqueConstraint(
+				name = "benchmark_answers_uk",
+				columnNames = {"response_id", "question_id"}
+		),
+		indexes = @Index(name = "benchmark_answers_response_idx", columnList = "response_id")
+)
 public class BenchmarkAnswer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
