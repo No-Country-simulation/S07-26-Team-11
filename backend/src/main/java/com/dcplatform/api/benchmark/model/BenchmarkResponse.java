@@ -10,16 +10,29 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "benchmark_responses")
+@Table(name = "benchmark_responses",
+		uniqueConstraints = @UniqueConstraint(
+				name = "benchmark_responses_lead_instrument_uk",
+				columnNames = {"lead_id", "instrument_id"}
+		),
+		indexes = {
+				@Index(name = "benchmark_responses_lead_idx", columnList = "lead_id"),
+				@Index(name = "benchmark_responses_completed_idx", columnList = "completed_at DESC")
+		}
+)
 public class BenchmarkResponse {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	@Column(name = "lead_id")
+	// Bloqueo Optimista: previene que dos hilos completen la sesión al mismo tiempo
+	@Version
+	private Long version;
+
+	@Column(name = "lead_id", nullable = false)
 	private UUID leadId;
 
-	@Column(name = "instrument_id")
+	@Column(name = "instrument_id", nullable = false)
 	private UUID instrumentId;
 
 	@Enumerated(EnumType.STRING)
@@ -29,14 +42,23 @@ public class BenchmarkResponse {
 	@Column(name = "global_score")
 	private BigDecimal globalScore;
 
-	@Column(name = "started_at")
+	@Column(name = "maturity_level")
+	private Integer maturityLevel;
+
+	@Column(name = "percentile")
+	private BigDecimal percentile;
+
+	@Column(name = "cohort_size")
+	private Integer cohortSize;
+
+	@Column(name = "started_at", nullable = false, updatable = false)
 	private OffsetDateTime startedAt;
 
 	@Column(name = "completed_at")
 	private OffsetDateTime completedAt;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	@Column(name = "ai_report_result", columnDefinition = "jsonb", nullable = false)
+	@Column(name = "ai_report_result", columnDefinition = "jsonb")
 	private AiReportResult aiReportResult;
 
 	public BenchmarkResponse() {
@@ -132,5 +154,37 @@ public class BenchmarkResponse {
 
 	public void setAiReportResult(AiReportResult aiReportResult) {
 		this.aiReportResult = aiReportResult;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
+	public Integer getMaturityLevel() {
+		return maturityLevel;
+	}
+
+	public void setMaturityLevel(Integer maturityLevel) {
+		this.maturityLevel = maturityLevel;
+	}
+
+	public BigDecimal getPercentile() {
+		return percentile;
+	}
+
+	public void setPercentile(BigDecimal percentile) {
+		this.percentile = percentile;
+	}
+
+	public Integer getCohortSize() {
+		return cohortSize;
+	}
+
+	public void setCohortSize(Integer cohortSize) {
+		this.cohortSize = cohortSize;
 	}
 }
