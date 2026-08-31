@@ -7,7 +7,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "benchmark_questions",
-		uniqueConstraints = @UniqueConstraint(name = "benchmark_questions_order_uk", columnNames = {"dimension_id", "display_order"}),
+		uniqueConstraints = @UniqueConstraint(
+				name = "benchmark_questions_order_uk",
+				columnNames = {"dimension_id", "display_order"}
+		),
 		indexes = @Index(name = "benchmark_questions_dimension_idx", columnList = "dimension_id")
 )
 public class BenchmarkQuestion {

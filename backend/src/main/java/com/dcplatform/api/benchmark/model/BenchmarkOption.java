@@ -6,7 +6,14 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "benchmark_options")
+@Table(name = "benchmark_options",
+		uniqueConstraints =
+		@UniqueConstraint(
+				name = "benchmark_options_order_uk",
+				columnNames = {"question_id", "display_order"}
+		),
+		indexes = @Index(name = "benchmark_options_question_idx", columnList = "question_id")
+)
 public class BenchmarkOption {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
