@@ -9,7 +9,11 @@ import com.dcplatform.api.benchmark.service.mapper.BenchmarkMapper;
 import com.dcplatform.api.leads.model.LeadEntity;
 import com.dcplatform.api.leads.service.LeadService;
 import com.dcplatform.api.shared.ApiException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 public class BenchmarkServiceImpl implements BenchmarkService {
@@ -30,25 +34,46 @@ public class BenchmarkServiceImpl implements BenchmarkService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ActiveBenchmarkResponse getActiveInstrument() {
 		return instrumentRepository.findByIsActiveTrue()
 				.map(mapper::toActiveBenchmarkResponse)
-				.orElseThrow(() -> ApiException.notFound("No se encontró un instrumento de benchmark activo."));
+				.orElseThrow(() -> ApiException.notFound("No existe un instrumento de benchmark activo."));
 	}
 
 	@Override
+	@Transactional
 	public StartBenchmark.Response startBenchmark(String leadEmail, StartBenchmark.Request request) {
 		BenchmarkInstrument activeInstrument = instrumentRepository.findByIdAndIsActiveTrue(request.instrumentId())
-				.orElseThrow(() -> ApiException.notFound("Instrumento de benchmark no encontrado, inactivo o ambos."));
+				.orElseThrow(() -> ApiException.notFound("Instrumento de benchmark inexistente o inactivo."));
 
 		LeadEntity authenticatedLead = leadService.getLeadEntityByEmail(leadEmail);
 
+		Optional<BenchmarkResponse> existingResponse = responseRepository
+				.findByLeadIdAndInstrumentId(authenticatedLead.getId(), activeInstrument.getId());
+
+		// si ya existe una respuesta iniciada por el lead autenticado, retornarla
+		if (existingResponse.isPresent()) {
+			return mapper.toStartBenchmarkResponse(existingResponse.get());
+		}
+
+		// si no existe una respuesta iniciada por el lead autenticado, crear una nueva
 		BenchmarkResponse response = new BenchmarkResponse();
-		response.setLeadId(authenticatedLead.getId());
-		response.setInstrumentId(activeInstrument.getId());
+		response.setLead(authenticatedLead);
+		response.setInstrument(activeInstrument);
 		response.markAsInProgress();
 
-		response = responseRepository.save(response);
+		try {
+			response = responseRepository.saveAndFlush(response);
+		} catch (DataIntegrityViolationException e) {
+			// fallback: si hubo race condition y otro hilo insertó primero, la BD rechaza este insert
+			BenchmarkResponse winnerResponse = responseRepository
+					.findByLeadIdAndInstrumentId(authenticatedLead.getId(), activeInstrument.getId())
+					.orElseThrow(
+							() -> ApiException.conflict("Error resolviendo la concurrencia al iniciar benchmark.")
+					);
+			return mapper.toStartBenchmarkResponse(winnerResponse);
+		}
 
 		return mapper.toStartBenchmarkResponse(response);
 	}
