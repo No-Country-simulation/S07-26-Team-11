@@ -2,24 +2,33 @@ package com.dcplatform.api.benchmark.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "benchmark_dimensions")
+@Table(name = "benchmark_dimensions", uniqueConstraints = {
+		@UniqueConstraint(name = "benchmark_dimensions_uk", columnNames = {"instrument_id", "code"})
+})
 public class BenchmarkDimension {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "instrument_id")
+	@JoinColumn(name = "instrument_id", nullable = false)
 	private BenchmarkInstrument instrument;
 
+	@Column(nullable = false, length = 60)
 	private String code;
+
+	@Column(nullable = false, length = 200)
 	private String label;
 
-	@Column(name = "display_order")
+	@Column(nullable = false, precision = 5, scale = 4)
+	private BigDecimal weight;
+
+	@Column(name = "display_order", nullable = false)
 	private Integer displayOrder;
 
 	@OneToMany(mappedBy = "dimension", fetch = FetchType.EAGER)
@@ -75,5 +84,13 @@ public class BenchmarkDimension {
 
 	public void setQuestions(List<BenchmarkQuestion> questions) {
 		this.questions = questions;
+	}
+
+	public BigDecimal getWeight() {
+		return weight;
+	}
+
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
 	}
 }
