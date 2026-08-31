@@ -1,12 +1,15 @@
 package com.dcplatform.api.benchmark.model;
 
 import com.dcplatform.api.benchmark.agent.dto.AiReportResult;
+import com.dcplatform.api.leads.model.LeadEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,15 +28,22 @@ public class BenchmarkResponse {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	// Bloqueo Optimista: previene que dos hilos completen la sesión al mismo tiempo
 	@Version
 	private Long version;
 
-	@Column(name = "lead_id", nullable = false)
-	private UUID leadId;
+	// Relación N:1 con Lead
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "lead_id", nullable = false, updatable = false)
+	private LeadEntity lead;
 
-	@Column(name = "instrument_id", nullable = false)
-	private UUID instrumentId;
+	// Relación N:1 con Instrument
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "instrument_id", nullable = false, updatable = false)
+	private BenchmarkInstrument instrument;
+
+	// Relación 1:N con Answers
+	@OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<BenchmarkAnswer> answers = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
@@ -72,10 +82,13 @@ public class BenchmarkResponse {
 	}
 
 	public enum BenchmarkStatus {
-		// respetando el constraint: 'IN_PROGRESS', 'COMPLETED', 'ABANDONED'
-		IN_PROGRESS,
-		COMPLETED,
-		ABANDONED
+		IN_PROGRESS, COMPLETED, ABANDONED
+	}
+
+	// Helper method para sincronizar la relación bidireccional
+	public void addAnswer(BenchmarkAnswer answer) {
+		answers.add(answer);
+		answer.setResponse(this);
 	}
 
 	public void markAsInProgress() {
@@ -100,20 +113,36 @@ public class BenchmarkResponse {
 		this.id = id;
 	}
 
-	public UUID getLeadId() {
-		return leadId;
+	public Long getVersion() {
+		return version;
 	}
 
-	public void setLeadId(UUID leadId) {
-		this.leadId = leadId;
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
-	public UUID getInstrumentId() {
-		return instrumentId;
+	public LeadEntity getLead() {
+		return lead;
 	}
 
-	public void setInstrumentId(UUID instrumentId) {
-		this.instrumentId = instrumentId;
+	public void setLead(LeadEntity lead) {
+		this.lead = lead;
+	}
+
+	public BenchmarkInstrument getInstrument() {
+		return instrument;
+	}
+
+	public void setInstrument(BenchmarkInstrument instrument) {
+		this.instrument = instrument;
+	}
+
+	public List<BenchmarkAnswer> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(List<BenchmarkAnswer> answers) {
+		this.answers = answers;
 	}
 
 	public BenchmarkStatus getStatus() {
@@ -130,38 +159,6 @@ public class BenchmarkResponse {
 
 	public void setGlobalScore(BigDecimal globalScore) {
 		this.globalScore = globalScore;
-	}
-
-	public OffsetDateTime getStartedAt() {
-		return startedAt;
-	}
-
-	public void setStartedAt(OffsetDateTime startedAt) {
-		this.startedAt = startedAt;
-	}
-
-	public OffsetDateTime getCompletedAt() {
-		return completedAt;
-	}
-
-	public void setCompletedAt(OffsetDateTime completedAt) {
-		this.completedAt = completedAt;
-	}
-
-	public AiReportResult getAiReportResult() {
-		return aiReportResult;
-	}
-
-	public void setAiReportResult(AiReportResult aiReportResult) {
-		this.aiReportResult = aiReportResult;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
 	}
 
 	public Integer getMaturityLevel() {
@@ -186,5 +183,29 @@ public class BenchmarkResponse {
 
 	public void setCohortSize(Integer cohortSize) {
 		this.cohortSize = cohortSize;
+	}
+
+	public OffsetDateTime getStartedAt() {
+		return startedAt;
+	}
+
+	public void setStartedAt(OffsetDateTime startedAt) {
+		this.startedAt = startedAt;
+	}
+
+	public OffsetDateTime getCompletedAt() {
+		return completedAt;
+	}
+
+	public void setCompletedAt(OffsetDateTime completedAt) {
+		this.completedAt = completedAt;
+	}
+
+	public AiReportResult getAiReportResult() {
+		return aiReportResult;
+	}
+
+	public void setAiReportResult(AiReportResult aiReportResult) {
+		this.aiReportResult = aiReportResult;
 	}
 }

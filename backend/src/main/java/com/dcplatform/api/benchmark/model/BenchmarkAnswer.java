@@ -18,19 +18,31 @@ public class BenchmarkAnswer {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	@Column(name = "response_id")
-	private UUID responseId;
+	// Relación N:1 con Response
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "response_id", nullable = false, updatable = false)
+	private BenchmarkResponse response;
 
-	@Column(name = "question_id")
-	private UUID questionId;
+	// Relación N:1 con Question
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "question_id", nullable = false, updatable = false)
+	private BenchmarkQuestion question;
 
-	@Column(name = "option_id")
-	private UUID optionId;
+	// Relación N:1 con Option
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "option_id", nullable = false)
+	private BenchmarkOption option;
 
-	@Column(name = "answered_at")
+	@Column(name = "answered_at", nullable = false)
 	private OffsetDateTime answeredAt;
 
 	public BenchmarkAnswer() {
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void preSave() {
+		this.answeredAt = OffsetDateTime.now();
 	}
 
 	public UUID getId() {
@@ -41,28 +53,28 @@ public class BenchmarkAnswer {
 		this.id = id;
 	}
 
-	public UUID getResponseId() {
-		return responseId;
+	public BenchmarkResponse getResponse() {
+		return response;
 	}
 
-	public void setResponseId(UUID responseId) {
-		this.responseId = responseId;
+	public void setResponse(BenchmarkResponse response) {
+		this.response = response;
 	}
 
-	public UUID getQuestionId() {
-		return questionId;
+	public BenchmarkQuestion getQuestion() {
+		return question;
 	}
 
-	public void setQuestionId(UUID questionId) {
-		this.questionId = questionId;
+	public void setQuestion(BenchmarkQuestion question) {
+		this.question = question;
 	}
 
-	public UUID getOptionId() {
-		return optionId;
+	public BenchmarkOption getOption() {
+		return option;
 	}
 
-	public void setOptionId(UUID optionId) {
-		this.optionId = optionId;
+	public void setOption(BenchmarkOption option) {
+		this.option = option;
 	}
 
 	public OffsetDateTime getAnsweredAt() {
