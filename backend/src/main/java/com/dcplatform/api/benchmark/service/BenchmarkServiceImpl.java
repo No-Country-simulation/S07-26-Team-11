@@ -85,6 +85,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
 	}
 
 	@Override
+	@Transactional
 	public BenchmarkProgressResponse saveProgress(String leadEmail, String responseId, SubmitBenchmarkRequest request) {
 		LeadEntity authenticatedLead = leadService.getLeadEntityByEmail(leadEmail);
 		UUID parsedResponseId = UUIDValidator.safeParse(responseId);
