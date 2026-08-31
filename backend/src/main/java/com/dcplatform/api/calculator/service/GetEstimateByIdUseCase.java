@@ -2,7 +2,7 @@ package com.dcplatform.api.calculator.service;
 
 import com.dcplatform.api.calculator.model.CalculatorEstimateEntity;
 import com.dcplatform.api.calculator.model.dto.CalculatorEstimateResponse;
-import com.dcplatform.api.shared.UuidValidator;
+import com.dcplatform.api.shared.UUIDValidator;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class GetEstimateByIdUseCase {
 	public CalculatorEstimateResponse execute(String leadEmail, String id) {
 		logger.info("Getting estimate for lead {} with id {}", leadEmail, id);
 
-		CalculatorEstimateEntity entity = persistenceService.findById(UuidValidator.safeParse(id));
+		CalculatorEstimateEntity entity = persistenceService.findById(UUIDValidator.safeParse(id));
 
 		return new CalculatorEstimateResponse(
 				entity.getId().toString(),
