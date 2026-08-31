@@ -65,6 +65,10 @@ CREATE TABLE benchmark_instruments (
     created_at   timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE UNIQUE INDEX benchmark_instruments_active_uk
+    ON benchmark_instruments (is_active)
+    WHERE is_active = true;
+
 CREATE TABLE benchmark_dimensions (
     id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     instrument_id uuid NOT NULL REFERENCES benchmark_instruments (id),
@@ -80,7 +84,8 @@ CREATE TABLE benchmark_questions (
     dimension_id  uuid NOT NULL REFERENCES benchmark_dimensions (id),
     text          text    NOT NULL,
     help_text     text,
-    display_order integer NOT NULL
+    display_order integer NOT NULL,
+    CONSTRAINT benchmark_questions_order_uk UNIQUE (dimension_id, display_order)
 );
 
 CREATE INDEX benchmark_questions_dimension_idx ON benchmark_questions (dimension_id);
@@ -91,7 +96,8 @@ CREATE TABLE benchmark_options (
     question_id   uuid NOT NULL REFERENCES benchmark_questions (id),
     label         varchar(300) NOT NULL,
     score         numeric(5,2) NOT NULL,
-    display_order integer      NOT NULL
+    display_order integer      NOT NULL,
+    CONSTRAINT benchmark_options_order_uk UNIQUE (question_id, display_order)
 );
 
 CREATE INDEX benchmark_options_question_idx ON benchmark_options (question_id);
@@ -108,7 +114,8 @@ CREATE TABLE benchmark_responses (
     started_at     timestamptz  NOT NULL DEFAULT now(),
     completed_at   timestamptz,
     CONSTRAINT benchmark_responses_status_check
-        CHECK (status IN ('IN_PROGRESS', 'COMPLETED', 'ABANDONED'))
+        CHECK (status IN ('IN_PROGRESS', 'COMPLETED', 'ABANDONED')),
+    CONSTRAINT benchmark_responses_lead_instrument_uk UNIQUE (lead_id, instrument_id)
 );
 
 CREATE INDEX benchmark_responses_lead_idx ON benchmark_responses (lead_id);
@@ -153,7 +160,8 @@ CREATE TABLE pdf_documents (
     size_bytes       bigint,
     page_count       integer,
     generated_at     timestamptz  NOT NULL DEFAULT now(),
-    download_count   integer      NOT NULL DEFAULT 0
+    download_count   integer      NOT NULL DEFAULT 0,
+    CONSTRAINT pdf_documents_response_uk UNIQUE (response_id)
 );
 
 CREATE UNIQUE INDEX pdf_documents_storage_key_uk ON pdf_documents (storage_key);
@@ -163,7 +171,7 @@ CREATE INDEX pdf_documents_response_idx ON pdf_documents (response_id);
 
 CREATE TABLE outreach_campaigns (
     id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    name          varchar(200) NOT NULL,
+    name          varchar(200) NOT NULL UNIQUE,
     subject       varchar(300),
     template_code varchar(60),
     status        varchar(20)  NOT NULL DEFAULT 'DRAFT',
