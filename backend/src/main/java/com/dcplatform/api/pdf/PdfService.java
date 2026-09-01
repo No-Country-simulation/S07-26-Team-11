@@ -96,6 +96,17 @@ public class PdfService {
     }
 
     /**
+     * Encola un nuevo trabajo de PDF.
+     * El PdfJob resultante es creado con estado PENDING, con el ID de la respuesta al benchmark.
+     */
+    @Transactional
+    public UUID enqueuePdfGeneration(UUID responseId) {
+        PdfJob job = new PdfJob(responseId);
+        job = pdfJobRepository.saveAndFlush(job);
+        return job.getId();
+    }
+
+    /**
      * HTML de la plantilla -> PDF. Lo usa el worker dentro de su propia
      * transaccion; no se expone por HTTP porque renderizar toma segundos.
      */
