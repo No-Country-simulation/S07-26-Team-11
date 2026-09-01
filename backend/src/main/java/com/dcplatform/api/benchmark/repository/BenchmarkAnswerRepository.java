@@ -7,12 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface BenchmarkAnswerRepository extends JpaRepository<BenchmarkAnswer, UUID> {
-	List<BenchmarkAnswer> findByResponseId(UUID responseId);
 
 	// UPSERT Nativo: Si no existe, inserta. Si ya existe la combinación (response_id, question_id), actualiza la opción
 	@Modifying
