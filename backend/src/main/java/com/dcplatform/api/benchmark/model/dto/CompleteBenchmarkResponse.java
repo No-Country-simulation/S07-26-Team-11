@@ -13,10 +13,10 @@ public record CompleteBenchmarkResponse(
 		String maturityLabel,
 		BigDecimal percentile,
 		Integer cohortSize,
-		List<DimensionScoreDto> dimensions,
+		List<DimensionScore> dimensions,
 		UUID pdfJobId
 ) {
-	public record DimensionScoreDto(
+	public record DimensionScore(
 			String code,
 			String label,
 			BigDecimal score,
