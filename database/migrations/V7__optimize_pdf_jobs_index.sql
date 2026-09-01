@@ -1,0 +1,1 @@
+CREATE INDEX pdf_jobs_response_id_idx ON pdf_jobs (response_id);
