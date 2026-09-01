@@ -1,5 +1,6 @@
 package com.dcplatform.api.pdf;
 
+import com.dcplatform.api.pdf.provider.PdfTemplateDataProvider;
 import com.dcplatform.api.pdf.storage.PdfStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,17 +21,20 @@ public class PdfWorker {
     private final PdfService pdfService;
     private final PdfStorage pdfStorage;
     private final PdfProperties pdfProperties;
+	private final PdfTemplateDataProvider dataProvider;
 
     public PdfWorker(PdfJobRepository pdfJobRepository,
                      PdfDocumentRepository pdfDocumentRepository,
                      PdfService pdfService,
                      PdfStorage pdfStorage,
-                     PdfProperties pdfProperties) {
+                     PdfProperties pdfProperties,
+                     PdfTemplateDataProvider dataProvider) {
         this.pdfJobRepository = pdfJobRepository;
         this.pdfDocumentRepository = pdfDocumentRepository;
         this.pdfService = pdfService;
         this.pdfStorage = pdfStorage;
         this.pdfProperties = pdfProperties;
+	    this.dataProvider = dataProvider;
     }
 
     @Scheduled(fixedDelayString = "3000")
@@ -53,10 +56,10 @@ public class PdfWorker {
             job.markProcessing();
             pdfJobRepository.save(job);
 
-            Map<String, Object> templateVariables = new HashMap<>();
-            templateVariables.put("responseId", job.getResponseId());
+			// Mapear las variables para la plantilla institucional
+			Map<String, Object> templateVariables = dataProvider.provideData(job.getResponseId());
 
-            byte[] pdfBytes = pdfService.renderReport("report-template", templateVariables);
+            byte[] pdfBytes = pdfService.renderReport("pdf/institutional-document", templateVariables);
 
             String storageKey = "reports/" + job.getResponseId() + "/informe-benchmark.pdf";
 
