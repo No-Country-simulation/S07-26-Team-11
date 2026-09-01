@@ -14,16 +14,18 @@ public interface PdfJobRepository extends JpaRepository<PdfJob, UUID> {
      * Toma el siguiente trabajo pendiente saltando los que ya bloqueo otro worker.
      * SKIP LOCKED es lo que permite correr varios workers sin cola externa
      * (ver PdfGeneratorArchitecture.md).
-     *
-     * El bloqueo solo vive dentro de una transaccion: quien llame a este metodo
+     * <p>
+     * El bloqueo solo vive dentro de una transacción: quien llame a este método
      * tiene que ser @Transactional, o la fila queda liberada de inmediato.
      */
     @Query(value = """
-            SELECT * FROM pdf_jobs
-            WHERE status = 'PENDING'
-            ORDER BY created_at
+            SELECT p.* FROM pdf_jobs p
+            INNER JOIN benchmark_responses r ON p.response_id = r.id
+            WHERE p.status = 'PENDING'
+              AND r.status = 'COMPLETED'
+            ORDER BY p.created_at ASC
             LIMIT 1
-            FOR UPDATE SKIP LOCKED
+            FOR UPDATE OF p SKIP LOCKED
             """, nativeQuery = true)
     Optional<PdfJob> findNextPendingJobForProcessing();
 
