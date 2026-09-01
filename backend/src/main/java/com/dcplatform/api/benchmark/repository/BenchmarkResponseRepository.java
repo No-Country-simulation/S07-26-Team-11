@@ -13,9 +13,9 @@ import java.util.UUID;
 @Repository
 public interface BenchmarkResponseRepository extends JpaRepository<BenchmarkResponse, UUID> {
 
-	Optional<BenchmarkResponse> findByLeadAndInstrumentAndStatusWithinIgnoreCase(LeadEntity lead,
-	                                                                             BenchmarkInstrument instrument,
-	                                                                             BenchmarkStatus status);
+	Optional<BenchmarkResponse> findByLeadAndInstrumentAndStatus(LeadEntity lead,
+	                                                             BenchmarkInstrument instrument,
+	                                                             BenchmarkStatus status);
 
-	Optional<BenchmarkResponse> findByIdAndLead(UUID responseId, LeadEntity lead);
+	Optional<BenchmarkResponse> findByIdAndLeadAndStatus(UUID id, LeadEntity lead, BenchmarkStatus status);
 }
