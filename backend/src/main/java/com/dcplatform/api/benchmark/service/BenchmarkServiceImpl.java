@@ -1,9 +1,6 @@
 package com.dcplatform.api.benchmark.service;
 
-import com.dcplatform.api.benchmark.model.BenchmarkAnswer;
-import com.dcplatform.api.benchmark.model.BenchmarkDimension;
-import com.dcplatform.api.benchmark.model.BenchmarkInstrument;
-import com.dcplatform.api.benchmark.model.BenchmarkResponse;
+import com.dcplatform.api.benchmark.model.*;
 import com.dcplatform.api.benchmark.model.dto.*;
 import com.dcplatform.api.benchmark.repository.BenchmarkAnswerRepository;
 import com.dcplatform.api.benchmark.repository.BenchmarkInstrumentRepository;
@@ -118,7 +115,27 @@ public class BenchmarkServiceImpl implements BenchmarkService {
 						"No existe una respuesta de benchmark con el ID " + responseId + " para el lead autenticado."
 				));
 
+		// Llave: questionId | Valor: Set de optionIds válidos para esa pregunta
+		Map<UUID, Set<UUID>> validQuestionsAndOptions = existingResponse.getInstrument().getDimensions().stream()
+				.flatMap(dimension -> dimension.getQuestions().stream())
+				.collect(Collectors.toMap(
+						BenchmarkQuestion::getId,
+						question -> question.getOptions().stream()
+								.map(BenchmarkOption::getId)
+								.collect(Collectors.toSet())
+				));
+
 		for (SubmitBenchmarkRequest.QuestionAnswerDto answer : request.answers()) {
+			Set<UUID> validOptions = validQuestionsAndOptions.get(answer.questionId());
+
+			// si la pregunta no existe o la opción no pertenece a la pregunta, se rechaza
+			if (validOptions == null || !validOptions.contains(answer.optionId())) {
+				throw ApiException.badRequest(
+						"La pregunta u opción provista no es válida para este instrumento. Verifique los datos enviados."
+				);
+			}
+
+			// en este punto, la ejecución del UPSET es completamente seguro
 			answerRepository.upsertAnswer(
 					parsedResponseId,
 					answer.questionId(),
@@ -126,10 +143,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
 			);
 		}
 
-		int totalQuestions = existingResponse.getInstrument().getDimensions().stream()
-				.mapToInt(dimension -> dimension.getQuestions().size())
-				.sum();
-
+		int totalQuestions = validQuestionsAndOptions.size();
 		int answeredCount = answerRepository.countByResponse(existingResponse);
 
 		return new BenchmarkProgressResponse(parsedResponseId, answeredCount, totalQuestions);
